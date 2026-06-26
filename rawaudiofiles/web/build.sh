@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-EXPORTED_FUNCTIONS='["_engine_init","_engine_process","_engine_set_step","_engine_set_base","_engine_set_lane","_engine_set_bpm","_engine_set_reverb","_engine_play","_engine_stop","_engine_get_step","_malloc","_free"]'
+EXPORTED_FUNCTIONS='["_engine_init","_engine_process","_engine_set_step","_engine_set_base","_engine_set_lane","_engine_set_bpm","_engine_set_reverb","_engine_play","_engine_stop","_engine_get_step","_engine_set_macro","_malloc","_free"]'
 
 ${EMCC:-emcc} kick_engine.cpp \
     -I. \

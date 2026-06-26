@@ -188,8 +188,9 @@ input[type=range]::-webkit-slider-thumb {
 <div id="rev-row">
     <div class="row-label">VERB</div>
     <div class="ctrls">
-        <div class="ctrl"><div class="ctrl-label">DECAY</div><input type="range" id="rv-decay" min="0" max="100" value="70"></div>
+        <div class="ctrl"><div class="ctrl-label">DECAY</div><input type="range" id="rv-decay" min="0" max="100" value="80"></div>
         <div class="ctrl"><div class="ctrl-label">RETURN</div><input type="range" id="rv-ret"   min="0" max="100" value="0"></div>
+        <div class="ctrl"><div class="ctrl-label">SPACE</div><input type="range" id="macro"     min="0" max="100" value="0" style="accent-color:#9966ff"></div>
     </div>
 </div>
 
@@ -234,17 +235,29 @@ const CLR = [
 
 let currentStep = -1;
 let bpm = 120;
-let rvDecay = 0.73, rvLP = 0.245, rvPD = 0.0, rvRet = 0.0;
+// Easter ReverbSettings defaults: tail=0.8, lowPass=0.7, highPass=0.25, preDelay=0.5, diffusion=0.9
+// HP and diffusion are hardcoded in C++; LP and decay go through the same tables Easter uses.
+function reverbTail(n)  { return 0.9 + Math.pow(n, 6) * (0.9999 - 0.9); }
+function filterNorm(n)  { return 20 * Math.pow(1200, n) / 48000; }
+
+const rvLP = filterNorm(0.7); // ≈ 0.059 (~2.8kHz)
+const rvPD = 0.5;             // 50ms pre-delay
+let   rvRet = 0.0;
 
 const steps = [
     // Kick: 1, 9 (steps 0 and 8)
     new Array(16).fill(false).map((_, i) => i === 0 || i === 8),
-    // Hat: 8th notes
-    new Array(16).fill(false).map((_, i) => i % 2 === 0),
+    // Hat: 16th notes
+    new Array(16).fill(true),
     // Snare: 5, 13 (steps 4 and 12)
     new Array(16).fill(false).map((_, i) => i === 4 || i === 12),
 ];
-const stepVel = Array.from({ length: NV }, () => new Array(NS).fill(0.75));
+const HAT_VEL = [0.25, 0.5, 1.0, 0.5]; // repeats each quarter note
+const stepVel = [
+    new Array(NS).fill(0.75),
+    Array.from({ length: NS }, (_, i) => HAT_VEL[i % 4]),
+    new Array(NS).fill(0.75),
+];
 const hatLane = new Uint8Array(LS).fill(128);
 
 // ── Audio ─────────────────────────────────────────────────────────────────────
@@ -326,7 +339,8 @@ function sendLane() {
     send({ type: 'set_lane', v: 1, buf: hatLane.buffer.slice(0) });
 }
 function sendReverb() {
-    send({ type: 'set_reverb', decay: rvDecay, lowPass: rvLP, preDelay: rvPD, ret: rvRet });
+    const tail = document.getElementById('rv-decay').value / 100;
+    send({ type: 'set_reverb', decay: reverbTail(tail), lowPass: rvLP, preDelay: rvPD, ret: rvRet });
 }
 
 // ── Sequencer drawing ─────────────────────────────────────────────────────────
@@ -487,13 +501,19 @@ document.getElementById('snare-tail').addEventListener('input', sendSnareParams)
 document.getElementById('snare-sub') .addEventListener('input', sendSnareParams);
 
 document.getElementById('rv-decay').addEventListener('input', function() {
-    rvDecay = 0.1 + this.value / 100 * 0.9;
     sendReverb();
 });
 document.getElementById('rv-ret').addEventListener('input', function() {
     rvRet = this.value / 100;
     sendReverb();
 });
+
+// Macro: HP sweep + reverb send. Springs back to 0 on pointer release (matches Easter MacroSlider).
+const macroEl = document.getElementById('macro');
+function sendMacro() { send({ type: 'set_macro', value: macroEl.value / 100 }); }
+macroEl.addEventListener('input', sendMacro);
+macroEl.addEventListener('pointerup',   () => { macroEl.value = 0; sendMacro(); });
+macroEl.addEventListener('pointerleave',() => { if (macroEl.value > 0) { macroEl.value = 0; sendMacro(); } });
 
 // ── Transport ─────────────────────────────────────────────────────────────────
 

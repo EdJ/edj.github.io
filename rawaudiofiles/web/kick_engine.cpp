@@ -141,6 +141,9 @@ public:
     void setReverb(float decay, float lowPass, float preDelay, float ret) {
         reverb.setDecay(decay);
         reverb.setLowPass(lowPass);
+        // HP and diffusion fixed from Easter defaults: highPass=filterNorm(0.25), diffusion=0.9
+        reverb.setHighPass(20.f * std::pow(1200.f, 0.25f) / static_cast<float>(sampleRate));
+        reverb.setDiffusion(0.9f);
         reverb.setPreDelay(preDelay);
         reverbReturn = ret;
     }
@@ -154,6 +157,12 @@ public:
     }
     void stop()  { isPlaying = false; }
     int  getCurrentStep() const { return currentStep; }
+    void setMacro(float value) {
+        macroValue = value;
+        float n = 0.05f + value * 0.85f; // 0→~30Hz (bypass), 1→~12kHz (extreme sweep)
+        float f = (20.f * std::pow(1200.f, n)) / static_cast<float>(sampleRate);
+        macroHp.set_f_q(f, 3.0f); // q=3 matches Easter highPassQuad
+    }
 
 private:
     int      sampleRate;
@@ -165,6 +174,8 @@ private:
     int      samplesToProcess = FRAME_SIZE;
     float    stepDurSamples   = 0.f;
     float    reverbReturn     = 0.0f;
+    float    macroValue       = 0.0f;
+    FastSvf  macroHp;
 
     VoiceState  v0, v1, v2;
     VoiceState* voices[NUM_VOICES];
@@ -194,10 +205,11 @@ private:
         auto& kick = voices[v]->kick;
         auto& vv   = *voices[v];
         int noiseDecayMs = static_cast<int>(vv.base[NoiseDecay] * 798.f + 2.f);
-        // Hat lane controls open/closed feel via decay length
+        // Hat: lane = open/closed, vel also scales decay (louder hit → longer tail)
         if (v == 1) {
-            float laneMod = laneValue(1) * 2.0f; // lane 0.5→1.0x, 0→0x, 1→2.0x
-            noiseDecayMs = std::max(2, static_cast<int>(noiseDecayMs * laneMod));
+            float laneMod    = laneValue(1) * 2.0f;       // lane 0.5→1.0x, 0→0x, 1→2.0x
+            float velDecayMod = 0.3f + vel * 0.7f;        // vel 0.25→0.475x, vel 1.0→1.0x
+            noiseDecayMs = std::max(2, static_cast<int>(noiseDecayMs * laneMod * velDecayMod));
         }
         kick.update(
             static_cast<int>(vv.base[SubDecay]       * 790.f + 10.f),
@@ -255,11 +267,31 @@ private:
             }
         }
 
-        if (reverbReturn > 0.f) {
+        // Macro: HP sweep + dry→wet crossfade (fully wet + extreme HP at macro=1)
+        if (macroValue > 0.001f) {
+            macroHp.process_high(voiceBufL, FRAME_SIZE);
+            macroHp.process_high(voiceBufR, FRAME_SIZE);
+            // Full reverb send at macro=1
+            for (int i = 0; i < FRAME_SIZE; ++i) {
+                reverbBufL[i] += voiceBufL[i] * macroValue;
+                reverbBufR[i] += voiceBufR[i] * macroValue;
+            }
+            // Fade dry signal to silence as macro reaches 1
+            float dryGain = 1.0f - macroValue;
+            for (int i = 0; i < FRAME_SIZE; ++i) {
+                voiceBufL[i] *= dryGain;
+                voiceBufR[i] *= dryGain;
+            }
+        }
+
+        float effectiveRvRet = (macroValue > 0.001f)
+            ? std::max(reverbReturn, macroValue)
+            : reverbReturn;
+        if (effectiveRvRet > 0.f) {
             reverb.process(reverbBufL, reverbBufR, FRAME_SIZE);
             for (int i = 0; i < FRAME_SIZE; ++i) {
-                voiceBufL[i] += reverbBufL[i] * reverbReturn;
-                voiceBufR[i] += reverbBufR[i] * reverbReturn;
+                voiceBufL[i] += reverbBufL[i] * effectiveRvRet;
+                voiceBufR[i] += reverbBufR[i] * effectiveRvRet;
             }
         }
 
@@ -306,5 +338,6 @@ void engine_set_reverb(float decay, float lowPass, float preDelay, float ret) {
 void engine_play() { if (g_engine) g_engine->play(); }
 void engine_stop() { if (g_engine) g_engine->stop(); }
 int  engine_get_step() { return g_engine ? g_engine->getCurrentStep() : -1; }
+void engine_set_macro(float value) { if (g_engine) g_engine->setMacro(value); }
 
 } // extern "C"

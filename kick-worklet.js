@@ -44,6 +44,7 @@ function dispatch(m, d) {
         }
         case 'set_bpm':    m._engine_set_bpm(d.bpm); break;
         case 'set_reverb': m._engine_set_reverb(d.decay, d.lowPass, d.preDelay, d.ret); break;
+        case 'set_macro':  m._engine_set_macro(d.value); break;
         case 'play':       m._engine_play(); break;
         case 'stop':       m._engine_stop(); break;
     }

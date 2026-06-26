@@ -18,7 +18,7 @@ public:
         return out;
     }
     inline float tap(size_t d) const { return buffer[(pos + activeSize - d) % activeSize]; }
-    void setActiveSize(size_t s) { activeSize = s; pos = pos % activeSize; }
+    void setActiveSize(size_t s) { activeSize = std::max(size_t(1), s); pos = pos % activeSize; }
     void clear() { memset(buffer.get(), 0, bufferSize * sizeof(float)); pos = 0; }
 private:
     const size_t bufferSize;
