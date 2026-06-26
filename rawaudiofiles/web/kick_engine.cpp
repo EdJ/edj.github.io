@@ -6,54 +6,37 @@
 #include "dsp/vdsp.hpp"
 #include "dsp/lib/tables.hpp"
 #include "dsp/kick_web.hpp"
-#include "dsp/lfo.hpp"
 #include "dsp/reverb.hpp"
+#include "dsp/overdrive.hpp"
 
-static constexpr int FRAME_SIZE = 24;
-static constexpr int NUM_VOICES = 3;
-static constexpr int NUM_STEPS  = 16;
-static constexpr int LANE_SIZE  = 128;
+static constexpr int FRAME_SIZE  = 24;
+static constexpr int NUM_VOICES  = 3;
+static constexpr int NUM_STEPS   = 16;
+static constexpr int LANE_SIZE   = 128;
 
-// Matches the mod destination indices exposed to JS
+// Param indices — must match JS P.* constants
 enum KickParam {
     SubGain = 0, SubDecay,
     TransientGain, TransientDecay,
     NoiseGain, NoiseDecay,
     NoiseLowPass, NoiseHighPass,
+    NoiseResonance,   // was hardcoded 0.5; now exposed
+    OverdriveAmt,     // QuickOverdrive drive amount
     ReverbSend,
     NUM_PARAMS
 };
 
-enum ModSrc { Velocity = 0, LfoSrc, LaneSrc, NUM_MOD_SOURCES };
-
 struct VoiceState {
-    Kick    kick;
-    Lfo     lfo;
-    float   base[NUM_PARAMS]                    = {};
-    float   modAmt[NUM_PARAMS][NUM_MOD_SOURCES] = {};
-    uint8_t lane[LANE_SIZE]                     = {};
-    bool    steps[NUM_STEPS]                    = {};
-    float   stepVel[NUM_STEPS]                  = {};
-    float   tempL[FRAME_SIZE]                   = {};
-    float   tempR[FRAME_SIZE]                   = {};
+    Kick           kick;
+    QuickOverdrive overdrive{0.0f};
+    float          base[NUM_PARAMS]   = {};
+    uint8_t        lane[LANE_SIZE]    = {};
+    bool           steps[NUM_STEPS]  = {};
+    float          stepVel[NUM_STEPS]= {};
+    float          tempL[FRAME_SIZE] = {};
+    float          tempR[FRAME_SIZE] = {};
 
     explicit VoiceState(int sr) : kick(sr) {
-        lfo.setSampleRate(static_cast<float>(sr));
-        lfo.frameSize_            = FRAME_SIZE;
-        lfo.settings_.type        = LfoType::Sin;
-        lfo.settings_.rateBeats   = 8;
-        lfo.settings_.depth       = 1.0f;
-
-        base[SubGain]        = 1.0f;
-        base[SubDecay]       = 0.4f;
-        base[TransientGain]  = 0.5f;
-        base[TransientDecay] = 0.1f;
-        base[NoiseGain]      = 0.5f;
-        base[NoiseDecay]     = 0.2f;
-        base[NoiseLowPass]   = 1.0f;
-        base[NoiseHighPass]  = 0.0125f;
-        base[ReverbSend]     = 0.0f;
-
         for (int s = 0; s < NUM_STEPS; ++s) stepVel[s] = 0.75f;
         for (int i = 0; i < LANE_SIZE;  ++i) lane[i]   = 128;
     }
@@ -69,10 +52,50 @@ public:
         voices[1] = &v1;
         voices[2] = &v2;
 
-        // Default patterns: 4-on-the-floor, offbeat, half-time accent
-        for (int s : {0,4,8,12}) voices[0]->steps[s] = true;
-        for (int s : {2,6,10,14}) voices[1]->steps[s] = true;
-        voices[2]->steps[0] = voices[2]->steps[8] = true;
+        // ── Kick (C2 = 65 Hz): transient + sub + short noise blast ───────────
+        voices[0]->kick.updateNote(36);
+        voices[0]->base[SubGain]        = 1.0f;
+        voices[0]->base[SubDecay]       = 0.35f;
+        voices[0]->base[TransientGain]  = 0.85f;
+        voices[0]->base[TransientDecay] = 0.07f;
+        voices[0]->base[NoiseGain]      = 0.25f;
+        voices[0]->base[NoiseDecay]     = 0.06f;
+        voices[0]->base[NoiseLowPass]   = 0.50f;
+        voices[0]->base[NoiseHighPass]  = 0.20f;
+        voices[0]->base[NoiseResonance] = 0.30f;
+        voices[0]->base[OverdriveAmt]   = 0.0f;
+        voices[0]->base[ReverbSend]     = 0.0f;
+        for (int s : {0, 8}) voices[0]->steps[s] = true;
+
+        // ── Hat: noise-only, high bandpass, lane drives per-step accent ───────
+        voices[1]->kick.updateNote(60); // note unused (SubGain = 0)
+        voices[1]->base[SubGain]        = 0.0f;
+        voices[1]->base[SubDecay]       = 0.2f;
+        voices[1]->base[TransientGain]  = 0.0f;
+        voices[1]->base[TransientDecay] = 0.05f;
+        voices[1]->base[NoiseGain]      = 0.9f;
+        voices[1]->base[NoiseDecay]     = 0.08f;
+        voices[1]->base[NoiseLowPass]   = 0.88f;
+        voices[1]->base[NoiseHighPass]  = 0.65f;
+        voices[1]->base[NoiseResonance] = 0.65f;
+        voices[1]->base[OverdriveAmt]   = 0.0f;
+        voices[1]->base[ReverbSend]     = 0.0f;
+        for (int s : {0,2,4,6,8,10,12,14}) voices[1]->steps[s] = true;
+
+        // ── Snare (C3 = 130 Hz): noise + sub, no transient ───────────────────
+        voices[2]->kick.updateNote(48);
+        voices[2]->base[SubGain]        = 0.45f;
+        voices[2]->base[SubDecay]       = 0.14f;
+        voices[2]->base[TransientGain]  = 0.0f;
+        voices[2]->base[TransientDecay] = 0.05f;
+        voices[2]->base[NoiseGain]      = 0.8f;
+        voices[2]->base[NoiseDecay]     = 0.16f;
+        voices[2]->base[NoiseLowPass]   = 0.62f;  // ~2.5kHz, below hat HP
+        voices[2]->base[NoiseHighPass]  = 0.40f;  // ~500Hz, punchy crack range
+        voices[2]->base[NoiseResonance] = 0.52f;  // more peaked
+        voices[2]->base[OverdriveAmt]   = 0.0f;
+        voices[2]->base[ReverbSend]     = 0.0f;
+        for (int s : {4, 12}) voices[2]->steps[s] = true;
 
         recomputeStepDuration();
         reverb.setDefaultParameters();
@@ -100,34 +123,20 @@ public:
 
     void setStep(int v, int step, bool active, float vel) {
         if (v < 0 || v >= NUM_VOICES || step < 0 || step >= NUM_STEPS) return;
-        voices[v]->steps[step]  = active;
-        voices[v]->stepVel[step]= vel;
+        voices[v]->steps[step]   = active;
+        voices[v]->stepVel[step] = vel;
     }
     void setBase(int v, int param, float value) {
         if (v < 0 || v >= NUM_VOICES || param < 0 || param >= NUM_PARAMS) return;
         voices[v]->base[param] = value;
     }
-    void setModAmount(int v, int param, int src, float amount) {
-        if (v < 0 || v >= NUM_VOICES || param < 0 || param >= NUM_PARAMS
-            || src < 0 || src >= NUM_MOD_SOURCES) return;
-        voices[v]->modAmt[param][src] = amount;
-    }
     void setLane(int v, const uint8_t* data) {
         if (v < 0 || v >= NUM_VOICES) return;
         memcpy(voices[v]->lane, data, LANE_SIZE);
     }
-    void setLfo(int v, int type, int rateBeats, float depth) {
-        if (v < 0 || v >= NUM_VOICES) return;
-        voices[v]->lfo.settings_.type      = static_cast<LfoType>(type);
-        voices[v]->lfo.settings_.rateBeats = rateBeats;
-        voices[v]->lfo.settings_.depth     = depth;
-        voices[v]->lfo.updateBpm(static_cast<int>(bpm));
-    }
     void setBpm(float newBpm) {
         bpm = newBpm;
         recomputeStepDuration();
-        for (int v = 0; v < NUM_VOICES; ++v)
-            voices[v]->lfo.updateBpm(static_cast<int>(bpm));
     }
     void setReverb(float decay, float lowPass, float preDelay, float ret) {
         reverb.setDecay(decay);
@@ -136,16 +145,15 @@ public:
         reverbReturn = ret;
     }
     void play() {
-        isPlaying    = true;
-        currentStep  = -1;
-        nextStepTime = 0;
-        sampleTime   = 0;
+        isPlaying        = true;
+        currentStep      = -1;
+        nextStepTime     = 0;
+        sampleTime       = 0;
         samplesToProcess = FRAME_SIZE;
-        for (int v = 0; v < NUM_VOICES; ++v) voices[v]->lfo.reset();
         reverb.clear();
     }
-    void stop() { isPlaying = false; }
-    int getCurrentStep() const { return currentStep; }
+    void stop()  { isPlaying = false; }
+    int  getCurrentStep() const { return currentStep; }
 
 private:
     int      sampleRate;
@@ -156,7 +164,7 @@ private:
     int      currentStep      = -1;
     int      samplesToProcess = FRAME_SIZE;
     float    stepDurSamples   = 0.f;
-    float    reverbReturn     = 0.5f;
+    float    reverbReturn     = 0.0f;
 
     VoiceState  v0, v1, v2;
     VoiceState* voices[NUM_VOICES];
@@ -182,46 +190,43 @@ private:
         return a + w * (b - a);
     }
 
-    float resolve(int v, KickParam p, float vel, float laneVal) const {
-        float val = voices[v]->base[p];
-        val += voices[v]->modAmt[p][Velocity] * vel;
-        val += voices[v]->modAmt[p][LfoSrc]   * voices[v]->lfo.value;
-        val += voices[v]->modAmt[p][LaneSrc]  * laneVal;
-        return std::clamp(val, 0.f, 1.f);
-    }
-
-    void applyKickParams(int v, float vel, float laneVal) {
+    void applyKickParams(int v, float vel) {
         auto& kick = voices[v]->kick;
+        auto& vv   = *voices[v];
+        int noiseDecayMs = static_cast<int>(vv.base[NoiseDecay] * 798.f + 2.f);
+        // Hat lane controls open/closed feel via decay length
+        if (v == 1) {
+            float laneMod = laneValue(1) * 2.0f; // lane 0.5→1.0x, 0→0x, 1→2.0x
+            noiseDecayMs = std::max(2, static_cast<int>(noiseDecayMs * laneMod));
+        }
         kick.update(
-            static_cast<int>(resolve(v, SubDecay,       vel, laneVal) * 790.f + 10.f),
-            static_cast<int>(resolve(v, TransientDecay, vel, laneVal) * 195.f +  5.f),
-            static_cast<int>(resolve(v, NoiseDecay,     vel, laneVal) * 798.f +  2.f),
+            static_cast<int>(vv.base[SubDecay]       * 790.f + 10.f),
+            static_cast<int>(vv.base[TransientDecay] * 195.f +  5.f),
+            noiseDecayMs,
             true
         );
-        kick.subAmp       = Tables::getValue<Tables::exponentialTable>(resolve(v, SubGain,       vel, laneVal));
-        kick.transientAmp = Tables::getValue<Tables::exponentialTable>(resolve(v, TransientGain, vel, laneVal));
-        kick.noiseAmp     = Tables::getValue<Tables::exponentialTable>(resolve(v, NoiseGain,     vel, laneVal)) * 0.35f;
+        kick.subAmp       = Tables::getValue<Tables::exponentialTable>(vv.base[SubGain])       * vel;
+        kick.transientAmp = Tables::getValue<Tables::exponentialTable>(vv.base[TransientGain]) * vel;
+        kick.noiseAmp     = Tables::getValue<Tables::exponentialTable>(vv.base[NoiseGain])     * vel * 0.35f;
         kick.totalAmp     = 1.0f;
+        float reso = Tables::getValue<Tables::stmResonanceNormalized>(vv.base[NoiseResonance]);
         kick.updateNoiseSvf(
-            Tables::getValue<Tables::filterNormalized>(resolve(v, NoiseHighPass, vel, laneVal)),
-            Tables::getValue<Tables::filterNormalized>(resolve(v, NoiseLowPass,  vel, laneVal)),
-            0.5f
+            Tables::getValue<Tables::filterNormalized>(vv.base[NoiseHighPass]),
+            Tables::getValue<Tables::filterNormalized>(vv.base[NoiseLowPass]),
+            reso
         );
+        vv.overdrive.update(vv.base[OverdriveAmt]);
     }
 
     void processFrame() {
-        // LFO advances every frame
-        for (int v = 0; v < NUM_VOICES; ++v) voices[v]->lfo.process();
-
         if (isPlaying && sampleTime >= nextStepTime) {
             currentStep  = (currentStep + 1) % NUM_STEPS;
             nextStepTime = static_cast<int64_t>(
                 static_cast<float>(nextStepTime) + stepDurSamples);
 
             for (int v = 0; v < NUM_VOICES; ++v) {
-                float vel     = voices[v]->stepVel[currentStep];
-                float laneVal = laneValue(v);
-                applyKickParams(v, vel, laneVal);
+                float vel = voices[v]->stepVel[currentStep];
+                applyKickParams(v, vel);
                 voices[v]->kick.trigger = voices[v]->steps[currentStep];
             }
         }
@@ -235,6 +240,11 @@ private:
             auto& voice = *voices[v];
             voice.kick.process(voice.tempL, voice.tempR);
             voice.kick.trigger = false;
+
+            if (voice.overdrive.amount > 0.001f) {
+                voice.overdrive.processBuffer(voice.tempL, FRAME_SIZE);
+                voice.overdrive.processBuffer(voice.tempR, FRAME_SIZE);
+            }
 
             float send = voice.base[ReverbSend];
             for (int i = 0; i < FRAME_SIZE; ++i) {
@@ -281,16 +291,8 @@ void engine_set_base(int voice, int param, float value) {
     if (g_engine) g_engine->setBase(voice, param, value);
 }
 
-void engine_set_mod_amount(int voice, int param, int src, float amount) {
-    if (g_engine) g_engine->setModAmount(voice, param, src, amount);
-}
-
 void engine_set_lane(int voice, const uint8_t* data) {
     if (g_engine) g_engine->setLane(voice, data);
-}
-
-void engine_set_lfo(int voice, int type, int rateBeats, float depth) {
-    if (g_engine) g_engine->setLfo(voice, type, rateBeats, depth);
 }
 
 void engine_set_bpm(float bpm) {
