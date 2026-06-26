@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kick Sequencer</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: #0c0c10;
+    color: #bbb;
+    font: 11px/1.2 'Courier New', monospace;
+    padding: 14px;
+    min-height: 100vh;
+}
+h1 {
+    color: #ddd;
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+/* ── Transport bar ── */
+#transport {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    background: #161620;
+    border-radius: 6px;
+    flex-wrap: wrap;
+}
+#transport label { color: #666; font-size: 10px; }
+input[type=number] {
+    width: 52px;
+    background: #1e1e28;
+    color: #ddd;
+    border: 1px solid #2a2a36;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font: inherit;
+}
+button {
+    background: #1e1e28;
+    color: #aaa;
+    border: 1px solid #2a2a36;
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: 0.5px;
+}
+button:hover { background: #262632; }
+button.active { background: #223366; color: #99bbff; border-color: #335; }
+#divider { width: 1px; height: 18px; background: #2a2a36; }
+.mod-row { display: flex; gap: 5px; align-items: center; }
+.mod-row span { color: #555; font-size: 10px; }
+.mod-btn { padding: 3px 8px; font-size: 10px; }
+.mod-btn[data-src="-1"].active { background: #222; color: #aaa; border-color: #444; }
+.mod-btn[data-src="0"].active  { background: #3a0a18; color: #ff6688; border-color: #cc2244; }
+.mod-btn[data-src="1"].active  { background: #0a1838; color: #55aaff; border-color: #2255cc; }
+.mod-btn[data-src="2"].active  { background: #2a1800; color: #ffbb44; border-color: #cc7700; }
+/* ── Reverb bar ── */
+#rev-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 7px 12px;
+    background: #161620;
+    border-radius: 6px;
+    flex-wrap: wrap;
+}
+#rev-bar .label { color: #555; font-size: 10px; letter-spacing: 1px; }
+.rv-ctrl { display: flex; align-items: center; gap: 5px; }
+.rv-ctrl span { color: #555; font-size: 10px; }
+input[type=range] {
+    width: 72px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #3355aa;
+}
+/* ── Voices ── */
+#voices {
+    display: flex;
+    gap: 10px;
+}
+.voice-panel {
+    flex: 1;
+    background: #111118;
+    border: 1px solid #1e1e28;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 0;
+}
+.v-header {
+    color: #666;
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+/* ── Step grid ── */
+.step-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    margin-bottom: 8px;
+}
+.step-btn {
+    height: 18px;
+    border-radius: 3px;
+    border: 1px solid #1e1e28;
+    background: #18181e;
+    cursor: pointer;
+    transition: background 60ms, box-shadow 60ms;
+}
+.step-btn.on            { background: #2a4488; border-color: #3355aa; }
+.step-btn.playing       { box-shadow: inset 0 0 0 1px #888; }
+.step-btn.on.playing    { background: #5588dd; box-shadow: inset 0 0 0 1px #aaccff; }
+/* ── Automation lane ── */
+canvas.lane-c {
+    display: block;
+    width: 100%;
+    height: 52px;
+    border-radius: 4px;
+    cursor: crosshair;
+    margin-bottom: 8px;
+    border: 1px solid #1e1e28;
+}
+/* ── Dials ── */
+.dials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    margin-bottom: 8px;
+}
+.dial-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: ns-resize;
+    user-select: none;
+    padding: 3px 0 2px;
+    border-radius: 4px;
+}
+.dial-cell:hover { background: #16161e; }
+canvas.dial-c {
+    width: 60px;
+    height: 34px;
+}
+.dial-name {
+    font-size: 8px;
+    color: #555;
+    text-align: center;
+    letter-spacing: 0.3px;
+    margin-top: 1px;
+}
+.dial-val {
+    font-size: 8px;
+    color: #444;
+}
+/* ── LFO controls ── */
+.lfo-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 10px;
+    color: #555;
+}
+.lfo-row select {
+    background: #161620;
+    color: #888;
+    border: 1px solid #2a2a36;
+    border-radius: 3px;
+    padding: 2px 3px;
+    font: 10px monospace;
+    cursor: pointer;
+}
+.lfo-row input[type=range] { width: 54px; }
+.lfo-row .rv { color: #666; min-width: 36px; }
+</style>
+</head>
+<body>
+<h1>KICK SEQUENCER</h1>
+
+<div id="transport">
+    <label>BPM</label>
+    <input type="number" id="bpm-in" value="120" min="40" max="300">
+    <button id="play-btn">▶ PLAY</button>
+    <button id="stop-btn">■ STOP</button>
+    <div id="divider"></div>
+    <div class="mod-row">
+        <span>MOD:</span>
+        <button class="mod-btn active" data-src="-1">BASE</button>
+        <button class="mod-btn" data-src="0" style="color:#ff4466">VEL</button>
+        <button class="mod-btn" data-src="1" style="color:#4499ff">LFO</button>
+        <button class="mod-btn" data-src="2" style="color:#ffaa22">LANE</button>
+    </div>
+</div>
+
+<div id="rev-bar">
+    <span class="label">REVERB</span>
+    <div class="rv-ctrl">
+        <span>Decay</span>
+        <input type="range" id="rv-decay" min="0" max="100" value="70">
+        <span class="rv" id="rv-decay-v">0.73</span>
+    </div>
+    <div class="rv-ctrl">
+        <span>LowPass</span>
+        <input type="range" id="rv-lp" min="0" max="100" value="50">
+        <span class="rv" id="rv-lp-v">~12k</span>
+    </div>
+    <div class="rv-ctrl">
+        <span>PreDly</span>
+        <input type="range" id="rv-pd" min="0" max="100" value="10">
+        <span class="rv" id="rv-pd-v">10ms</span>
+    </div>
+    <div class="rv-ctrl">
+        <span>Return</span>
+        <input type="range" id="rv-ret" min="0" max="100" value="0">
+        <span class="rv" id="rv-ret-v">0%</span>
+    </div>
+</div>
+
+<div id="voices"></div>
+
+<script>
+'use strict';
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const NV = 3, NP = 9, LS = 128, NS = 16;
+
+const PARAM = [
+    'Sub Gn', 'Sub Dc', 'Tr Gn', 'Tr Dc',
+    'Ns Gn', 'Ns Dc', 'NS LP', 'NS HP', 'Rvb Snd'
+];
+const MOD_CLR = ['#cc2244', '#2255cc', '#cc7700'];
+
+// defaults match KickSettingsCpp / VoiceState
+const DEF_BASE = [1.0, 0.4, 0.5, 0.1, 0.5, 0.2, 1.0, 0.0125, 0.0];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let globalSrc = -1;   // -1=base, 0=vel, 1=lfo, 2=lane
+let bpm = 120;
+let currentStep = -1;
+let rvDecay = 0.73, rvLP = 0.245, rvPD = 0.1, rvRet = 0.0;
+
+const voices = Array.from({ length: NV }, (_, v) => ({
+    base:   [...DEF_BASE],
+    modAmt: Array.from({ length: NP }, () => [0, 0, 0]),
+    lane:   new Uint8Array(LS).fill(128),
+    steps:  Array.from({ length: NS }, (_, s) =>
+        (v === 0 && [0,4,8,12].includes(s)) ||
+        (v === 1 && [2,6,10,14].includes(s)) ||
+        (v === 2 && [0,8].includes(s))),
+    stepVel: new Array(NS).fill(0.75),
+    lfoType: 0, lfoRate: 8, lfoDepth: 0.5,
+}));
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+let actx = null, wNode = null;
+
+async function startAudio() {
+    if (actx) { actx.resume(); return; }
+    actx = new AudioContext({ sampleRate: 48000 });
+
+    // Load the bundle (KickEngineModule factory + worklet processor class).
+    await actx.audioWorklet.addModule('kick-worklet-bundle.js');
+
+    // Compile WASM on the main thread where fetch() works reliably.
+    // AudioWorkletGlobalScope has broken environment detection in Emscripten
+    // (neither ENVIRONMENT_IS_WEB nor ENVIRONMENT_IS_WORKER is true there),
+    // so we bypass Emscripten's fetch path entirely and pass the compiled
+    // WebAssembly.Module to the worklet via postMessage.
+    const wasmBuf = await fetch('kick_engine.wasm').then(r => {
+        if (!r.ok) throw new Error('kick_engine.wasm not found — run ./run.sh to build');
+        return r.arrayBuffer();
+    });
+
+    wNode = new AudioWorkletNode(actx, 'kick-processor', {
+        outputChannelCount: [2],
+        numberOfOutputs: 1,
+    });
+    wNode.port.onmessage = ({ data }) => {
+        if (data.type === 'step') {
+            currentStep = data.step;
+            refreshSteps();
+            for (let v = 0; v < NV; v++) redrawLane(v);
+        } else if (data.type === 'status') {
+            console.log('[worklet]', data.msg);
+        }
+    };
+    wNode.connect(actx.destination);
+
+    // Transfer raw WASM bytes (ArrayBuffer is universally transferable via
+    // AudioWorklet ports; WebAssembly.Module postMessage is not).
+    wNode.port.postMessage({ type: 'init', sr: actx.sampleRate, wasmBuf }, [wasmBuf]);
+    syncAll();
+}
+
+function send(msg) { if (wNode) wNode.port.postMessage(msg); }
+
+function syncAll() {
+    send({ type: 'set_bpm', bpm });
+    sendReverb();
+    for (let v = 0; v < NV; v++) {
+        const vx = voices[v];
+        for (let s = 0; s < NS; s++)
+            send({ type: 'set_step', v, step: s, active: vx.steps[s], vel: vx.stepVel[s] });
+        for (let p = 0; p < NP; p++) {
+            send({ type: 'set_base', v, param: p, value: vx.base[p] });
+            for (let src = 0; src < 3; src++)
+                send({ type: 'set_mod', v, param: p, src, amount: vx.modAmt[p][src] });
+        }
+        sendLane(v);
+        send({ type: 'set_lfo', v, lfoType: vx.lfoType, rateBeats: vx.lfoRate, depth: vx.lfoDepth });
+    }
+    send({ type: 'play' });
+}
+
+function sendReverb() {
+    send({ type: 'set_reverb', decay: rvDecay, lowPass: rvLP, preDelay: rvPD, ret: rvRet });
+}
+
+function sendLane(v) {
+    send({ type: 'set_lane', v, buf: voices[v].lane.buffer.slice(0) });
+}
+
+// ── Build voice panels ────────────────────────────────────────────────────────
+function buildUI() {
+    const container = document.getElementById('voices');
+    for (let v = 0; v < NV; v++) {
+        const panel = document.createElement('div');
+        panel.className = 'voice-panel';
+        panel.innerHTML = `
+            <div class="v-header">VOICE ${v + 1}</div>
+            <div class="step-grid" id="sg${v}"></div>
+            <canvas class="lane-c" id="lc${v}" height="52"></canvas>
+            <div class="dials-grid" id="dg${v}"></div>
+            <div class="lfo-row">
+                <span>LFO</span>
+                <select id="lt${v}">
+                    <option value="0">Sin</option><option value="1">Ramp</option>
+                    <option value="2">Sqr</option><option value="3">Rnd</option>
+                    <option value="4">Walk</option>
+                </select>
+                <span>Rate</span>
+                <input type="range" id="lr${v}" min="1" max="32" value="8">
+                <span class="rv" id="lrv${v}">8b</span>
+                <span>Depth</span>
+                <input type="range" id="ld${v}" min="0" max="100" value="50">
+            </div>`;
+        container.appendChild(panel);
+        buildSteps(v);
+        buildDials(v);
+        setupLane(v);
+        setupLfo(v);
+    }
+}
+
+// ── Steps ─────────────────────────────────────────────────────────────────────
+function buildSteps(v) {
+    const grid = document.getElementById(`sg${v}`);
+    for (let s = 0; s < NS; s++) {
+        const b = document.createElement('div');
+        b.className = 'step-btn' + (voices[v].steps[s] ? ' on' : '');
+        b.dataset.step = s;
+        b.addEventListener('click', () => {
+            voices[v].steps[s] = !voices[v].steps[s];
+            b.classList.toggle('on', voices[v].steps[s]);
+            send({ type: 'set_step', v, step: s, active: voices[v].steps[s], vel: voices[v].stepVel[s] });
+        });
+        grid.appendChild(b);
+    }
+}
+
+function refreshSteps() {
+    for (let v = 0; v < NV; v++) {
+        const btns = document.querySelectorAll(`#sg${v} .step-btn`);
+        btns.forEach((b, s) => b.classList.toggle('playing', s === currentStep));
+    }
+}
+
+// ── Automation lane ───────────────────────────────────────────────────────────
+function setupLane(v) {
+    const canvas = document.getElementById(`lc${v}`);
+    // set actual pixel width after layout
+    requestAnimationFrame(() => {
+        canvas.width = canvas.offsetWidth || 256;
+        redrawLane(v);
+    });
+
+    let drag = false, lastI = -1, lastV = 128;
+
+    function posFrom(e) {
+        const r = canvas.getBoundingClientRect();
+        const cx = (e.clientX ?? e.touches[0].clientX) - r.left;
+        const cy = (e.clientY ?? e.touches[0].clientY) - r.top;
+        return {
+            i: Math.max(0, Math.min(LS - 1, Math.floor((cx / r.width) * LS))),
+            val: Math.max(0, Math.min(255, Math.round((1 - cy / r.height) * 255))),
+        };
+    }
+
+    function paint(p) {
+        const lane = voices[v].lane;
+        if (lastI >= 0 && lastI !== p.i) {
+            const steps = Math.abs(p.i - lastI);
+            for (let k = 0; k <= steps; k++) {
+                const t = k / Math.max(steps, 1);
+                const ii = Math.round(lastI + t * (p.i - lastI));
+                lane[ii] = Math.round(lastV + t * (p.val - lastV));
+            }
+        } else {
+            lane[p.i] = p.val;
+        }
+        lastI = p.i; lastV = p.val;
+        sendLane(v);
+        redrawLane(v);
+    }
+
+    canvas.addEventListener('mousedown', e => { drag = true; lastI = -1; paint(posFrom(e)); });
+    canvas.addEventListener('mousemove', e => { if (drag) paint(posFrom(e)); });
+    window.addEventListener('mouseup',   () => { drag = false; });
+}
+
+function redrawLane(v) {
+    const canvas = document.getElementById(`lc${v}`);
+    if (!canvas) return;
+    const W = canvas.width, H = canvas.height;
+    if (!W) return;
+    const ctx = canvas.getContext('2d');
+    const lane = voices[v].lane;
+
+    ctx.fillStyle = '#0e0e14';
+    ctx.fillRect(0, 0, W, H);
+
+    // Step column guides
+    ctx.strokeStyle = '#191926';
+    ctx.lineWidth = 0.5;
+    for (let s = 0; s < NS; s++) {
+        const x = (s / NS) * W;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+
+    // Value bars
+    const bw = W / LS;
+    for (let i = 0; i < LS; i++) {
+        const bh = (lane[i] / 255) * H;
+        ctx.fillStyle = '#2a3a66';
+        ctx.fillRect(i * bw, H - bh, bw, bh);
+    }
+
+    // Playhead
+    if (currentStep >= 0) {
+        const x = (currentStep / NS) * W;
+        const pw = W / NS;
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(x, 0, pw, H);
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+}
+
+// ── Dials ─────────────────────────────────────────────────────────────────────
+const DIAL_W = 60, DIAL_H = 34;
+const DCX = DIAL_W / 2, DCY = 3, DR = 25;
+const D_START = Math.PI, D_SWEEP = Math.PI;
+
+function drawDial(v, p) {
+    const canvas = document.getElementById(`dc${v}${p}`);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, DIAL_W, DIAL_H);
+
+    const base = voices[v].base[p];
+    const mods = voices[v].modAmt[p];
+
+    // Background track
+    ctx.beginPath();
+    ctx.arc(DCX, DCY, DR, D_START, D_START + D_SWEEP, false);
+    ctx.strokeStyle = '#1e1e2a';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Base value fill
+    if (base > 0.001) {
+        ctx.beginPath();
+        ctx.arc(DCX, DCY, DR, D_START, D_START + base * D_SWEEP, false);
+        ctx.strokeStyle = globalSrc === -1 ? '#3a3a55' : '#252534';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+    }
+
+    // Modulation arcs (each offset inward by 3px so they stack)
+    const baseAngle = D_START + base * D_SWEEP;
+    for (let s = 0; s < 3; s++) {
+        const amt = mods[s];
+        if (Math.abs(amt) < 0.001) continue;
+        const sweep = amt * D_SWEEP;
+        const rs = DR - 2 - s * 3;
+        ctx.beginPath();
+        if (sweep > 0) {
+            ctx.arc(DCX, DCY, rs, baseAngle, baseAngle + sweep, false);
+        } else {
+            ctx.arc(DCX, DCY, rs, baseAngle + sweep, baseAngle, false);
+        }
+        ctx.strokeStyle = MOD_CLR[s] + (globalSrc === s ? 'ff' : '88');
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+    }
+
+    // Needle from center
+    const na = D_START + base * D_SWEEP;
+    ctx.beginPath();
+    ctx.moveTo(DCX, DCY);
+    ctx.lineTo(DCX + (DR - 6) * Math.cos(na), DCY + (DR - 6) * Math.sin(na));
+    ctx.strokeStyle = '#aaa';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Value readout
+    const el = document.getElementById(`dv${v}${p}`);
+    if (el) el.textContent = base.toFixed(3);
+}
+
+function buildDials(v) {
+    const grid = document.getElementById(`dg${v}`);
+    for (let p = 0; p < NP; p++) {
+        const cell = document.createElement('div');
+        cell.className = 'dial-cell';
+        cell.innerHTML = `
+            <canvas class="dial-c" id="dc${v}${p}" width="${DIAL_W}" height="${DIAL_H}"></canvas>
+            <div class="dial-name">${PARAM[p]}</div>
+            <div class="dial-val" id="dv${v}${p}"></div>`;
+        grid.appendChild(cell);
+        setupDialDrag(v, p, cell);
+        drawDial(v, p);
+    }
+}
+
+function setupDialDrag(v, p, cell) {
+    let startY, startBase, startMod;
+
+    cell.addEventListener('mousedown', e => {
+        e.preventDefault();
+        startY    = e.clientY;
+        startBase = voices[v].base[p];
+        startMod  = globalSrc >= 0 ? voices[v].modAmt[p][globalSrc] : 0;
+
+        const onMove = e => {
+            const delta = (startY - e.clientY) * 0.005;
+            if (globalSrc === -1) {
+                voices[v].base[p] = Math.max(0, Math.min(1, startBase + delta));
+                send({ type: 'set_base', v, param: p, value: voices[v].base[p] });
+            } else {
+                voices[v].modAmt[p][globalSrc] = Math.max(-1, Math.min(1, startMod + delta));
+                send({ type: 'set_mod', v, param: p, src: globalSrc, amount: voices[v].modAmt[p][globalSrc] });
+            }
+            drawDial(v, p);
+        };
+
+        const onUp = () => {
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+        };
+
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+    });
+}
+
+// ── LFO controls ──────────────────────────────────────────────────────────────
+function setupLfo(v) {
+    const typeEl  = document.getElementById(`lt${v}`);
+    const rateEl  = document.getElementById(`lr${v}`);
+    const rateVal = document.getElementById(`lrv${v}`);
+    const depthEl = document.getElementById(`ld${v}`);
+
+    typeEl.addEventListener('change', () => {
+        voices[v].lfoType = +typeEl.value;
+        sendLfo(v);
+    });
+    rateEl.addEventListener('input', () => {
+        voices[v].lfoRate = +rateEl.value;
+        rateVal.textContent = `${voices[v].lfoRate}b`;
+        sendLfo(v);
+    });
+    depthEl.addEventListener('input', () => {
+        voices[v].lfoDepth = +depthEl.value / 100;
+        sendLfo(v);
+    });
+}
+
+function sendLfo(v) {
+    send({ type: 'set_lfo', v, lfoType: voices[v].lfoType,
+           rateBeats: voices[v].lfoRate, depth: voices[v].lfoDepth });
+}
+
+// ── Transport ─────────────────────────────────────────────────────────────────
+document.getElementById('play-btn').addEventListener('click', async () => {
+    await startAudio();
+    send({ type: 'play' });
+    document.getElementById('play-btn').classList.add('active');
+    document.getElementById('stop-btn').classList.remove('active');
+});
+
+document.getElementById('stop-btn').addEventListener('click', () => {
+    send({ type: 'stop' });
+    currentStep = -1;
+    refreshSteps();
+    for (let v = 0; v < NV; v++) redrawLane(v);
+    document.getElementById('stop-btn').classList.add('active');
+    document.getElementById('play-btn').classList.remove('active');
+});
+
+document.getElementById('bpm-in').addEventListener('change', function () {
+    bpm = Math.max(40, Math.min(300, +this.value || 120));
+    send({ type: 'set_bpm', bpm });
+});
+
+// ── Mod source selector ───────────────────────────────────────────────────────
+document.querySelectorAll('.mod-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        globalSrc = +btn.dataset.src;
+        for (let v = 0; v < NV; v++)
+            for (let p = 0; p < NP; p++) drawDial(v, p);
+    });
+});
+
+// ── Reverb controls ───────────────────────────────────────────────────────────
+document.getElementById('rv-decay').addEventListener('input', function () {
+    rvDecay = 0.1 + this.value / 100 * 0.9;
+    document.getElementById('rv-decay-v').textContent = rvDecay.toFixed(2);
+    sendReverb();
+});
+document.getElementById('rv-lp').addEventListener('input', function () {
+    // map 0-100% → 0.01-0.49 (normalized freq coefficient)
+    rvLP = 0.01 + this.value / 100 * 0.48;
+    const hz = Math.round(rvLP * 48000);
+    document.getElementById('rv-lp-v').textContent = hz > 1000 ? `~${(hz/1000).toFixed(1)}k` : `${hz}`;
+    sendReverb();
+});
+document.getElementById('rv-pd').addEventListener('input', function () {
+    rvPD = this.value / 100;
+    document.getElementById('rv-pd-v').textContent = `${Math.round(rvPD * 100)}ms`;
+    sendReverb();
+});
+document.getElementById('rv-ret').addEventListener('input', function () {
+    rvRet = this.value / 100;
+    document.getElementById('rv-ret-v').textContent = `${Math.round(rvRet * 100)}%`;
+    sendReverb();
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildUI();
+// Trigger initial LP label
+(function () {
+    const hz = Math.round(rvLP * 48000);
+    document.getElementById('rv-lp-v').textContent = hz > 1000 ? `~${(hz/1000).toFixed(1)}k` : `${hz}`;
+    document.getElementById('rv-decay-v').textContent = rvDecay.toFixed(2);
+})();
+</script>
+</body>
+</html>
