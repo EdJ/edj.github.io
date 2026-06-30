@@ -8,6 +8,15 @@ let _ready = false;
 const _pending = [];
 let _port = null;
 
+// ── Sampler ───────────────────────────────────────────────────────────────────
+let _sampleL = null, _sampleR = null, _sampleLen = 0;
+const _sliceOffsets = [0, 0, 0];
+const _samplerSteps = new Int8Array(16).fill(-1); // -1=off, 0/1/2=slice index
+let _samplerPos = -1;
+let _samplerGain = 0.7;
+let _samplerEnv = 1.0;
+let _samplerFade = 0; // per-sample env decrement; 0 = no fade
+
 function initModule(sr, wasmBuf) {
     const report = msg => { if (_port) _port.postMessage({ type: 'status', msg }); };
     report('initModule sr=' + sr + ' bytes=' + (wasmBuf && wasmBuf.byteLength));
@@ -44,9 +53,31 @@ function dispatch(m, d) {
         }
         case 'set_bpm':    m._engine_set_bpm(d.bpm); break;
         case 'set_reverb': m._engine_set_reverb(d.decay, d.lowPass, d.preDelay, d.ret); break;
-        case 'set_macro':  m._engine_set_macro(d.value); break;
+        case 'set_macro':    m._engine_set_macro(d.value); break;
+        case 'set_swing':    m._engine_set_swing(d.amount); break;
+        case 'set_fm_step':    m._engine_set_fm_step(d.voice, d.step, d.active ? 1 : 0, d.note, d.vel); break;
+        case 'set_fm_param':   m._engine_set_fm_param(d.voice, d.param, d.value); break;
+        case 'set_swarm_step': m._engine_set_swarm_step(d.step, d.active ? 1 : 0, d.note, d.vel); break;
+        case 'set_swarm_param':m._engine_set_swarm_param(d.param, d.value); break;
         case 'play':       m._engine_play(); break;
-        case 'stop':       m._engine_stop(); break;
+        case 'stop':
+            m._engine_stop();
+            if (_samplerPos >= 0) {
+                _samplerFade = 1.0 / (48000 * 0.12); // 120 ms fade
+                if (_port) _port.postMessage({ type: 'sampler_stop' });
+            }
+            break;
+        case 'sampler_load': {
+            _sampleL = new Float32Array(d.left);
+            _sampleR = d.right ? new Float32Array(d.right) : null;
+            _sampleLen = _sampleL.length;
+            _sliceOffsets[0] = d.slices[0];
+            _sliceOffsets[1] = d.slices[1];
+            _sliceOffsets[2] = d.slices[2];
+            break;
+        }
+        case 'sampler_set_step': _samplerSteps[d.step] = d.slice; break;
+        case 'sampler_gain':     _samplerGain = d.value; break;
     }
 }
 
@@ -78,7 +109,31 @@ class KickProcessor extends AudioWorkletProcessor {
         if (step !== this._lastStep) {
             this._lastStep = step;
             this.port.postMessage({ type: 'step', step });
+            if (_sampleL && step >= 0 && step < 16 && _samplerSteps[step] >= 0) {
+                _samplerPos = _sliceOffsets[_samplerSteps[step]];
+                _samplerEnv = 1.0;
+                _samplerFade = 0;
+                if (_port) _port.postMessage({ type: 'sampler_start', offset: _samplerPos });
+            }
         }
+
+        if (_samplerPos >= 0 && _sampleL) {
+            const L = ch[0], R = ch[1];
+            const g = _samplerGain;
+            let done = false;
+            for (let i = 0; i < 128 && _samplerPos < _sampleLen; i++, _samplerPos++) {
+                const env = _samplerEnv;
+                L[i] += _sampleL[_samplerPos] * g * env;
+                if (R) R[i] += (_sampleR ? _sampleR[_samplerPos] : _sampleL[_samplerPos]) * g * env;
+                if (_samplerFade > 0) {
+                    _samplerEnv -= _samplerFade;
+                    if (_samplerEnv <= 0) { _samplerEnv = 0; _samplerPos = -1; done = true; break; }
+                }
+            }
+            if (_samplerPos >= _sampleLen) { _samplerPos = -1; done = true; }
+            if (done && _samplerFade === 0 && _port) _port.postMessage({ type: 'sampler_stop' });
+        }
+
         return true;
     }
 }

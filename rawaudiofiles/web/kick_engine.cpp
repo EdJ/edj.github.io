@@ -8,11 +8,13 @@
 #include "dsp/kick_web.hpp"
 #include "dsp/reverb.hpp"
 #include "dsp/overdrive.hpp"
+#include "dsp/sawbassvoice.hpp"
+#include "dsp/swarmvoice.hpp"
 
-static constexpr int FRAME_SIZE  = 24;
-static constexpr int NUM_VOICES  = 3;
-static constexpr int NUM_STEPS   = 16;
-static constexpr int LANE_SIZE   = 128;
+static constexpr int FRAME_SIZE = 24;
+static constexpr int NUM_VOICES = 3;
+static constexpr int NUM_STEPS  = 16;
+static constexpr int LANE_SIZE     = 128;
 
 // Param indices — must match JS P.* constants
 enum KickParam {
@@ -51,6 +53,9 @@ public:
         voices[0] = &v0;
         voices[1] = &v1;
         voices[2] = &v2;
+        sawBass.init(sr);
+        swarm.init(sr);
+        for (int s = 0; s < NUM_STEPS; ++s) swarm.stepNote[s] = 60; // lead: C4
 
         // ── Kick (C2 = 65 Hz): transient + sub + short noise blast ───────────
         voices[0]->kick.updateNote(36);
@@ -147,10 +152,30 @@ public:
         reverb.setPreDelay(preDelay);
         reverbReturn = ret;
     }
+    void setSwing(float amount) { swingAmount = amount; }
+
+    void setFmStep(int step, bool active, int note, float vel) {
+        if (step < 0 || step >= NUM_STEPS) return;
+        sawBass.steps[step]    = active;
+        sawBass.stepNote[step] = note;
+        sawBass.stepVel[step]  = vel;
+    }
+    void setFmParam(int param, float value) {
+        sawBass.setParam(param, value);
+    }
+    void setSwarmStep(int step, bool active, int note, float vel) {
+        if (step < 0 || step >= NUM_STEPS) return;
+        swarm.steps[step]    = active;
+        swarm.stepNote[step] = note;
+        swarm.stepVel[step]  = vel;
+    }
+    void setSwarmParam(int param, float value) { swarm.setParam(param, value); }
+
     void play() {
         isPlaying        = true;
         currentStep      = -1;
         nextStepTime     = 0;
+        baseStepTime     = 0;
         sampleTime       = 0;
         samplesToProcess = FRAME_SIZE;
         reverb.clear();
@@ -170,15 +195,19 @@ private:
     bool     isPlaying        = false;
     int64_t  sampleTime       = 0;
     int64_t  nextStepTime     = 0;
+    int64_t  baseStepTime     = 0;
     int      currentStep      = -1;
     int      samplesToProcess = FRAME_SIZE;
     float    stepDurSamples   = 0.f;
     float    reverbReturn     = 0.0f;
     float    macroValue       = 0.0f;
+    float    swingAmount      = 0.0f;
     FastSvf  macroHp;
 
     VoiceState  v0, v1, v2;
     VoiceState* voices[NUM_VOICES];
+    SawBassVoice sawBass;
+    SwarmVoice  swarm;
     PlateReverb reverb;
 
     float voiceBufL[FRAME_SIZE]  = {};
@@ -233,14 +262,20 @@ private:
     void processFrame() {
         if (isPlaying && sampleTime >= nextStepTime) {
             currentStep  = (currentStep + 1) % NUM_STEPS;
-            nextStepTime = static_cast<int64_t>(
-                static_cast<float>(nextStepTime) + stepDurSamples);
+            baseStepTime = static_cast<int64_t>(
+                static_cast<float>(baseStepTime) + stepDurSamples);
+            int nextStep = (currentStep + 1) % NUM_STEPS;
+            float swingOff = (swingAmount > 0.001f && (nextStep % 2 == 1))
+                ? swingAmount * stepDurSamples * 0.33f : 0.0f;
+            nextStepTime = baseStepTime + static_cast<int64_t>(swingOff);
 
             for (int v = 0; v < NUM_VOICES; ++v) {
-                float vel = voices[v]->stepVel[currentStep];
-                applyKickParams(v, vel);
-                voices[v]->kick.trigger = voices[v]->steps[currentStep];
+                bool triggered = voices[v]->steps[currentStep];
+                voices[v]->kick.trigger = triggered;
+                if (triggered) applyKickParams(v, voices[v]->stepVel[currentStep]);
             }
+            sawBass.triggerStep(currentStep);
+            swarm.triggerStep(currentStep);
         }
 
         memset(voiceBufL,  0, FRAME_SIZE * sizeof(float));
@@ -266,6 +301,9 @@ private:
                 reverbBufR[i] += voice.tempR[i] * send;
             }
         }
+
+        sawBass.process(voiceBufL, voiceBufR, reverbBufL, reverbBufR, FRAME_SIZE);
+        swarm.process(voiceBufL, voiceBufR, reverbBufL, reverbBufR, FRAME_SIZE);
 
         // Macro: HP sweep + dry→wet crossfade (fully wet + extreme HP at macro=1)
         if (macroValue > 0.001f) {
@@ -339,5 +377,18 @@ void engine_play() { if (g_engine) g_engine->play(); }
 void engine_stop() { if (g_engine) g_engine->stop(); }
 int  engine_get_step() { return g_engine ? g_engine->getCurrentStep() : -1; }
 void engine_set_macro(float value) { if (g_engine) g_engine->setMacro(value); }
+void engine_set_swing(float amount) { if (g_engine) g_engine->setSwing(amount); }
+void engine_set_fm_step(int /*voice*/, int step, int active, int note, float vel) {
+    if (g_engine) g_engine->setFmStep(step, active != 0, note, vel);
+}
+void engine_set_fm_param(int /*voice*/, int param, float value) {
+    if (g_engine) g_engine->setFmParam(param, value);
+}
+void engine_set_swarm_step(int step, int active, int note, float vel) {
+    if (g_engine) g_engine->setSwarmStep(step, active != 0, note, vel);
+}
+void engine_set_swarm_param(int param, float value) {
+    if (g_engine) g_engine->setSwarmParam(param, value);
+}
 
 } // extern "C"

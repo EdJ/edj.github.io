@@ -1,0 +1,29 @@
+{
+  "bpm": 120,
+  "dials": {
+    "d-kick-body":   { "value": 0.30, "min": 0.12, "max": 0.90 },
+    "d-kick-click":  { "value": 0.85, "min": 0.00, "max": 1.00 },
+    "d-kick-drive":  { "value": 0.00, "min": 0.00, "max": 0.70 },
+    "d-hat-open":    { "value": 0.18, "min": 0.02, "max": 0.35 },
+    "d-hat-tone":    { "value": 0.65, "min": 0.45, "max": 0.80 },
+    "d-hat-filter":  { "value": 0.77, "min": 0.55, "max": 0.98 },
+    "d-snare-body":  { "value": 0.50, "min": 0.05, "max": 0.85 },
+    "d-snare-crack": { "value": 0.40, "min": 0.08, "max": 0.42 },
+    "d-snare-send":  { "value": 0.00 },
+    "d-rv-tail":     { "value": 0.80 },
+    "d-fm0-decay":   { "value": 0.35 },
+    "d-fm0-filter":  { "value": 0.45 },
+    "d-fm0-drive":   { "value": 0.00, "min": 0.00, "max": 0.70 },
+    "d-sw-spread":   { "value": 0.45 },
+    "d-sw-drift":    { "value": 0.35 },
+    "d-sw-decay":    { "value": 0.25 },
+    "d-sw-filter":   { "value": 0.55 },
+    "d-sw-send":     { "value": 0.00 }
+  },
+  "bass": {
+    "barNotes": [38, 43, 45, 41]
+  },
+  "hat": {
+    "stepVelocities": [0.25, 0.5, 1.0, 0.5]
+  }
+}

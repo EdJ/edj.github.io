@@ -8,9 +8,9 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    background: #0c0c10;
-    color: #666;
-    font: 11px/1 -apple-system, 'Helvetica Neue', sans-serif;
+    background: #0F1115;
+    color: #A9B1BC;
+    font: 11px/1 "DINAlternate-Bold", "DIN Alternate", -apple-system, "Helvetica Neue", sans-serif;
     padding: 20px;
     user-select: none;
 }
@@ -22,33 +22,40 @@ body {
     gap: 14px;
     margin-bottom: 18px;
 }
-#title { color: #ddd; font-size: 11px; letter-spacing: 4px; font-weight: 600; }
-#hdr .sep { width: 1px; height: 14px; background: #222; }
+#title { color: #F5F7FA; font-size: 14px; letter-spacing: 4px; font-weight: bold; }
+#hdr .sep { width: 1px; height: 14px; background: #3A4252; }
 
 button {
-    background: transparent;
-    color: #555;
-    border: 1px solid #222;
-    border-radius: 3px;
-    padding: 4px 12px;
+    background: #222733;
+    color: #A9B1BC;
+    border: 1px solid #3A4252;
+    border-radius: 2px;
+    padding: 0 14px;
     cursor: pointer;
-    font: 10px/1 -apple-system, sans-serif;
-    letter-spacing: 1px;
+    font: inherit;
+    letter-spacing: 1.5px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
-button:hover { color: #888; border-color: #333; }
-button.active { color: #6699ff; border-color: #2244aa; }
+button:hover { color: #F5F7FA; border-color: #A9B1BC; }
+button.active { background: #A9B1BC; color: #0F1115; border-color: #A9B1BC; }
+#mute-btn { width: 34px; padding: 0; }
+#mute-btn.active { background: #7DFBFD; border-color: #7DFBFD; color: #0F1115; }
 
 input[type=number] {
-    width: 44px;
-    background: transparent;
-    color: #888;
-    border: 1px solid #222;
-    border-radius: 3px;
-    padding: 3px 6px;
-    font: 11px -apple-system, sans-serif;
+    width: 52px;
+    background: #171A21;
+    color: #A9B1BC;
+    border: 1px solid #3A4252;
+    border-radius: 2px;
+    padding: 0 6px;
+    font: inherit;
     text-align: center;
+    height: 32px;
 }
-input[type=number]:focus { outline: none; border-color: #333; }
+input[type=number]:focus { outline: none; border-color: #A9B1BC; color: #F5F7FA; }
 
 /* ── Voice rows ── */
 .row {
@@ -57,20 +64,20 @@ input[type=number]:focus { outline: none; border-color: #333; }
     gap: 16px;
     margin-bottom: 6px;
     padding: 10px 12px;
-    background: #0f0f14;
-    border-radius: 5px;
+    background: #171A21;
+    border-radius: 4px;
 }
 .row-label {
     width: 42px;
     font-size: 9px;
     letter-spacing: 2px;
-    color: #333;
+    color: #A9B1BC;
     padding-top: 6px;
     flex-shrink: 0;
 }
 
 /* ── Sequencer canvas ── */
-canvas.seq { cursor: pointer; flex-shrink: 0; }
+canvas.seq { cursor: pointer; flex-shrink: 0; display: block; }
 
 /* ── Controls ── */
 .ctrls {
@@ -89,14 +96,15 @@ canvas.seq { cursor: pointer; flex-shrink: 0; }
 .ctrl-label {
     font-size: 8px;
     letter-spacing: 1px;
-    color: #333;
+    color: #A9B1BC;
 }
+
 input[type=range] {
     -webkit-appearance: none;
     appearance: none;
     width: 56px;
     height: 2px;
-    background: #1e1e26;
+    background: #3A4252;
     border-radius: 1px;
     outline: none;
     cursor: pointer;
@@ -106,12 +114,16 @@ input[type=range]::-webkit-slider-thumb {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #333;
+    background: #A9B1BC;
     cursor: pointer;
 }
-.row-kick  input[type=range]::-webkit-slider-thumb { background: #3355cc; }
-.row-hat   input[type=range]::-webkit-slider-thumb { background: #1a9988; }
-.row-snare input[type=range]::-webkit-slider-thumb { background: #cc5533; }
+.row-kick  input[type=range]::-webkit-slider-thumb { background: #CFFB52; }
+.row-hat   input[type=range]::-webkit-slider-thumb { background: #7DFBFD; }
+.row-snare input[type=range]::-webkit-slider-thumb { background: #FFBA36; }
+#rv-decay::-webkit-slider-thumb,
+#rv-ret::-webkit-slider-thumb { background: #A9B1BC; }
+#macro::-webkit-slider-thumb { background: #9966ff; }
+.row-smpl input[type=range]::-webkit-slider-thumb { background: #9966FF; }
 
 /* ── Hat lane ── */
 #hat-lane-wrap {
@@ -122,7 +134,6 @@ input[type=range]::-webkit-slider-thumb {
     display: block;
     border-radius: 3px;
     cursor: crosshair;
-    width: 100%;
 }
 
 /* ── Reverb row ── */
@@ -131,8 +142,8 @@ input[type=range]::-webkit-slider-thumb {
     align-items: center;
     gap: 16px;
     padding: 8px 12px;
-    background: #0f0f14;
-    border-radius: 5px;
+    background: #171A21;
+    border-radius: 4px;
     margin-top: 2px;
 }
 #rev-row .row-label { padding-top: 0; }
@@ -145,6 +156,9 @@ input[type=range]::-webkit-slider-thumb {
     <div class="sep"></div>
     <label style="font-size:9px;letter-spacing:1px">BPM</label>
     <input type="number" id="bpm-in" value="120" min="40" max="300">
+    <button id="mute-btn" title="Unmute">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+    </button>
     <button id="play-btn">PLAY</button>
     <button id="stop-btn">STOP</button>
 </div>
@@ -171,7 +185,7 @@ input[type=range]::-webkit-slider-thumb {
 </div>
 
 <div id="hat-lane-wrap">
-    <canvas id="hat-lane" height="32"></canvas>
+    <canvas id="hat-lane"></canvas>
 </div>
 
 <!-- Snare -->
@@ -184,13 +198,22 @@ input[type=range]::-webkit-slider-thumb {
     </div>
 </div>
 
+<!-- Sampler -->
+<div class="row row-smpl">
+    <div class="row-label">SMPL</div>
+    <canvas class="seq" id="seq-3"></canvas>
+    <div class="ctrls">
+        <div class="ctrl"><div class="ctrl-label">VOL</div><input type="range" id="smpl-vol" min="0" max="100" value="70"></div>
+    </div>
+</div>
+
 <!-- Reverb -->
 <div id="rev-row">
     <div class="row-label">VERB</div>
     <div class="ctrls">
         <div class="ctrl"><div class="ctrl-label">DECAY</div><input type="range" id="rv-decay" min="0" max="100" value="80"></div>
         <div class="ctrl"><div class="ctrl-label">RETURN</div><input type="range" id="rv-ret"   min="0" max="100" value="0"></div>
-        <div class="ctrl"><div class="ctrl-label">SPACE</div><input type="range" id="macro"     min="0" max="100" value="0" style="accent-color:#9966ff"></div>
+        <div class="ctrl"><div class="ctrl-label">SPACE</div><input type="range" id="macro"     min="0" max="100" value="0"></div>
     </div>
 </div>
 
@@ -201,7 +224,6 @@ input[type=range]::-webkit-slider-thumb {
 
 const NV = 3, NS = 16, LS = 128;
 
-// Param indices matching kick_engine.cpp enum
 const P = {
     SubGain:0, SubDecay:1, TransientGain:2, TransientDecay:3,
     NoiseGain:4, NoiseDecay:5, NoiseLowPass:6, NoiseHighPass:7,
@@ -209,7 +231,6 @@ const P = {
 };
 const NUM_PARAMS = 11;
 
-// Per-voice base defaults matching C++ constructor (used for initial syncAll)
 const DEF_BASE = [
     // Kick
     [1.0, 0.35, 0.85, 0.07, 0.25, 0.06, 0.50, 0.20, 0.30, 0.0, 0.0],
@@ -219,40 +240,35 @@ const DEF_BASE = [
     [0.45,0.18, 0.0,  0.05, 0.8,  0.22, 0.88, 0.15, 0.22, 0.0, 0.0],
 ];
 
-// Sequencer cell layout
 const CELL = 24, GAP = 2, GROUP_EXTRA = 2;
-const SEQ_W = 8 * CELL + 7 * GAP + GROUP_EXTRA; // 178px
-const SEQ_H = 2 * CELL + GAP;                    // 50px
+const SEQ_W = 8 * CELL + 7 * GAP + GROUP_EXTRA;
+const SEQ_H = 2 * CELL + GAP;
 
-// Voice colors: [active, dim, bright-playing]
+// Easter/Inertia instrument colors from InstrumentColors.fixed
 const CLR = [
-    { on:'#3355cc', off:'#131626', play:'#6688ff' },
-    { on:'#1a9988', off:'#0d1f1e', play:'#33ccbb' },
-    { on:'#cc5533', off:'#201208', play:'#ff8866' },
+    { on:'#CFFB52', off:'#222733', play:'#E8FCA0', playOff:'#3A4252' },  // Kick: lime
+    { on:'#7DFBFD', off:'#222733', play:'#B8FEFF', playOff:'#3A4252' },  // Hat: cyan
+    { on:'#FFBA36', off:'#222733', play:'#FFD98A', playOff:'#3A4252' },  // Snare: amber
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
 let currentStep = -1;
 let bpm = 120;
-// Easter ReverbSettings defaults: tail=0.8, lowPass=0.7, highPass=0.25, preDelay=0.5, diffusion=0.9
-// HP and diffusion are hardcoded in C++; LP and decay go through the same tables Easter uses.
+
 function reverbTail(n)  { return 0.9 + Math.pow(n, 6) * (0.9999 - 0.9); }
 function filterNorm(n)  { return 20 * Math.pow(1200, n) / 48000; }
 
-const rvLP = filterNorm(0.7); // ≈ 0.059 (~2.8kHz)
-const rvPD = 0.5;             // 50ms pre-delay
+const rvLP = filterNorm(0.7);
+const rvPD = 0.5;
 let   rvRet = 0.0;
 
 const steps = [
-    // Kick: 1, 9 (steps 0 and 8)
     new Array(16).fill(false).map((_, i) => i === 0 || i === 8),
-    // Hat: 16th notes
     new Array(16).fill(true),
-    // Snare: 5, 13 (steps 4 and 12)
     new Array(16).fill(false).map((_, i) => i === 4 || i === 12),
 ];
-const HAT_VEL = [0.25, 0.5, 1.0, 0.5]; // repeats each quarter note
+const HAT_VEL = [0.25, 0.5, 1.0, 0.5];
 const stepVel = [
     new Array(NS).fill(0.75),
     Array.from({ length: NS }, (_, i) => HAT_VEL[i % 4]),
@@ -260,13 +276,36 @@ const stepVel = [
 ];
 const hatLane = new Uint8Array(LS).fill(128);
 
+// ── Sampler ───────────────────────────────────────────────────────────────────
+const SAMPLER_SLICE_FRACS = [0.0, 0.333, 0.667];
+const SMPL_CLR = [
+    { on:'#9966FF', play:'#CCB3FF' },
+    { on:'#FF6B6B', play:'#FFB3B3' },
+    { on:'#52FBBA', play:'#A0FCD8' },
+];
+const samplerSteps = new Array(NS).fill(-1); // -1=off, 0/1/2=slice index
+
 // ── Audio ─────────────────────────────────────────────────────────────────────
 
-let actx = null, wNode = null;
+let actx = null, wNode = null, muteGain = null;
+let isMuted = true;
+
+const SVG_MUTED = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
+const SVG_SOUND = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+
+function updateMuteBtn() {
+    const btn = document.getElementById('mute-btn');
+    btn.innerHTML = isMuted ? SVG_MUTED : SVG_SOUND;
+    btn.title = isMuted ? 'Unmute' : 'Mute';
+    btn.classList.toggle('active', !isMuted);
+}
 
 async function startAudio() {
     if (actx) { await actx.resume(); return; }
     actx = new AudioContext({ sampleRate: 48000 });
+    muteGain = actx.createGain();
+    muteGain.gain.value = 0; // silent until user unmutes
+    muteGain.connect(actx.destination);
     await actx.resume();
     await actx.audioWorklet.addModule('kick-worklet-bundle.js');
 
@@ -287,9 +326,32 @@ async function startAudio() {
             console.log('[worklet]', data.msg);
         }
     };
-    wNode.connect(actx.destination);
+    wNode.connect(muteGain);
     wNode.port.postMessage({ type: 'init', sr: actx.sampleRate, wasmBuf }, [wasmBuf]);
     syncAll();
+    loadSampler();
+}
+
+async function loadSampler() {
+    try {
+        const resp = await fetch('rawaudiofiles/858313__newlocknew__noise-resonant-synth-percussionsustained.wav');
+        if (!resp.ok) throw new Error('WAV not found');
+        const buf = await resp.arrayBuffer();
+        const audio = await actx.decodeAudioData(buf);
+        const len = audio.length;
+        const slices = SAMPLER_SLICE_FRACS.map(f => Math.floor(f * len));
+        const left = audio.getChannelData(0).slice().buffer;
+        const msg = { type: 'sampler_load', left, slices };
+        const transfer = [left];
+        if (audio.numberOfChannels > 1) {
+            const right = audio.getChannelData(1).slice().buffer;
+            msg.right = right;
+            transfer.push(right);
+        }
+        wNode.port.postMessage(msg, transfer);
+    } catch(e) {
+        console.warn('Sampler load failed:', e);
+    }
 }
 
 function send(msg) { if (wNode) wNode.port.postMessage(msg); }
@@ -303,11 +365,13 @@ function syncAll() {
         for (let p = 0; p < NUM_PARAMS; p++)
             send({ type: 'set_base', v, param: p, value: DEF_BASE[v][p] });
     }
-    // Apply current slider values over defaults
     sendKickParams();
     sendHatParams();
     sendSnareParams();
     sendLane();
+    for (let s = 0; s < NS; s++)
+        send({ type: 'sampler_set_step', step: s, slice: samplerSteps[s] });
+    send({ type: 'sampler_gain', value: document.getElementById('smpl-vol').value / 100 });
     send({ type: 'play' });
 }
 
@@ -316,21 +380,21 @@ function lerp(t, a, b) { return a + t * (b - a); }
 function sendKickParams() {
     const dist = document.getElementById('kick-dist').value / 100;
     const tail = document.getElementById('kick-tail').value / 100;
-    send({ type: 'set_base', v: 0, param: P.OverdriveAmt, value: dist * 0.4 });        // 0→0.4
-    send({ type: 'set_base', v: 0, param: P.SubDecay,     value: lerp(tail, 0.12, 0.90) }); // 106ms→720ms
+    send({ type: 'set_base', v: 0, param: P.OverdriveAmt, value: dist * 0.4 });
+    send({ type: 'set_base', v: 0, param: P.SubDecay,     value: lerp(tail, 0.12, 0.90) });
 }
 function sendHatParams() {
     const decay = document.getElementById('hat-decay').value / 100;
     const freq  = document.getElementById('hat-freq').value  / 100;
     const reso  = document.getElementById('hat-reso').value  / 100;
-    send({ type: 'set_base', v: 1, param: P.NoiseDecay,    value: lerp(decay, 0.02, 0.35) }); // 18ms→281ms
-    send({ type: 'set_base', v: 1, param: P.NoiseLowPass,  value: lerp(freq,  0.70, 0.97) }); // 4kHz→22kHz, always > HP
+    send({ type: 'set_base', v: 1, param: P.NoiseDecay,    value: lerp(decay, 0.02, 0.35) });
+    send({ type: 'set_base', v: 1, param: P.NoiseLowPass,  value: lerp(freq,  0.70, 0.97) });
     send({ type: 'set_base', v: 1, param: P.NoiseResonance,value: lerp(reso,  0.20, 0.85) });
 }
 function sendSnareParams() {
     const tail = document.getElementById('snare-tail').value / 100;
     const sub  = document.getElementById('snare-sub').value  / 100;
-    const subDecay = lerp(tail, 0.08, 0.42); // 73ms→342ms — shorter, punchier
+    const subDecay = lerp(tail, 0.08, 0.42);
     send({ type: 'set_base', v: 2, param: P.SubDecay,  value: subDecay });
     send({ type: 'set_base', v: 2, param: P.NoiseDecay,value: subDecay * 0.8 });
     send({ type: 'set_base', v: 2, param: P.SubGain,   value: lerp(sub, 0.05, 0.85) });
@@ -352,7 +416,9 @@ function colX(col) {
 function drawSeq(v) {
     const canvas = document.getElementById('seq-' + v);
     if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
     const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, SEQ_W, SEQ_H);
 
     const chamfer = CELL * 0.2;
@@ -368,10 +434,46 @@ function drawSeq(v) {
         const isPlaying = s === currentStep;
 
         let fill;
-        if (isOn && isPlaying) fill = clr.play;
-        else if (isOn)         fill = clr.on;
-        else if (isPlaying)    fill = '#1e1e2a';
-        else                   fill = clr.off;
+        if      (isOn && isPlaying) fill = clr.play;
+        else if (isOn)              fill = clr.on;
+        else if (isPlaying)         fill = clr.playOff;
+        else                        fill = clr.off;
+
+        ctx.fillStyle = fill;
+        ctx.beginPath();
+        ctx.moveTo(x + chamfer, y);
+        ctx.lineTo(x + CELL - chamfer, y);
+        ctx.lineTo(x + CELL, y + chamfer);
+        ctx.lineTo(x + CELL, y + CELL - chamfer);
+        ctx.lineTo(x + CELL - chamfer, y + CELL);
+        ctx.lineTo(x + chamfer, y + CELL);
+        ctx.lineTo(x, y + CELL - chamfer);
+        ctx.lineTo(x, y + chamfer);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+function drawSamplerSeq() {
+    const canvas = document.getElementById('seq-3');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, SEQ_W, SEQ_H);
+    const chamfer = CELL * 0.2;
+
+    for (let s = 0; s < NS; s++) {
+        const col = s % 8;
+        const row = s >> 3;
+        const x = colX(col);
+        const y = row * (CELL + GAP);
+        const slice = samplerSteps[s];
+        const isPlaying = s === currentStep;
+
+        let fill;
+        if (slice >= 0) fill = isPlaying ? SMPL_CLR[slice].play : SMPL_CLR[slice].on;
+        else            fill = isPlaying ? '#3A4252' : '#222733';
 
         ctx.fillStyle = fill;
         ctx.beginPath();
@@ -390,17 +492,21 @@ function drawSeq(v) {
 
 function drawAllSeq() {
     for (let v = 0; v < NV; v++) drawSeq(v);
+    drawSamplerSeq();
 }
 
 function initSeqCanvas(v) {
     const canvas = document.getElementById('seq-' + v);
-    canvas.width  = SEQ_W;
-    canvas.height = SEQ_H;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width  = SEQ_W + 'px';
+    canvas.style.height = SEQ_H + 'px';
+    canvas.width  = Math.round(SEQ_W * dpr);
+    canvas.height = Math.round(SEQ_H * dpr);
 
     canvas.addEventListener('click', e => {
         const rect = canvas.getBoundingClientRect();
-        const cx = (e.clientX - rect.left) * (SEQ_W / rect.width);
-        const cy = (e.clientY - rect.top)  * (SEQ_H / rect.height);
+        const cx = e.clientX - rect.left;
+        const cy = e.clientY - rect.top;
         const row = cy < CELL + GAP / 2 ? 0 : 1;
 
         for (let col = 0; col < 8; col++) {
@@ -418,29 +524,63 @@ function initSeqCanvas(v) {
     drawSeq(v);
 }
 
+function initSamplerSeq() {
+    const canvas = document.getElementById('seq-3');
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width  = SEQ_W + 'px';
+    canvas.style.height = SEQ_H + 'px';
+    canvas.width  = Math.round(SEQ_W * dpr);
+    canvas.height = Math.round(SEQ_H * dpr);
+
+    canvas.addEventListener('click', e => {
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.clientX - rect.left;
+        const cy = e.clientY - rect.top;
+        const row = cy < CELL + GAP / 2 ? 0 : 1;
+
+        for (let col = 0; col < 8; col++) {
+            const x = colX(col);
+            if (cx >= x && cx < x + CELL) {
+                const s = row * 8 + col;
+                // cycle: -1 → 0 → 1 → 2 → -1
+                samplerSteps[s] = (samplerSteps[s] + 2) % 4 - 1;
+                send({ type: 'sampler_set_step', step: s, slice: samplerSteps[s] });
+                drawSamplerSeq();
+                return;
+            }
+        }
+    });
+
+    drawSamplerSeq();
+}
+
 // ── Hat lane ──────────────────────────────────────────────────────────────────
+
+const LANE_H = 32;
 
 function initHatLane() {
     const canvas = document.getElementById('hat-lane');
-    // Match sequencer width
-    canvas.width  = SEQ_W;
-    canvas.height = 32;
-    // Align lane canvas with sequencer canvas inside its row
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width  = SEQ_W + 'px';
+    canvas.style.height = LANE_H + 'px';
+    canvas.width  = Math.round(SEQ_W * dpr);
+    canvas.height = Math.round(LANE_H * dpr);
+
+    // Align with sequencer canvas in hat row
     const seqEl = document.getElementById('seq-1');
     const rowEl = document.querySelector('.row-hat');
     const offsetLeft = seqEl.offsetLeft + rowEl.offsetLeft + parseInt(getComputedStyle(rowEl).paddingLeft);
-    const wrap = document.getElementById('hat-lane-wrap');
-    wrap.style.paddingLeft = offsetLeft + 'px';
+    document.getElementById('hat-lane-wrap').style.paddingLeft = offsetLeft + 'px';
 
     let drag = false, lastI = -1, lastV = 128;
 
     function posFrom(e) {
         const r = canvas.getBoundingClientRect();
-        const cx = (e.clientX - r.left) * (canvas.width / r.width);
-        const cy = (e.clientY - r.top)  * (canvas.height / r.height);
+        const cx = e.clientX - r.left;
+        const cy = e.clientY - r.top;
         return {
-            i:   Math.max(0, Math.min(LS - 1, Math.floor((cx / canvas.width) * LS))),
-            val: Math.max(0, Math.min(255, Math.round((1 - cy / canvas.height) * 255))),
+            i:   Math.max(0, Math.min(LS - 1, Math.floor((cx / r.width) * LS))),
+            val: Math.max(0, Math.min(255, Math.round((1 - cy / r.height) * 255))),
         };
     }
 
@@ -470,23 +610,28 @@ function initHatLane() {
 function drawHatLane() {
     const canvas = document.getElementById('hat-lane');
     if (!canvas) return;
-    const W = canvas.width, H = canvas.height;
+    const dpr = window.devicePixelRatio || 1;
+    const W = SEQ_W, H = LANE_H;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#0d1f1e';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Background
+    ctx.fillStyle = '#171A21';
     ctx.fillRect(0, 0, W, H);
 
     // Step column guides
     for (let s = 0; s < NS; s++) {
         const x = (s / NS) * W;
-        ctx.fillStyle = (s === currentStep) ? 'rgba(51,204,187,0.12)' : '#0f2523';
+        ctx.fillStyle = (s === currentStep) ? 'rgba(125,251,253,0.10)' : '#1C2029';
         ctx.fillRect(x, 0, W / NS, H);
     }
 
+    // Lane bars
     const bw = W / LS;
+    ctx.fillStyle = '#7DFBFD';
     for (let i = 0; i < LS; i++) {
         const bh = (hatLane[i] / 255) * H;
-        ctx.fillStyle = '#1a9988';
-        ctx.fillRect(i * bw, H - bh, bw, bh);
+        ctx.fillRect(i * bw, H - bh, bw + 0.5, bh);
     }
 }
 
@@ -500,15 +645,16 @@ document.getElementById('hat-reso') .addEventListener('input', sendHatParams);
 document.getElementById('snare-tail').addEventListener('input', sendSnareParams);
 document.getElementById('snare-sub') .addEventListener('input', sendSnareParams);
 
-document.getElementById('rv-decay').addEventListener('input', function() {
-    sendReverb();
+document.getElementById('smpl-vol').addEventListener('input', function() {
+    send({ type: 'sampler_gain', value: this.value / 100 });
 });
+
+document.getElementById('rv-decay').addEventListener('input', sendReverb);
 document.getElementById('rv-ret').addEventListener('input', function() {
     rvRet = this.value / 100;
     sendReverb();
 });
 
-// Macro: HP sweep + reverb send. Springs back to 0 on pointer release (matches Easter MacroSlider).
 const macroEl = document.getElementById('macro');
 function sendMacro() { send({ type: 'set_macro', value: macroEl.value / 100 }); }
 macroEl.addEventListener('input', sendMacro);
@@ -517,9 +663,18 @@ macroEl.addEventListener('pointerleave',() => { if (macroEl.value > 0) { macroEl
 
 // ── Transport ─────────────────────────────────────────────────────────────────
 
+document.getElementById('mute-btn').addEventListener('click', async () => {
+    await startAudio();
+    isMuted = !isMuted;
+    muteGain.gain.value = isMuted ? 0 : 1;
+    updateMuteBtn();
+});
+
 document.getElementById('play-btn').addEventListener('click', async () => {
     await startAudio();
     send({ type: 'play' });
+    // unmute on explicit play
+    if (isMuted) { isMuted = false; muteGain.gain.value = 1; updateMuteBtn(); }
     document.getElementById('play-btn').classList.add('active');
     document.getElementById('stop-btn').classList.remove('active');
 });
@@ -541,7 +696,7 @@ document.getElementById('bpm-in').addEventListener('change', function() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 for (let v = 0; v < NV; v++) initSeqCanvas(v);
-// Hat lane alignment needs layout to be done; defer one frame
+initSamplerSeq();
 requestAnimationFrame(initHatLane);
 </script>
 </body>
