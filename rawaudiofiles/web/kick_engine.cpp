@@ -215,6 +215,26 @@ private:
     float reverbBufL[FRAME_SIZE] = {};
     float reverbBufR[FRAME_SIZE] = {};
 
+public:
+    // Staging buffers — JS writes here before calling engine_sampler_push
+    float samplerInL[128] = {};
+    float samplerInR[128] = {};
+
+    void samplerPush(int n) {
+        for (int i = 0; i < n; ++i) {
+            samplerRingL[samplerRingWr] = samplerInL[i];
+            samplerRingR[samplerRingWr] = samplerInR[i];
+            samplerRingWr = (samplerRingWr + 1) & (SAMP_RING - 1);
+        }
+    }
+
+private:
+    static constexpr int SAMP_RING = 512; // power-of-2, comfortably > 144
+    float samplerRingL[SAMP_RING] = {};
+    float samplerRingR[SAMP_RING] = {};
+    int   samplerRingRd = 0;
+    int   samplerRingWr = 0;
+
     void recomputeStepDuration() {
         stepDurSamples = (60.f / bpm) * static_cast<float>(sampleRate) / 4.f;
     }
@@ -305,6 +325,15 @@ private:
         sawBass.process(voiceBufL, voiceBufR, reverbBufL, reverbBufR, FRAME_SIZE);
         swarm.process(voiceBufL, voiceBufR, reverbBufL, reverbBufR, FRAME_SIZE);
 
+        // Drain sampler ring buffer into the voice bus (before macro/reverb)
+        for (int i = 0; i < FRAME_SIZE; ++i) {
+            if (samplerRingRd != samplerRingWr) {
+                voiceBufL[i] += samplerRingL[samplerRingRd];
+                voiceBufR[i] += samplerRingR[samplerRingRd];
+                samplerRingRd = (samplerRingRd + 1) & (SAMP_RING - 1);
+            }
+        }
+
         // Macro: HP sweep + dry→wet crossfade (fully wet + extreme HP at macro=1)
         if (macroValue > 0.001f) {
             macroHp.process_high(voiceBufL, FRAME_SIZE);
@@ -377,6 +406,10 @@ void engine_play() { if (g_engine) g_engine->play(); }
 void engine_stop() { if (g_engine) g_engine->stop(); }
 int  engine_get_step() { return g_engine ? g_engine->getCurrentStep() : -1; }
 void engine_set_macro(float value) { if (g_engine) g_engine->setMacro(value); }
+
+float* engine_sampler_in_l() { return g_engine ? g_engine->samplerInL : nullptr; }
+float* engine_sampler_in_r() { return g_engine ? g_engine->samplerInR : nullptr; }
+void   engine_sampler_push(int n) { if (g_engine) g_engine->samplerPush(n); }
 void engine_set_swing(float amount) { if (g_engine) g_engine->setSwing(amount); }
 void engine_set_fm_step(int /*voice*/, int step, int active, int note, float vel) {
     if (g_engine) g_engine->setFmStep(step, active != 0, note, vel);

@@ -17,12 +17,14 @@ public:
     static constexpr int SW_CUTOFF  = 3;
     static constexpr int SW_REVERB  = 4;
     static constexpr int SW_GAIN    = 5;
-    static constexpr int SW_NUM_PARAMS = 6;
+    static constexpr int SW_DELAY   = 6;
+    static constexpr int SW_ENV_AMT = 7;
+    static constexpr int SW_NUM_PARAMS = 8;
     static constexpr int NUM_STEPS  = 16;
     static constexpr int NUM_VOICES = 5;
     static constexpr int BUF        = 24; // matches FRAME_SIZE
 
-    float param[SW_NUM_PARAMS] = { 0.45f, 0.35f, 0.25f, 0.55f, 0.0f, 0.65f };
+    float param[SW_NUM_PARAMS] = { 0.45f, 0.35f, 0.25f, 0.55f, 0.0f, 0.65f, 0.0f, 0.0f };
     bool  steps[NUM_STEPS]    = {};
     float stepVel[NUM_STEPS];
     int   stepNote[NUM_STEPS];
@@ -76,8 +78,12 @@ public:
 
         float spreadCents = param[SW_SPREAD] * 15.0f;
         float driftDepth  = param[SW_DRIFT]  * 0.002f;
-        float send        = param[SW_REVERB];
+        float rvSend      = param[SW_REVERB];
         float gain        = param[SW_GAIN] * (1.0f / NUM_VOICES);
+        float delaySend   = param[SW_DELAY];
+        float delayFb     = delaySend * 0.55f;
+        float envAmt      = param[SW_ENV_AMT];
+        float baseCutoffF = std::min(20.0f * std::pow(1200.0f, param[SW_CUTOFF]) / sampleRate, 0.499f);
 
         for (int i = 0; i < n; ++i) {
             float sumL = 0.0f, sumR = 0.0f;
@@ -99,14 +105,30 @@ public:
                 sumR += s * PAN_R[v];
             }
 
+            // Amp envelope → filter modulation
+            float ef = std::min(baseCutoffF + env.buffer[i] * envAmt * 0.45f, 0.499f);
+            lpL.set_f_q(ef, 0.65f);
+            lpR.set_f_q(ef, 0.65f);
+
             float ampEnv = env.buffer[i] * velocity * gain;
             float sigL = lpL.process_low(sumL * ampEnv);
             float sigR = lpR.process_low(sumR * ampEnv);
 
-            outL[i] += sigL;
-            outR[i] += sigR;
-            rvL[i]  += sigL * send;
-            rvR[i]  += sigR * send;
+            // Delay
+            int rdPos = (delayPos + DELAY_BUF - DELAY_SAMP) & (DELAY_BUF - 1);
+            float dL = delayBufL[rdPos];
+            float dR = delayBufR[rdPos];
+            delayBufL[delayPos] = sigL + dL * delayFb;
+            delayBufR[delayPos] = sigR + dR * delayFb;
+            delayPos = (delayPos + 1) & (DELAY_BUF - 1);
+
+            float outSigL = sigL + dL * delaySend;
+            float outSigR = sigR + dR * delaySend;
+
+            outL[i] += outSigL;
+            outR[i] += outSigR;
+            rvL[i]  += outSigL * rvSend;
+            rvR[i]  += outSigR * rvSend;
         }
     }
 
@@ -119,6 +141,12 @@ private:
     FastSvf lpL, lpR;
     float phases[NUM_VOICES]      = {};
     float driftPhases[NUM_VOICES] = {};
+
+    static constexpr int DELAY_BUF  = 8192;   // power-of-2 ring buffer
+    static constexpr int DELAY_SAMP = 6000;   // ~125 ms @ 48 kHz (≈ 1/8th @ 120 BPM)
+    float delayBufL[DELAY_BUF] = {};
+    float delayBufR[DELAY_BUF] = {};
+    int   delayPos = 0;
 
     static constexpr float DRIFT_RATES[NUM_VOICES] = { 0.047f, 0.059f, 0.071f, 0.037f, 0.083f };
     static constexpr float SPREAD_ST[NUM_VOICES]   = { -2.0f, -1.0f, 0.0f, 1.0f, 2.0f };

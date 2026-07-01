@@ -2,7 +2,7 @@
 // KickEngineModule and __kickBase are in scope.
 // WASM bytes are sent from the main thread via 'init' message (ArrayBuffer).
 
-let _mod = null, _outLPtr = 0, _outRPtr = 0;
+let _mod = null, _outLPtr = 0, _outRPtr = 0, _sampInLPtr = 0, _sampInRPtr = 0;
 const _lanePtr = [0, 0, 0];
 let _ready = false;
 const _pending = [];
@@ -34,6 +34,8 @@ function initModule(sr, wasmBuf) {
         _outRPtr = m._malloc(128 * 4);
         for (let v = 0; v < 3; v++) _lanePtr[v] = m._malloc(128);
         m._engine_init(sr);
+        _sampInLPtr = m._engine_sampler_in_l();
+        _sampInRPtr = m._engine_sampler_in_r();
         _ready = true;
         report('ready, dispatching ' + _pending.length + ' msgs');
         for (const d of _pending) dispatch(_mod, d);
@@ -76,8 +78,13 @@ function dispatch(m, d) {
             _sliceOffsets[2] = d.slices[2];
             break;
         }
-        case 'sampler_set_step': _samplerSteps[d.step] = d.slice; break;
-        case 'sampler_gain':     _samplerGain = d.value; break;
+        case 'sampler_set_step':   _samplerSteps[d.step] = d.slice; break;
+        case 'sampler_gain':       _samplerGain = d.value; break;
+        case 'sampler_set_slices':
+            _sliceOffsets[0] = d.slices[0];
+            _sliceOffsets[1] = d.slices[1];
+            _sliceOffsets[2] = d.slices[2];
+            break;
     }
 }
 
@@ -99,12 +106,45 @@ class KickProcessor extends AudioWorkletProcessor {
 
     process(_inputs, outputs) {
         if (!_ready) return true;
+
+        // Write sampler into WASM input buffers so the engine routes it through FX.
+        // Always fill all 128 slots — zeros for any positions past the end of the sample —
+        // because the C++ engine reads samplerInL/R in FRAME_SIZE chunks across multiple
+        // processFrame() calls and needs the full block to be present.
+        if (_sampInLPtr) {
+            const heap = _mod.HEAPF32;
+            const lOff = _sampInLPtr >>> 2;
+            const rOff = _sampInRPtr >>> 2;
+            for (let i = 0; i < 128; i++) {
+                if (_samplerPos >= 0 && _samplerPos < _sampleLen) {
+                    const env = _samplerEnv;
+                    const g = _samplerGain;
+                    heap[lOff + i] = _sampleL[_samplerPos] * g * env;
+                    heap[rOff + i] = (_sampleR ? _sampleR[_samplerPos] : _sampleL[_samplerPos]) * g * env;
+                    _samplerPos++;
+                    if (_samplerFade > 0) {
+                        _samplerEnv -= _samplerFade;
+                        if (_samplerEnv <= 0) { _samplerEnv = 0; _samplerPos = -1; }
+                    } else if (_samplerPos >= _sampleLen) {
+                        if (_port) _port.postMessage({ type: 'sampler_stop' });
+                        _samplerPos = -1;
+                    }
+                } else {
+                    heap[lOff + i] = 0;
+                    heap[rOff + i] = 0;
+                }
+            }
+        }
+
+        if (_sampInLPtr) _mod._engine_sampler_push(128);
         _mod._engine_process(_outLPtr, _outRPtr, 128);
+
         const lOff = _outLPtr >>> 2, rOff = _outRPtr >>> 2;
         const heap = _mod.HEAPF32;
         const ch = outputs[0];
         ch[0].set(heap.subarray(lOff, lOff + 128));
         if (ch[1]) ch[1].set(heap.subarray(rOff, rOff + 128));
+
         const step = _mod._engine_get_step();
         if (step !== this._lastStep) {
             this._lastStep = step;
@@ -115,23 +155,6 @@ class KickProcessor extends AudioWorkletProcessor {
                 _samplerFade = 0;
                 if (_port) _port.postMessage({ type: 'sampler_start', offset: _samplerPos });
             }
-        }
-
-        if (_samplerPos >= 0 && _sampleL) {
-            const L = ch[0], R = ch[1];
-            const g = _samplerGain;
-            let done = false;
-            for (let i = 0; i < 128 && _samplerPos < _sampleLen; i++, _samplerPos++) {
-                const env = _samplerEnv;
-                L[i] += _sampleL[_samplerPos] * g * env;
-                if (R) R[i] += (_sampleR ? _sampleR[_samplerPos] : _sampleL[_samplerPos]) * g * env;
-                if (_samplerFade > 0) {
-                    _samplerEnv -= _samplerFade;
-                    if (_samplerEnv <= 0) { _samplerEnv = 0; _samplerPos = -1; done = true; break; }
-                }
-            }
-            if (_samplerPos >= _sampleLen) { _samplerPos = -1; done = true; }
-            if (done && _samplerFade === 0 && _port) _port.postMessage({ type: 'sampler_stop' });
         }
 
         return true;

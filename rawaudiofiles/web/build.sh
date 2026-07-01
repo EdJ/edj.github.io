@@ -7,7 +7,7 @@ _PYBIN=$(mktemp -d)
 ln -sf /usr/local/bin/python3.10 "$_PYBIN/python3"
 export PATH="$_PYBIN:$PATH"
 
-EXPORTED_FUNCTIONS='["_engine_init","_engine_process","_engine_set_step","_engine_set_base","_engine_set_lane","_engine_set_bpm","_engine_set_reverb","_engine_play","_engine_stop","_engine_get_step","_engine_set_macro","_engine_set_swing","_engine_set_fm_step","_engine_set_fm_param","_engine_set_swarm_step","_engine_set_swarm_param","_malloc","_free"]'
+EXPORTED_FUNCTIONS='["_engine_init","_engine_process","_engine_set_step","_engine_set_base","_engine_set_lane","_engine_set_bpm","_engine_set_reverb","_engine_play","_engine_stop","_engine_get_step","_engine_set_macro","_engine_set_swing","_engine_set_fm_step","_engine_set_fm_param","_engine_set_swarm_step","_engine_set_swarm_param","_engine_sampler_in_l","_engine_sampler_in_r","_engine_sampler_push","_malloc","_free"]'
 
 ${EMCC:-emcc} kick_engine.cpp \
     -I. \

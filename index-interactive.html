@@ -437,6 +437,13 @@
       <span class="dlabel">Snare</span>
       <div class="seq-wrap"><canvas class="seq" id="seq-2-synths"></canvas></div>
     </div>
+    <div class="drow drow-smpl">
+      <span class="dlabel">Smpl</span>
+      <div class="seq-wrap">
+        <canvas class="seq" id="seq-smpl-synths"></canvas>
+        <canvas id="smpl-wave-synths"></canvas>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -631,12 +638,19 @@
           <div class="dial-row">
             <div class="dial-ctrl"><canvas class="dial" id="d-sw-filter"></canvas><div class="dial-label">Filter</div></div>
             <div class="dial-ctrl"><canvas class="dial" id="d-sw-send"></canvas><div class="dial-label">Send</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-delay"></canvas><div class="dial-label">Dly</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-envamt"></canvas><div class="dial-label">Env→F</div></div>
           </div>
         </div>
 
         <div class="panel-inst pi-hidden" id="pi-smpl">
           <div class="dial-row">
             <div class="dial-ctrl"><canvas class="dial" id="d-smpl-vol"></canvas><div class="dial-label">Vol</div></div>
+          </div>
+          <div class="panel-row">
+            <button class="dbtn" id="smpl-load-btn">Load sample</button>
+            <input type="file" id="smpl-file-input" accept="audio/*" style="display:none">
+            <span id="smpl-filename" style="font-size:11px;opacity:0.6;margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px"></span>
           </div>
         </div>
 
@@ -654,6 +668,7 @@
 
 <footer>
   <p>Copyright &copy; 2026 EdJ / Jolt Groovebox</p>
+  <p>"Noise Resonant Synth Percussion.Sustained.Vari Octaves" by newlocknew -- <a href="https://freesound.org/s/858313/">https://freesound.org/s/858313/</a> -- License: Creative Commons 0</p>
 </footer>
 
 <script>
@@ -716,7 +731,9 @@ const SMPL_CLR = [
     { on:'#FF3B30', play:'#FF9490', off:'#242424', playOff:'#333' },
     { on:'#32E5C8', play:'#8EF2E1', off:'#242424', playOff:'#333' },
 ];
-const SMPL_CANVAS_ID = 'seq-smpl-jam';
+const SMPL_CANVAS_ID  = 'seq-smpl-jam';
+const SMPL_CANVASES   = ['seq-smpl-jam', 'seq-smpl-synths'];
+const SMPL_WAVE_IDS   = ['smpl-wave',    'smpl-wave-synths'];
 const samplerSteps = new Array(NS).fill(-1); // -1=off, 0/1/2=slice index
 
 // Waveform display state
@@ -1167,6 +1184,14 @@ let kickDriveOn = false;
 
 // ── FX events ────────────────────────────────────────────────────────────────
 
+document.getElementById('smpl-load-btn').addEventListener('click', () => {
+    document.getElementById('smpl-file-input').click();
+});
+document.getElementById('smpl-file-input').addEventListener('change', function() {
+    if (this.files && this.files[0]) loadSampleFromFile(this.files[0]);
+    this.value = '';
+});
+
 document.getElementById('kick-drive-toggle').addEventListener('click', function() {
     kickDriveOn = !kickDriveOn;
     this.textContent = kickDriveOn ? 'Drive on' : 'Drive off';
@@ -1250,7 +1275,7 @@ document.getElementById('panel-toggle').addEventListener('click', function() {
 // ── D minor scales ────────────────────────────────────────────────────────────
 
 // D2..D3 (bass); D5 down to D4 for swarm (row 0=top=high)
-const D_MINOR_BASS  = [38, 40, 41, 43, 45, 46, 48, 50];
+const D_MINOR_BASS  = [26, 28, 29, 31, 33, 34, 36, 38];
 const D_MINOR_SWARM = [74, 72, 70, 69, 67, 65, 64, 62]; // D5→D4, top→bottom
 const SWARM_GRID_ROWS = D_MINOR_SWARM.length; // 8
 const SWARM_ROW_GAP = 1;
@@ -1268,7 +1293,7 @@ const bassSteps = new Array(NS).fill(false);
 const bassNote  = new Array(NS).fill(38); // D2
 
 // Bar automation: 4 notes cycling per bar (updated at step 15 boundary)
-const bassBarNotes  = [38, 43, 45, 41]; // D2, G2, A2, F2
+const bassBarNotes  = [26, 26, 26, 26]; // overwritten by initFromParams
 let   currentBarNote = 0;
 
 function sendBassStep(s) {
@@ -1295,7 +1320,7 @@ function syncBassAll() {
 
 // Populate bar note selects with D minor options, then wire change handler
 document.querySelectorAll('[data-bar]').forEach(sel => {
-    D_MINOR_BASS.forEach(midi => {
+    [...D_MINOR_BASS].reverse().forEach(midi => {
         const opt = document.createElement('option');
         opt.value = midi;
         opt.textContent = noteName(midi);
@@ -1400,7 +1425,7 @@ const BASS_DIAL_PARAM = [FM_P.AMP_DECAY, FM_P.LP_CUTOFF, FM_P.DRIVE];
 
 // ── Swarm lead voice — 8×16 note grid ────────────────────────────────────────
 
-const SW_P = { SPREAD:0, DRIFT:1, DECAY:2, CUTOFF:3, REVERB:4, GAIN:5 };
+const SW_P = { SPREAD:0, DRIFT:1, DECAY:2, CUTOFF:3, REVERB:4, GAIN:5, DELAY:6, ENV_AMT:7 };
 const SWARM_CLR = { on:'#FF2D8C', off:'#1e1e1e', play:'#FF89C2', playOff:'#2a2a2a', root:'#2a1020' };
 const SWARM_CANVAS_ID = 'seq-swarm-jam';
 
@@ -1527,8 +1552,8 @@ function initSwarmSeqCanvas(id) {
 }
 
 // Swarm dials: spread, drift, decay, filter, send
-const SWARM_DIAL_IDS   = ['d-sw-spread', 'd-sw-drift', 'd-sw-decay', 'd-sw-filter', 'd-sw-send'];
-const SWARM_DIAL_PARAM = [SW_P.SPREAD, SW_P.DRIFT, SW_P.DECAY, SW_P.CUTOFF, SW_P.REVERB];
+const SWARM_DIAL_IDS   = ['d-sw-spread', 'd-sw-drift', 'd-sw-decay', 'd-sw-filter', 'd-sw-send', 'd-sw-delay', 'd-sw-envamt'];
+const SWARM_DIAL_PARAM = [SW_P.SPREAD, SW_P.DRIFT, SW_P.DECAY, SW_P.CUTOFF, SW_P.REVERB, SW_P.DELAY, SW_P.ENV_AMT];
 
 function drawAllFmSeq() { drawBassSeq(); drawSwarmSeq(); }
 function syncFmAll() { syncBassAll(); syncSwarmAll(); }
@@ -1567,6 +1592,25 @@ function buildSamplerWaveform(audio) {
     drawSamplerWave();
 }
 
+function applySamplerAudio(audio) {
+    _decodedSampleL = audio.getChannelData(0).slice();
+    _decodedSampleR = audio.numberOfChannels > 1 ? audio.getChannelData(1).slice() : null;
+    buildSamplerWaveform(audio);
+}
+
+function sendSamplerToWorklet() {
+    const slices = [...samplerSliceOffsets];
+    const left = _decodedSampleL.slice().buffer;
+    const msg = { type: 'sampler_load', left, slices };
+    const transfer = [left];
+    if (_decodedSampleR) {
+        const right = _decodedSampleR.slice().buffer;
+        msg.right = right;
+        transfer.push(right);
+    }
+    wNode.port.postMessage(msg, transfer);
+}
+
 // Runs on page load — no AudioContext needed
 async function loadSamplerDisplay() {
     try {
@@ -1575,9 +1619,7 @@ async function loadSamplerDisplay() {
         const buf = await resp.arrayBuffer();
         const tmpCtx = new OfflineAudioContext(1, 1, 48000);
         const audio = await tmpCtx.decodeAudioData(buf);
-        _decodedSampleL = audio.getChannelData(0).slice();
-        if (audio.numberOfChannels > 1) _decodedSampleR = audio.getChannelData(1).slice();
-        buildSamplerWaveform(audio);
+        applySamplerAudio(audio);
     } catch(e) {
         console.warn('Sampler display load failed:', e);
     }
@@ -1592,22 +1634,30 @@ async function loadSampler() {
             if (!resp.ok) throw new Error('WAV not found');
             const buf = await resp.arrayBuffer();
             const audio = await actx.decodeAudioData(buf);
-            _decodedSampleL = audio.getChannelData(0).slice();
-            if (audio.numberOfChannels > 1) _decodedSampleR = audio.getChannelData(1).slice();
-            if (!samplerWaveform) buildSamplerWaveform(audio);
+            applySamplerAudio(audio);
         }
-        const slices = [...samplerSliceOffsets];
-        const left = _decodedSampleL.slice().buffer;
-        const msg = { type: 'sampler_load', left, slices };
-        const transfer = [left];
-        if (_decodedSampleR) {
-            const right = _decodedSampleR.slice().buffer;
-            msg.right = right;
-            transfer.push(right);
-        }
-        wNode.port.postMessage(msg, transfer);
+        sendSamplerToWorklet();
     } catch(e) {
         console.warn('Sampler load failed:', e);
+    }
+}
+
+async function loadSampleFromFile(file) {
+    try {
+        const buf = await file.arrayBuffer();
+        if (actx) {
+            const audio = await actx.decodeAudioData(buf);
+            applySamplerAudio(audio);
+            if (wNode) sendSamplerToWorklet();
+        } else {
+            const tmpCtx = new OfflineAudioContext(1, 1, 48000);
+            const audio = await tmpCtx.decodeAudioData(buf);
+            applySamplerAudio(audio);
+        }
+        const el = document.getElementById('smpl-filename');
+        if (el) el.textContent = file.name;
+    } catch(e) {
+        console.warn('Sample file load failed:', e);
     }
 }
 
@@ -1639,7 +1689,7 @@ function drawSamplerSeqOnCanvas(id) {
         ctx.globalAlpha = 1.0;
     }
 }
-function drawSamplerSeq() { drawSamplerSeqOnCanvas(SMPL_CANVAS_ID); }
+function drawSamplerSeq() { SMPL_CANVASES.forEach(id => drawSamplerSeqOnCanvas(id)); }
 
 function doSamplerSeqLayout(id) {
     const canvas = document.getElementById(id);
@@ -1658,8 +1708,9 @@ function doSamplerSeqLayout(id) {
     drawSamplerSeqOnCanvas(id);
 }
 
-function drawSamplerWave() {
-    const canvas = document.getElementById('smpl-wave');
+function drawSamplerWave(id = 'smpl-wave') {
+    if (id === 'smpl-wave') { SMPL_WAVE_IDS.forEach(wid => { if (wid !== 'smpl-wave') drawSamplerWave(wid); }); }
+    const canvas = document.getElementById(id);
     if (!canvas) return;
     const W = canvas.offsetWidth;
     const H = SMPL_WAVE_H;
@@ -1724,24 +1775,71 @@ function animateSamplerWave() {
     }
 }
 
-function initSamplerWave() {
-    const canvas = document.getElementById('smpl-wave');
+function initSamplerWaveCanvas(id = 'smpl-wave') {
+    const canvas = document.getElementById(id);
     if (!canvas) return;
 
-    canvas.style.cursor = 'pointer';
-    canvas.addEventListener('pointerdown', e => {
-        if (!samplerTotalLen) return;
-        const rect = canvas.getBoundingClientRect();
-        const frac = (e.clientX - rect.left) / rect.width;
-        const pos = frac * samplerTotalLen;
-        // Which region did we click? Regions: [s0..s1), [s1..s2), [s2..end)
-        let slice = 0;
-        if (pos >= samplerSliceOffsets[2]) slice = 2;
-        else if (pos >= samplerSliceOffsets[1]) slice = 1;
-        samplerSelectedSlice = slice;
-        drawSamplerWave();
-        drawSamplerSeq(); // update seq display to reflect new selected slice
-    });
+    // Drag-to-move slice markers only on the primary interactive canvas
+    if (id === 'smpl-wave') {
+        canvas.style.cursor = 'pointer';
+        const DRAG_HIT_PX = 8;
+        let draggingSlice = -1;
+
+        function markerUnderCursor(clientX) {
+            if (!samplerTotalLen) return -1;
+            const rect = canvas.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const W = rect.width;
+            for (let si = 1; si <= 2; si++) {
+                const mx = (samplerSliceOffsets[si] / samplerTotalLen) * W;
+                if (Math.abs(x - mx) <= DRAG_HIT_PX) return si;
+            }
+            return -1;
+        }
+
+        canvas.addEventListener('pointermove', e => {
+            if (!samplerTotalLen) return;
+            if (draggingSlice < 0) {
+                canvas.style.cursor = markerUnderCursor(e.clientX) >= 0 ? 'col-resize' : 'pointer';
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const pos = Math.floor(Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * samplerTotalLen);
+            if (draggingSlice === 1) {
+                samplerSliceOffsets[1] = Math.max(samplerSliceOffsets[0] + 1, Math.min(pos, samplerSliceOffsets[2] - 1));
+            } else {
+                samplerSliceOffsets[2] = Math.max(samplerSliceOffsets[1] + 1, Math.min(pos, samplerTotalLen - 1));
+            }
+            drawSamplerWave();
+        });
+
+        canvas.addEventListener('pointerdown', e => {
+            if (!samplerTotalLen) return;
+            const si = markerUnderCursor(e.clientX);
+            if (si >= 0) {
+                draggingSlice = si;
+                canvas.setPointerCapture(e.pointerId);
+                canvas.style.cursor = 'col-resize';
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width * samplerTotalLen;
+            let slice = 0;
+            if (pos >= samplerSliceOffsets[2]) slice = 2;
+            else if (pos >= samplerSliceOffsets[1]) slice = 1;
+            samplerSelectedSlice = slice;
+            drawSamplerWave();
+            drawSamplerSeq();
+        });
+
+        canvas.addEventListener('pointerup', () => {
+            if (draggingSlice >= 0) {
+                draggingSlice = -1;
+                canvas.style.cursor = 'pointer';
+                if (wNode) send({ type: 'sampler_set_slices', slices: [...samplerSliceOffsets] });
+            }
+        });
+    }
 
     function layout() {
         const w = canvas.offsetWidth;
@@ -1750,7 +1848,7 @@ function initSamplerWave() {
         canvas.style.height = SMPL_WAVE_H + 'px';
         canvas.width  = Math.round(w * dpr);
         canvas.height = Math.round(SMPL_WAVE_H * dpr);
-        drawSamplerWave();
+        drawSamplerWave(id);
     }
     layout();
 }
@@ -1810,9 +1908,11 @@ async function initFromParams() {
             'd-sw-decay':    { value: 0.25 },
             'd-sw-filter':   { value: 0.55 },
             'd-sw-send':     { value: 0.00 },
+            'd-sw-delay':    { value: 0.00 },
+            'd-sw-envamt':   { value: 0.00 },
             'd-smpl-vol':    { value: 0.70 },
         },
-        bass: { barNotes: [38, 43, 45, 41] },
+        bass: { barNotes: [0,1,2,3].map(() => D_MINOR_BASS[Math.floor(Math.random() * D_MINOR_BASS.length)]) },
         hat:  { stepVelocities: [0.25, 0.5, 1.0, 0.5] },
     };
 
@@ -1881,8 +1981,8 @@ window.addEventListener('resize', () => {
         VOICE_CANVASES.forEach((ids, v) => ids.forEach(id => doSeqLayout(v, id)));
         doBassSeqLayout(BASS_CANVAS_ID);
         doSwarmSeqLayout(SWARM_CANVAS_ID);
-        doSamplerSeqLayout(SMPL_CANVAS_ID);
-        initSamplerWave();
+        SMPL_CANVASES.forEach(id => doSamplerSeqLayout(id));
+        SMPL_WAVE_IDS.forEach(id => initSamplerWaveCanvas(id));
         doHatLaneLayout();
     }, 120);
 });
@@ -1903,8 +2003,8 @@ document.querySelectorAll('.ptab').forEach(tab => {
 VOICE_CANVASES.forEach((ids, v) => ids.forEach(id => initSeqCanvas(v, id)));
 initBassSeqCanvas(BASS_CANVAS_ID);
 initSwarmSeqCanvas(SWARM_CANVAS_ID);
-initSamplerSeqCanvas(SMPL_CANVAS_ID);
-initSamplerWave();
+SMPL_CANVASES.forEach(id => initSamplerSeqCanvas(id));
+SMPL_WAVE_IDS.forEach(id => initSamplerWaveCanvas(id));
 loadSamplerDisplay();
 initHatLane();
 initFromParams();

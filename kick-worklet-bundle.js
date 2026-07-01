@@ -1,12 +1,12 @@
 var __kickBase=(function(){try{return new URL(".",self.location.href).href}catch(e){return "/"}})();
-var KickEngineModule=(()=>{var _scriptName=globalThis.document?.currentScript?.src;return async function(moduleArg={}){var Module=moduleArg;var ENVIRONMENT_IS_WEB=!!globalThis.window;var ENVIRONMENT_IS_WORKER=!!globalThis.WorkerGlobalScope;var ENVIRONMENT_IS_NODE=globalThis.process?.versions?.node&&globalThis.process?.type!="renderer";var programArgs=[];var thisProgram="./this.program";if(ENVIRONMENT_IS_WORKER){_scriptName=self.location.href}var scriptDirectory="";function locateFile(path){if(Module["locateFile"]){return Module["locateFile"](path,scriptDirectory)}return scriptDirectory+path}var readAsync,readBinary;if(ENVIRONMENT_IS_WEB||ENVIRONMENT_IS_WORKER){try{scriptDirectory=new URL(".",_scriptName).href}catch{}{if(ENVIRONMENT_IS_WORKER){readBinary=url=>{var xhr=new XMLHttpRequest;xhr.open("GET",url,false);xhr.responseType="arraybuffer";xhr.send(null);return new Uint8Array(xhr.response)}}readAsync=async url=>{var response=await fetch(url,{credentials:"same-origin"});if(response.ok){return response.arrayBuffer()}throw new Error(response.status+" : "+response.url)}}}else{}var out=console.log.bind(console);var err=console.error.bind(console);var wasmBinary;var ABORT=false;class EmscriptenEH{}class EmscriptenSjLj extends EmscriptenEH{}var runtimeInitialized=false;function updateMemoryViews(){var b=wasmMemory.buffer;HEAP8=new Int8Array(b);HEAP16=new Int16Array(b);Module["HEAPU8"]=HEAPU8=new Uint8Array(b);HEAPU16=new Uint16Array(b);HEAP32=new Int32Array(b);HEAPU32=new Uint32Array(b);Module["HEAPF32"]=HEAPF32=new Float32Array(b);HEAPF64=new Float64Array(b);HEAP64=new BigInt64Array(b);HEAPU64=new BigUint64Array(b)}function preRun(){if(Module["preRun"]){if(typeof Module["preRun"]=="function")Module["preRun"]=[Module["preRun"]];while(Module["preRun"].length){addOnPreRun(Module["preRun"].shift())}}callRuntimeCallbacks(onPreRuns)}function initRuntime(){runtimeInitialized=true;wasmExports["e"]()}function postRun(){if(Module["postRun"]){if(typeof Module["postRun"]=="function")Module["postRun"]=[Module["postRun"]];while(Module["postRun"].length){addOnPostRun(Module["postRun"].shift())}}callRuntimeCallbacks(onPostRuns)}function abort(what){Module["onAbort"]?.(what);what=`Aborted(${what})`;err(what);ABORT=true;what+=". Build with -sASSERTIONS for more info.";var e=new WebAssembly.RuntimeError(what);throw e}var wasmBinaryFile;function findWasmBinary(){return locateFile("kick_engine.wasm")}function getBinarySync(file){if(file==wasmBinaryFile&&wasmBinary){return new Uint8Array(wasmBinary)}if(readBinary){return readBinary(file)}throw"both async and sync fetching of the wasm failed"}async function getWasmBinary(binaryFile){if(!wasmBinary){try{var response=await readAsync(binaryFile);return new Uint8Array(response)}catch{}}return getBinarySync(binaryFile)}async function instantiateArrayBuffer(binaryFile,imports){try{var binary=await getWasmBinary(binaryFile);var instance=await WebAssembly.instantiate(binary,imports);return instance}catch(reason){err(`failed to asynchronously prepare wasm: ${reason}`);abort(reason)}}async function instantiateAsync(binary,binaryFile,imports){if(!binary){try{var response=fetch(binaryFile,{credentials:"same-origin"});var instantiationResult=await WebAssembly.instantiateStreaming(response,imports);return instantiationResult}catch(reason){err(`wasm streaming compile failed: ${reason}`);err("falling back to ArrayBuffer instantiation")}}return instantiateArrayBuffer(binaryFile,imports)}function getWasmImports(){var imports={a:wasmImports};return imports}async function createWasm(){function receiveInstance(instance,module){wasmExports=instance.exports;assignWasmExports(wasmExports);updateMemoryViews();return wasmExports}function receiveInstantiationResult(result){return receiveInstance(result["instance"])}var info=getWasmImports();if(Module["instantiateWasm"]){return new Promise((resolve,reject)=>{Module["instantiateWasm"](info,(inst,mod)=>{resolve(receiveInstance(inst,mod))})})}wasmBinaryFile??=findWasmBinary();var result=await instantiateAsync(wasmBinary,wasmBinaryFile,info);var exports=receiveInstantiationResult(result);return exports}class ExitStatus{name="ExitStatus";constructor(status){this.message=`Program terminated with exit(${status})`;this.status=status}}var HEAP16;var HEAP32;var HEAP64;var HEAP8;var HEAPF32;var HEAPF64;var HEAPU16;var HEAPU32;var HEAPU64;var HEAPU8;var callRuntimeCallbacks=callbacks=>{while(callbacks.length>0){callbacks.shift()(Module)}};var onPostRuns=[];var addOnPostRun=cb=>onPostRuns.push(cb);var onPreRuns=[];var addOnPreRun=cb=>onPreRuns.push(cb);var noExitRuntime=true;var __abort_js=()=>abort("");var _emscripten_date_now=()=>Date.now();var getHeapMax=()=>2147483648;var alignMemory=(size,alignment)=>Math.ceil(size/alignment)*alignment;var growMemory=size=>{var oldHeapSize=wasmMemory.buffer.byteLength;var pages=(size-oldHeapSize+65535)/65536|0;try{wasmMemory.grow(pages);updateMemoryViews();return 1}catch(e){}};var _emscripten_resize_heap=requestedSize=>{var oldSize=HEAPU8.length;requestedSize>>>=0;var maxHeapSize=getHeapMax();if(requestedSize>maxHeapSize){return false}for(var cutDown=1;cutDown<=4;cutDown*=2){var overGrownHeapSize=oldSize*(1+.2/cutDown);overGrownHeapSize=Math.min(overGrownHeapSize,requestedSize+100663296);var newSize=Math.min(maxHeapSize,alignMemory(Math.max(requestedSize,overGrownHeapSize),65536));var replacement=growMemory(newSize);if(replacement){return true}}return false};{if(Module["noExitRuntime"])noExitRuntime=Module["noExitRuntime"];if(Module["print"])out=Module["print"];if(Module["printErr"])err=Module["printErr"];if(Module["wasmBinary"])wasmBinary=Module["wasmBinary"];if(Module["arguments"])programArgs=Module["arguments"];if(Module["thisProgram"])thisProgram=Module["thisProgram"];if(Module["preInit"]){if(typeof Module["preInit"]=="function")Module["preInit"]=[Module["preInit"]];while(Module["preInit"].length>0){Module["preInit"].shift()()}}}var _engine_init,_engine_process,_engine_set_step,_engine_set_base,_engine_set_lane,_engine_set_bpm,_engine_set_reverb,_engine_play,_engine_stop,_engine_get_step,_engine_set_macro,_engine_set_swing,_engine_set_fm_step,_engine_set_fm_param,_engine_set_swarm_step,_engine_set_swarm_param,_malloc,_free,memory,__indirect_function_table,wasmMemory;function assignWasmExports(wasmExports){_engine_init=Module["_engine_init"]=wasmExports["f"];_engine_process=Module["_engine_process"]=wasmExports["g"];_engine_set_step=Module["_engine_set_step"]=wasmExports["h"];_engine_set_base=Module["_engine_set_base"]=wasmExports["i"];_engine_set_lane=Module["_engine_set_lane"]=wasmExports["j"];_engine_set_bpm=Module["_engine_set_bpm"]=wasmExports["k"];_engine_set_reverb=Module["_engine_set_reverb"]=wasmExports["l"];_engine_play=Module["_engine_play"]=wasmExports["m"];_engine_stop=Module["_engine_stop"]=wasmExports["n"];_engine_get_step=Module["_engine_get_step"]=wasmExports["o"];_engine_set_macro=Module["_engine_set_macro"]=wasmExports["p"];_engine_set_swing=Module["_engine_set_swing"]=wasmExports["q"];_engine_set_fm_step=Module["_engine_set_fm_step"]=wasmExports["r"];_engine_set_fm_param=Module["_engine_set_fm_param"]=wasmExports["s"];_engine_set_swarm_step=Module["_engine_set_swarm_step"]=wasmExports["t"];_engine_set_swarm_param=Module["_engine_set_swarm_param"]=wasmExports["u"];_malloc=Module["_malloc"]=wasmExports["v"];_free=Module["_free"]=wasmExports["w"];memory=wasmMemory=wasmExports["d"];__indirect_function_table=wasmExports["__indirect_function_table"]}var wasmImports={a:__abort_js,c:_emscripten_date_now,b:_emscripten_resize_heap};async function run(){preRun();var setStatus=Module["setStatus"];if(setStatus){setStatus("Running...");await new Promise(resolve=>setTimeout(resolve,1));setTimeout(setStatus,1,"")}if(ABORT)return;initRuntime();Module["onRuntimeInitialized"]?.();postRun()}var wasmExports;wasmExports=await createWasm();await run();
+var KickEngineModule=(()=>{var _scriptName=globalThis.document?.currentScript?.src;return async function(moduleArg={}){var Module=moduleArg;var ENVIRONMENT_IS_WEB=!!globalThis.window;var ENVIRONMENT_IS_WORKER=!!globalThis.WorkerGlobalScope;var ENVIRONMENT_IS_NODE=globalThis.process?.versions?.node&&globalThis.process?.type!="renderer";var programArgs=[];var thisProgram="./this.program";if(ENVIRONMENT_IS_WORKER){_scriptName=self.location.href}var scriptDirectory="";function locateFile(path){if(Module["locateFile"]){return Module["locateFile"](path,scriptDirectory)}return scriptDirectory+path}var readAsync,readBinary;if(ENVIRONMENT_IS_WEB||ENVIRONMENT_IS_WORKER){try{scriptDirectory=new URL(".",_scriptName).href}catch{}{if(ENVIRONMENT_IS_WORKER){readBinary=url=>{var xhr=new XMLHttpRequest;xhr.open("GET",url,false);xhr.responseType="arraybuffer";xhr.send(null);return new Uint8Array(xhr.response)}}readAsync=async url=>{var response=await fetch(url,{credentials:"same-origin"});if(response.ok){return response.arrayBuffer()}throw new Error(response.status+" : "+response.url)}}}else{}var out=console.log.bind(console);var err=console.error.bind(console);var wasmBinary;var ABORT=false;class EmscriptenEH{}class EmscriptenSjLj extends EmscriptenEH{}var runtimeInitialized=false;function updateMemoryViews(){var b=wasmMemory.buffer;HEAP8=new Int8Array(b);HEAP16=new Int16Array(b);Module["HEAPU8"]=HEAPU8=new Uint8Array(b);HEAPU16=new Uint16Array(b);HEAP32=new Int32Array(b);HEAPU32=new Uint32Array(b);Module["HEAPF32"]=HEAPF32=new Float32Array(b);HEAPF64=new Float64Array(b);HEAP64=new BigInt64Array(b);HEAPU64=new BigUint64Array(b)}function preRun(){if(Module["preRun"]){if(typeof Module["preRun"]=="function")Module["preRun"]=[Module["preRun"]];while(Module["preRun"].length){addOnPreRun(Module["preRun"].shift())}}callRuntimeCallbacks(onPreRuns)}function initRuntime(){runtimeInitialized=true;wasmExports["e"]()}function postRun(){if(Module["postRun"]){if(typeof Module["postRun"]=="function")Module["postRun"]=[Module["postRun"]];while(Module["postRun"].length){addOnPostRun(Module["postRun"].shift())}}callRuntimeCallbacks(onPostRuns)}function abort(what){Module["onAbort"]?.(what);what=`Aborted(${what})`;err(what);ABORT=true;what+=". Build with -sASSERTIONS for more info.";var e=new WebAssembly.RuntimeError(what);throw e}var wasmBinaryFile;function findWasmBinary(){return locateFile("kick_engine.wasm")}function getBinarySync(file){if(file==wasmBinaryFile&&wasmBinary){return new Uint8Array(wasmBinary)}if(readBinary){return readBinary(file)}throw"both async and sync fetching of the wasm failed"}async function getWasmBinary(binaryFile){if(!wasmBinary){try{var response=await readAsync(binaryFile);return new Uint8Array(response)}catch{}}return getBinarySync(binaryFile)}async function instantiateArrayBuffer(binaryFile,imports){try{var binary=await getWasmBinary(binaryFile);var instance=await WebAssembly.instantiate(binary,imports);return instance}catch(reason){err(`failed to asynchronously prepare wasm: ${reason}`);abort(reason)}}async function instantiateAsync(binary,binaryFile,imports){if(!binary){try{var response=fetch(binaryFile,{credentials:"same-origin"});var instantiationResult=await WebAssembly.instantiateStreaming(response,imports);return instantiationResult}catch(reason){err(`wasm streaming compile failed: ${reason}`);err("falling back to ArrayBuffer instantiation")}}return instantiateArrayBuffer(binaryFile,imports)}function getWasmImports(){var imports={a:wasmImports};return imports}async function createWasm(){function receiveInstance(instance,module){wasmExports=instance.exports;assignWasmExports(wasmExports);updateMemoryViews();return wasmExports}function receiveInstantiationResult(result){return receiveInstance(result["instance"])}var info=getWasmImports();if(Module["instantiateWasm"]){return new Promise((resolve,reject)=>{Module["instantiateWasm"](info,(inst,mod)=>{resolve(receiveInstance(inst,mod))})})}wasmBinaryFile??=findWasmBinary();var result=await instantiateAsync(wasmBinary,wasmBinaryFile,info);var exports=receiveInstantiationResult(result);return exports}class ExitStatus{name="ExitStatus";constructor(status){this.message=`Program terminated with exit(${status})`;this.status=status}}var HEAP16;var HEAP32;var HEAP64;var HEAP8;var HEAPF32;var HEAPF64;var HEAPU16;var HEAPU32;var HEAPU64;var HEAPU8;var callRuntimeCallbacks=callbacks=>{while(callbacks.length>0){callbacks.shift()(Module)}};var onPostRuns=[];var addOnPostRun=cb=>onPostRuns.push(cb);var onPreRuns=[];var addOnPreRun=cb=>onPreRuns.push(cb);var noExitRuntime=true;var __abort_js=()=>abort("");var _emscripten_date_now=()=>Date.now();var getHeapMax=()=>2147483648;var alignMemory=(size,alignment)=>Math.ceil(size/alignment)*alignment;var growMemory=size=>{var oldHeapSize=wasmMemory.buffer.byteLength;var pages=(size-oldHeapSize+65535)/65536|0;try{wasmMemory.grow(pages);updateMemoryViews();return 1}catch(e){}};var _emscripten_resize_heap=requestedSize=>{var oldSize=HEAPU8.length;requestedSize>>>=0;var maxHeapSize=getHeapMax();if(requestedSize>maxHeapSize){return false}for(var cutDown=1;cutDown<=4;cutDown*=2){var overGrownHeapSize=oldSize*(1+.2/cutDown);overGrownHeapSize=Math.min(overGrownHeapSize,requestedSize+100663296);var newSize=Math.min(maxHeapSize,alignMemory(Math.max(requestedSize,overGrownHeapSize),65536));var replacement=growMemory(newSize);if(replacement){return true}}return false};{if(Module["noExitRuntime"])noExitRuntime=Module["noExitRuntime"];if(Module["print"])out=Module["print"];if(Module["printErr"])err=Module["printErr"];if(Module["wasmBinary"])wasmBinary=Module["wasmBinary"];if(Module["arguments"])programArgs=Module["arguments"];if(Module["thisProgram"])thisProgram=Module["thisProgram"];if(Module["preInit"]){if(typeof Module["preInit"]=="function")Module["preInit"]=[Module["preInit"]];while(Module["preInit"].length>0){Module["preInit"].shift()()}}}var _engine_init,_engine_process,_engine_set_step,_engine_set_base,_engine_set_lane,_engine_set_bpm,_engine_set_reverb,_engine_play,_engine_stop,_engine_get_step,_engine_set_macro,_engine_sampler_in_l,_engine_sampler_in_r,_engine_sampler_push,_engine_set_swing,_engine_set_fm_step,_engine_set_fm_param,_engine_set_swarm_step,_engine_set_swarm_param,_malloc,_free,memory,__indirect_function_table,wasmMemory;function assignWasmExports(wasmExports){_engine_init=Module["_engine_init"]=wasmExports["f"];_engine_process=Module["_engine_process"]=wasmExports["g"];_engine_set_step=Module["_engine_set_step"]=wasmExports["h"];_engine_set_base=Module["_engine_set_base"]=wasmExports["i"];_engine_set_lane=Module["_engine_set_lane"]=wasmExports["j"];_engine_set_bpm=Module["_engine_set_bpm"]=wasmExports["k"];_engine_set_reverb=Module["_engine_set_reverb"]=wasmExports["l"];_engine_play=Module["_engine_play"]=wasmExports["m"];_engine_stop=Module["_engine_stop"]=wasmExports["n"];_engine_get_step=Module["_engine_get_step"]=wasmExports["o"];_engine_set_macro=Module["_engine_set_macro"]=wasmExports["p"];_engine_sampler_in_l=Module["_engine_sampler_in_l"]=wasmExports["q"];_engine_sampler_in_r=Module["_engine_sampler_in_r"]=wasmExports["r"];_engine_sampler_push=Module["_engine_sampler_push"]=wasmExports["s"];_engine_set_swing=Module["_engine_set_swing"]=wasmExports["t"];_engine_set_fm_step=Module["_engine_set_fm_step"]=wasmExports["u"];_engine_set_fm_param=Module["_engine_set_fm_param"]=wasmExports["v"];_engine_set_swarm_step=Module["_engine_set_swarm_step"]=wasmExports["w"];_engine_set_swarm_param=Module["_engine_set_swarm_param"]=wasmExports["x"];_malloc=Module["_malloc"]=wasmExports["y"];_free=Module["_free"]=wasmExports["z"];memory=wasmMemory=wasmExports["d"];__indirect_function_table=wasmExports["__indirect_function_table"]}var wasmImports={a:__abort_js,c:_emscripten_date_now,b:_emscripten_resize_heap};async function run(){preRun();var setStatus=Module["setStatus"];if(setStatus){setStatus("Running...");await new Promise(resolve=>setTimeout(resolve,1));setTimeout(setStatus,1,"")}if(ABORT)return;initRuntime();Module["onRuntimeInitialized"]?.();postRun()}var wasmExports;wasmExports=await createWasm();await run();
 ;return Module}})();if(typeof exports==="object"&&typeof module==="object"){module.exports=KickEngineModule;module.exports.default=KickEngineModule}else if(typeof define==="function"&&define["amd"])define([],()=>KickEngineModule);
 
 // kick-worklet.js — concatenated after kick_engine.js in kick-worklet-bundle.js
 // KickEngineModule and __kickBase are in scope.
 // WASM bytes are sent from the main thread via 'init' message (ArrayBuffer).
 
-let _mod = null, _outLPtr = 0, _outRPtr = 0;
+let _mod = null, _outLPtr = 0, _outRPtr = 0, _sampInLPtr = 0, _sampInRPtr = 0;
 const _lanePtr = [0, 0, 0];
 let _ready = false;
 const _pending = [];
@@ -38,6 +38,8 @@ function initModule(sr, wasmBuf) {
         _outRPtr = m._malloc(128 * 4);
         for (let v = 0; v < 3; v++) _lanePtr[v] = m._malloc(128);
         m._engine_init(sr);
+        _sampInLPtr = m._engine_sampler_in_l();
+        _sampInRPtr = m._engine_sampler_in_r();
         _ready = true;
         report('ready, dispatching ' + _pending.length + ' msgs');
         for (const d of _pending) dispatch(_mod, d);
@@ -80,8 +82,13 @@ function dispatch(m, d) {
             _sliceOffsets[2] = d.slices[2];
             break;
         }
-        case 'sampler_set_step': _samplerSteps[d.step] = d.slice; break;
-        case 'sampler_gain':     _samplerGain = d.value; break;
+        case 'sampler_set_step':   _samplerSteps[d.step] = d.slice; break;
+        case 'sampler_gain':       _samplerGain = d.value; break;
+        case 'sampler_set_slices':
+            _sliceOffsets[0] = d.slices[0];
+            _sliceOffsets[1] = d.slices[1];
+            _sliceOffsets[2] = d.slices[2];
+            break;
     }
 }
 
@@ -103,12 +110,45 @@ class KickProcessor extends AudioWorkletProcessor {
 
     process(_inputs, outputs) {
         if (!_ready) return true;
+
+        // Write sampler into WASM input buffers so the engine routes it through FX.
+        // Always fill all 128 slots — zeros for any positions past the end of the sample —
+        // because the C++ engine reads samplerInL/R in FRAME_SIZE chunks across multiple
+        // processFrame() calls and needs the full block to be present.
+        if (_sampInLPtr) {
+            const heap = _mod.HEAPF32;
+            const lOff = _sampInLPtr >>> 2;
+            const rOff = _sampInRPtr >>> 2;
+            for (let i = 0; i < 128; i++) {
+                if (_samplerPos >= 0 && _samplerPos < _sampleLen) {
+                    const env = _samplerEnv;
+                    const g = _samplerGain;
+                    heap[lOff + i] = _sampleL[_samplerPos] * g * env;
+                    heap[rOff + i] = (_sampleR ? _sampleR[_samplerPos] : _sampleL[_samplerPos]) * g * env;
+                    _samplerPos++;
+                    if (_samplerFade > 0) {
+                        _samplerEnv -= _samplerFade;
+                        if (_samplerEnv <= 0) { _samplerEnv = 0; _samplerPos = -1; }
+                    } else if (_samplerPos >= _sampleLen) {
+                        if (_port) _port.postMessage({ type: 'sampler_stop' });
+                        _samplerPos = -1;
+                    }
+                } else {
+                    heap[lOff + i] = 0;
+                    heap[rOff + i] = 0;
+                }
+            }
+        }
+
+        if (_sampInLPtr) _mod._engine_sampler_push(128);
         _mod._engine_process(_outLPtr, _outRPtr, 128);
+
         const lOff = _outLPtr >>> 2, rOff = _outRPtr >>> 2;
         const heap = _mod.HEAPF32;
         const ch = outputs[0];
         ch[0].set(heap.subarray(lOff, lOff + 128));
         if (ch[1]) ch[1].set(heap.subarray(rOff, rOff + 128));
+
         const step = _mod._engine_get_step();
         if (step !== this._lastStep) {
             this._lastStep = step;
@@ -119,23 +159,6 @@ class KickProcessor extends AudioWorkletProcessor {
                 _samplerFade = 0;
                 if (_port) _port.postMessage({ type: 'sampler_start', offset: _samplerPos });
             }
-        }
-
-        if (_samplerPos >= 0 && _sampleL) {
-            const L = ch[0], R = ch[1];
-            const g = _samplerGain;
-            let done = false;
-            for (let i = 0; i < 128 && _samplerPos < _sampleLen; i++, _samplerPos++) {
-                const env = _samplerEnv;
-                L[i] += _sampleL[_samplerPos] * g * env;
-                if (R) R[i] += (_sampleR ? _sampleR[_samplerPos] : _sampleL[_samplerPos]) * g * env;
-                if (_samplerFade > 0) {
-                    _samplerEnv -= _samplerFade;
-                    if (_samplerEnv <= 0) { _samplerEnv = 0; _samplerPos = -1; done = true; break; }
-                }
-            }
-            if (_samplerPos >= _sampleLen) { _samplerPos = -1; done = true; }
-            if (done && _samplerFade === 0 && _port) _port.postMessage({ type: 'sampler_stop' });
         }
 
         return true;
