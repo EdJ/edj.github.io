@@ -1,0 +1,3159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jolt Groovebox | Onboarding</title>
+<style>
+/* ── Fonts (Clinical Dark set, matching the app) ─────────────────────────── */
+@font-face {
+  font-family: 'Chakra Petch';
+  src: url('fonts/ChakraPetch-SemiBold.ttf') format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  src: url('fonts/ChakraPetch-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('geist/GeistMono/webfonts/GeistMono-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('geist/GeistMono/webfonts/GeistMono-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+
+/* ── ColorScheme (InertiaApp.swift) ──────────────────────────────────────── */
+:root {
+  --bg:      #0B0C0F;
+  --darker:  #14161D;
+  --dark:    #1E222C;
+  --mid:     #3A3F4B;
+  --text:    #EDEFF3;
+  --lightg:  #8B93A6;
+  --accent:  #7DFBFD;
+  --orange:  #FF9500;
+  /* panel chamfer: all four corners, 8px */
+  --cham8: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px),
+                   calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+  /* button chamfer: diagonal cut, top-left + bottom-right only, 6px */
+  --diag6: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  --diag5: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Geist Mono', monospace;
+  font-size: 16px;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 8px;
+}
+
+#screen-root {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── OnboardingLayout: compact = stacked, regular = two equal columns ────── */
+.olayout {
+  flex: 1; min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ol-info {
+  flex: none;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px;
+}
+.ol-content {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+.ol-content-inner {
+  width: 100%;
+  max-width: 560px;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+}
+@media (min-width: 768px) {
+  .olayout { flex-direction: row; }
+  .ol-info    { flex: 1 1 0; min-width: 0; }
+  .ol-content { flex: 1 1 0; min-width: 0; }
+}
+
+/* ── FullPage: compact = full width, regular = centered half width ───────── */
+.fullpage {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.fullpage .tpanel { width: 100%; }
+@media (min-width: 768px) {
+  .fullpage .tpanel { width: 50%; }
+}
+
+/* ── Text panel (Onboarding.createTextPanel) ─────────────────────────────── */
+.tpanel {
+  background: var(--mid);
+  padding: 16px;
+  text-align: center;
+  clip-path: var(--cham8);
+  width: 100%;
+  max-width: 560px;
+}
+.tpanel h1 {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.25;
+  margin: 0 0 16px;
+}
+.tpanel p {
+  font-size: 16px;
+  line-height: 1.3;
+  margin: 0 0 8px;
+}
+.tpanel p:last-child { margin-bottom: 0; }
+
+/* ── ToggleableButtonStyle / InstrumentButtonStyle ───────────────────────── */
+.tbtn {
+  appearance: none; -webkit-appearance: none;
+  border: none; margin: 0; padding: 1px;
+  background: var(--mid);            /* border colour layer */
+  clip-path: var(--diag6);
+  cursor: pointer;
+  font-family: 'Geist Mono', monospace;
+  display: inline-flex;
+  height: 48px; min-width: 40px;
+  flex-shrink: 0;
+  color: var(--lightg);
+  user-select: none; touch-action: manipulation;
+}
+.tbtn .ti {
+  clip-path: var(--diag5);
+  background: var(--dark);           /* fill layer */
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 8px;
+  font-size: 16px;
+  color: inherit;
+  min-width: 0; white-space: nowrap;
+}
+.tbtn.small { height: 32px; min-width: 28px; }
+.tbtn.small .ti { font-size: 16px; padding: 0 6px; }
+.tbtn.caption .ti { font-size: 10px; font-weight: 500; }
+.tbtn.selected { background: var(--btnc, var(--lightg)); color: var(--bg); }
+.tbtn.selected .ti { background: var(--btnc, var(--lightg)); }
+.tbtn:active:not(.disabled) .ti { background: var(--btnc, var(--lightg)); color: var(--bg); }
+.tbtn.disabled { color: var(--mid); pointer-events: none; }
+.tbtn svg { display: block; }
+
+/* Instrument chip: 32x32 small, coloured border + glyph, fill on select */
+.ichip { height: 32px; width: 32px; min-width: 28px; background: var(--chipc); color: var(--chipc); }
+.ichip .ti { background: var(--dark); padding: 0; }
+.ichip.selected { color: var(--bg); }
+.ichip.selected .ti { background: var(--chipc); }
+.ichip svg { width: 24px; height: 24px; }
+
+/* ── Rows / misc ─────────────────────────────────────────────────────────── */
+.seqrow { width: 100%; }
+.seqrow canvas { display: block; width: 100%; touch-action: none; cursor: pointer; }
+.vdivider { width: 100%; height: 1px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+.chiprow { display: flex; gap: 8px; justify-content: center; }
+
+.dialgroup-row {
+  width: 100%;
+  display: flex; justify-content: space-evenly; align-items: flex-start;
+}
+.dialcol { display: flex; flex-direction: column; align-items: center; }
+.iswatch { width: 36px; height: 36px; margin-bottom: 12px; position: relative;
+           display: flex; align-items: center; justify-content: center; }
+.iswatch svg { width: 24px; height: 24px; color: var(--bg); }
+
+.dialbox { width: 80px; display: flex; flex-direction: column; align-items: center; }
+@media (min-width: 768px) { .dialbox { width: 112px; } }
+.dialbox canvas { display: block; touch-action: none; cursor: ns-resize; }
+.dial-caption { font-size: 10px; font-weight: 500; padding-top: 4px; color: var(--text); text-align: center; }
+
+/* ── Automation editor ───────────────────────────────────────────────────── */
+.auto-ed { width: 100%; }
+.auto-ed canvas { display: block; width: 100%; touch-action: none; }
+.toolrow { width: 100%; display: flex; align-items: center; }
+.toolrow .sp { flex: 1; }
+
+/* ── Preset panel (NoteEntryPresetPanel) — rounded, not chamfered ────────── */
+.preset-panel {
+  width: 100%;
+  background: var(--dark);
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.pp-top { display: flex; align-items: center; gap: 8px; padding: 12px 12px 0; }
+.pp-left  { width: 44px; display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; }
+.pp-right { width: 40px; display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; }
+.pp-chart { position: relative; flex: 1; height: 120px; min-width: 0; }
+.pp-chart canvas { display: block; width: 100%; height: 120px; background: rgba(139,147,166,0.2); }
+.pp-handle {
+  position: absolute; width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(139,147,166,0.3);
+  transform: translate(-50%, -50%);
+  touch-action: none; cursor: grab;
+}
+.pp-div { height: 1px; background: var(--mid); margin-top: 8px; }
+.pp-bottom { display: flex; justify-content: space-between; padding: 12px; }
+.pp-shape svg { width: 20px; height: 20px; }
+
+/* ── Mod source selector ─────────────────────────────────────────────────── */
+.modsel-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.modsel-menu {
+  position: absolute; top: 36px; z-index: 40;
+  background: var(--dark);
+  border: 1px solid var(--mid);
+  border-radius: 8px;
+  min-width: 160px;
+  overflow: hidden;
+  display: none;
+}
+.modsel-menu.open { display: block; }
+.modsel-item { padding: 9px 14px; font-size: 13px; color: var(--lightg); cursor: pointer; white-space: pre; }
+.modsel-item:hover { background: var(--mid); }
+.modsel-item.lane1 { color: var(--orange); }
+
+/* ── Page selector ───────────────────────────────────────────────────────── */
+.pagesel { display: flex; align-items: center; width: 100%; }
+.pagesel .ps-chip {
+  font-size: 12px; color: var(--bg);
+  background: var(--lightg);
+  height: 32px; padding: 0 8px;
+  display: inline-flex; align-items: center;
+  clip-path: var(--cham8);
+  flex-shrink: 0;
+}
+.pagesel .ps-btn {
+  position: relative;
+  width: 32px; height: 32px;
+  font-family: 'Geist Mono', monospace; font-size: 12px;
+  color: var(--bg);
+  background: var(--mid);
+  border: none; padding: 0; cursor: pointer;
+  clip-path: var(--cham8);
+}
+.pagesel .ps-btn.hl { background: var(--lightg); }
+.pagesel .ps-btn .playbar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 8px;
+  background: transparent;
+}
+.pagesel .ps-btn .playbar.on { background: var(--accent); }
+
+.note-ed { width: 100%; }
+.note-ed canvas { display: block; width: 100%; touch-action: none; }
+
+/* ── Canvas widgets ──────────────────────────────────────────────────────── */
+.grid-wrap, .lg-wrap, .song-wrap { width: 100%; }
+.grid-wrap canvas, .lg-wrap canvas, .song-wrap canvas {
+  display: block; width: 100%; touch-action: none;
+}
+
+/* Song-view hold menu */
+.holdmenu {
+  position: fixed; z-index: 60;
+  display: none;
+  background: var(--dark);
+  border-radius: 8px;
+  padding: 8px;
+  gap: 0;
+  align-items: center;
+}
+.holdmenu.open { display: flex; }
+.holdmenu .hm-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--lightg);
+}
+.holdmenu .hm-btn.danger { color: rgba(255,59,48,0.8); }
+.holdmenu svg { width: 18px; height: 18px; }
+
+/* ── Nav (Back / Next) ───────────────────────────────────────────────────── */
+#navrow { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+#btn-back.hidden { visibility: hidden; }
+
+/* Drag ghost overlay */
+#drag-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  pointer-events: none;
+  display: none;
+}
+#drag-overlay.on { display: block; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="screen-root"></div>
+  <div id="navrow">
+    <button class="tbtn" id="btn-back"><span class="ti">Back</span></button>
+    <button class="tbtn" id="btn-next"><span class="ti">Next</span></button>
+  </div>
+</div>
+<canvas id="drag-overlay"></canvas>
+<div class="holdmenu" id="holdmenu"></div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Constants — ported from Easter (Jolt iOS app)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const C = {
+  bg:     '#0B0C0F',
+  darker: '#14161D',
+  dark:   '#1E222C',
+  mid:    '#3A3F4B',
+  text:   '#EDEFF3',
+  lightg: '#8B93A6',
+  accent: '#7DFBFD',
+  orange: '#FF9500',
+};
+
+// InstrumentPalette.swift — 20 colours
+const PALETTE = [
+  '#7DFBFD','#64D2FF','#A3DFE5','#32E5C8','#CFFB52',
+  '#99E673','#34C759','#00FF41','#FFBA36','#FF9500',
+  '#FF5500','#FF3B30','#FF2D8C','#FCF1A1','#EA3EE7',
+  '#BF5AF2','#0080FF','#5E5CE6','#9B59FF','#4A1FB8',
+];
+
+// PatternColors (PatternComposerView.swift)
+const ROW_COLORS = [
+  '#7DFBFD','#64D2FF','#A3DFE5','#32E5C8','#CFFB52','#99E673','#34C759','#00FF41',
+  '#FFBA36','#FF9500','#FF5500','#FF3B30','#EA3EE7','#BF5AF2','#0080FF','#5E5CE6',
+  '#9B59FF','#4A1FB8',
+];
+const GROUP_COLORS = ['#7DFBFD','#CFFB52','#FF5500','#EA3EE7'];
+
+// Pixel-art instrument icons (Easter/svg/*.svg, 16x16, packed y*16+x)
+const ICON_PX = {
+  kick: [21,22,23,24,25,26,36,42,43,51,59,60,66,76,77,82,87,92,93,98,102,104,108,109,114,118,120,124,125,130,135,140,141,147,151,155,156,164,167,170,171,179,181,182,183,184,185,186,188,194,198,199,200,201,205],
+  hihat: [39,40,55,56,67,68,69,70,71,72,73,74,75,76,82,83,87,88,92,93,97,103,104,110,114,115,116,117,118,119,120,121,122,123,124,125,135,136,151,152,167,168,183,184,199,200,215,216],
+  snare: [19,28,36,43,53,58,70,73,100,101,102,103,104,105,106,107,115,124,130,141,146,157,162,163,172,173,178,180,181,182,183,184,185,186,187,189,194,205,211,220,228,229,230,231,232,233,234,235],
+  waves: [18,22,23,28,29,34,37,39,43,45,50,53,55,59,61,66,68,71,74,77,82,84,87,89,93,98,99,103,105,109,114,119,120,125,146,152,153,154,155,156,157,162,168,173,178,184,189,194,200,205,210,216,221,226,227,228,229,230,231,232,237],
+};
+
+function iconSvg(key, sizePx) {
+  const rects = (ICON_PX[key] || []).map(p =>
+    `<rect x="${p % 16}" y="${Math.floor(p / 16)}" width="1" height="1"/>`).join('');
+  return `<svg viewBox="0 0 16 16" fill="currentColor"${sizePx ? ` width="${sizePx}" height="${sizePx}"` : ''}>${rects}</svg>`;
+}
+
+function drawIcon(ctx, key, x, y, size, color) {
+  const px = ICON_PX[key];
+  if (!px) return;
+  const u = size / 16;
+  ctx.fillStyle = color;
+  for (const p of px) ctx.fillRect(x + (p % 16) * u, y + Math.floor(p / 16) * u, u + 0.05, u + 0.05);
+}
+
+const isRegular = () => window.matchMedia('(min-width: 768px)').matches;
+const DPR = () => window.devicePixelRatio || 1;
+
+const capture = (el, e) => { try { capture(el, e); } catch {} };
+
+function chamPath(ctx, x, y, w, h, r, opts = {}) {
+  const skipBR = !!opts.skipBottomRight;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y); ctx.lineTo(x + w, y + r);
+  if (skipBR) { ctx.lineTo(x + w, y + h); }
+  else { ctx.lineTo(x + w, y + h - r); ctx.lineTo(x + w - r, y + h); }
+  ctx.lineTo(x + r, y + h); ctx.lineTo(x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.closePath();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Demo song data — mainSetup() from Onboarding.swift
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const BPM = 128;
+const SWING = 0.05;
+
+const INSTRUMENTS = [
+  { icon: 'kick',  color: 0,  note: 36 },
+  { icon: 'hihat', color: 8,  note: 60 },
+  { icon: 'snare', color: 5,  note: 36 },
+  { icon: 'hihat', color: 16, note: 60 },
+  { icon: 'waves', color: 12, note: 48 },
+];
+const instColor = i => PALETTE[INSTRUMENTS[i].color];
+
+function mkPattern(id, color, pages = 1) {
+  return {
+    id, color, pages,
+    steps: Array.from({ length: pages }, () =>
+      Array.from({ length: 16 }, () => ({ on: false, inst: 0 }))),
+    notes: Array.from({ length: pages }, () =>
+      Array.from({ length: 16 }, () => ({ active: false, note: 60 }))),
+    lane: new Uint8Array(128),
+  };
+}
+function setFromArray(p, values) {
+  values.forEach((v, i) => {
+    p.steps[0][i].on = v !== null;
+    p.steps[0][i].inst = v ?? 0;
+  });
+}
+
+const patterns = {};
+for (let i = 0; i <= 8; i++) patterns[i] = mkPattern(i, 0);
+
+setFromArray(patterns[0], [0,null,null,null, 0,null,null,null, 0,null,null,null, 0,null,null,null]);
+setFromArray(patterns[1], [0,null,null,null, 0,null,null,null, 0,null,null,null, 0,null,null,null]);
+setFromArray(patterns[2], [0,null,1,null, 0,null,1,null, 0,null,1,null, 0,null,1,null]);
+setFromArray(patterns[3], [0,null,1,null, 0,null,1,null, 0,null,1,null, 0,null,1,null]);
+setFromArray(patterns[4], [null,null,null,null, 2,null,null,null, null,null,null,null, 2,null,null,null]);
+setFromArray(patterns[6], [null,null,null,null, 2,null,null,null, null,null,null,null, 2,null,null,null]);
+setFromArray(patterns[5], [3,3,3,3, 3,3,3,3, 3,3,3,3, 3,3,3,3]);
+setFromArray(patterns[7], [1,null,1,null, 1,null,1,null, 1,null,1,null, 1,null,1,null]);
+
+// Pre-fill p5's automation lane with a ramp
+for (let i = 0; i < 128; i++) patterns[5].lane[i] = Math.min(255, Math.round(i / 127 * 255));
+
+// p8: two-page Euclidean arp E(5,16), Cm7 notes cycled over the hits
+{
+  const p = mkPattern(8, 0, 2);
+  const hits = [0, 3, 6, 9, 12];
+  const arpNotes = [48, 51, 55, 58];
+  let ni = 0;
+  for (let page = 0; page < 2; page++) {
+    for (const s of hits) {
+      p.steps[page][s].on = true;
+      p.steps[page][s].inst = 4;
+      p.notes[page][s].active = true;
+      p.notes[page][s].note = arpNotes[ni % arpNotes.length];
+      ni++;
+    }
+  }
+  patterns[8] = p;
+}
+
+// Pattern grid (segment 0): grid[row][col] = pattern id or null
+const grid = [
+  [0, 4,    5,    8   ],
+  [1, 6,    7,    null],
+  [2, null, null, null],
+  [3, null, null, null],
+];
+function syncGridColors() {
+  for (let r = 0; r < 4; r++)
+    for (let c = 0; c < 4; c++)
+      if (grid[r][c] !== null) patterns[grid[r][c]].color = r;
+}
+syncGridColors();
+
+// Loop groups: sections = arrays of [voice0, voice1, voice2] pattern ids (null = empty)
+const DRAG_DROP_GROUP = 4;
+const VOICE_COUNT = 3;
+let loopGroups = [
+  { sections: [[3, 4, null]] },
+  { sections: [[0, 5, null]] },
+  { sections: [[0, null, null]] },
+  { sections: [[0, 8, null], [0, null, null]] },
+  { sections: [[0, null, null], [0, null, null]] },
+];
+
+function ensureDragDropGroupExists() {
+  while (loopGroups.length <= DRAG_DROP_GROUP)
+    loopGroups.push({ sections: [[null, null, null]] });
+}
+
+// Multi-page ghost resolution (ResolvedPatternCache)
+function resolveCell(group, sIdx, vIdx) {
+  const pid = group.sections[sIdx][vIdx];
+  if (pid !== null && pid !== undefined) return { type: 'direct', pid, page: 0 };
+  for (let k = 1; k <= sIdx; k++) {
+    const src = group.sections[sIdx - k][vIdx];
+    if (src !== null && src !== undefined) {
+      if (patterns[src].pages > k) {
+        // intermediate cells must be empty (they are, since we got here scanning back)
+        return { type: 'ghost', pid: src, page: k };
+      }
+      break;
+    }
+  }
+  return { type: 'empty' };
+}
+
+function dominantInstrument(p) {
+  const counts = {};
+  for (let pg = 0; pg < p.pages; pg++)
+    for (const st of p.steps[pg])
+      if (st.on) counts[st.inst] = (counts[st.inst] || 0) + 1;
+  let best = null, bestN = -1;
+  for (const [k, n] of Object.entries(counts))
+    if (n > bestN || (n === bestN && +k < best)) { best = +k; bestN = n; }
+  return best;
+}
+const patternIcon = p => { const d = dominantInstrument(p); return d === null ? null : INSTRUMENTS[d].icon; };
+
+// LoopGroupsDetails.calculateStartTimes
+function calcStartTimes() {
+  let totalBeats = 0;
+  return loopGroups.map(g => {
+    const totalSeconds = totalBeats * 60 / BPM;
+    const m = Math.floor(totalSeconds / 60);
+    const s = Math.floor(totalSeconds % 60);
+    totalBeats += g.sections.length * 16;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mutable UI state
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const sel = {
+  inst: 0,               // InstrumentSelection.currentIndex
+  pattern: null,         // currently selected pattern id (grid tap)
+  loopGroup: null,       // opened group in song view (screen 12)
+  highlightedGroup: 0,   // song view highlighted card
+};
+
+// screen 4 dial values (base params)
+const inst0 = { harmonics: 0.6 };
+const inst1 = { morph: 0.3 };
+const inst2 = { morph: 0.4 };
+const inst3 = { morph: 0.1, laneOne: 0.4 };
+
+// screens 5-7 state
+let showPresetPanel = true;
+let isDrawingAutomation = false;
+const preset = { type: 'ramp', frequency: 1, reverse: false, top: 1, bottom: 0 };
+let selectedPreset = [];   // filled by recalcPreset() once the generators exist below
+
+// screen 8 state
+let notesPageId = 0;
+let notesScrollStep = 0;   // 0..16
+let notesScrollNote = 0;   // vertical scale-degree offset
+let notesVisiblePages = new Set([0]);
+
+// screen 11 carousel state
+let chainScroll = { offset: 0, centered: 0 };
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Preset generators (AutomationPresetEditor)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const AUTO_W = 128;
+function genRamp()     { return Array.from({ length: AUTO_W }, (_, i) => i / AUTO_W); }
+function genSteps()    { const seg = AUTO_W / 4; return Array.from({ length: AUTO_W }, (_, i) => [0, 0.5, 1, 0.5][Math.floor(i / seg)] ?? 0); }
+function genShelf()    { return Array.from({ length: AUTO_W }, (_, i) => i < AUTO_W / 2 ? 0 : 1); }
+function genHalfRamp() { const mid = AUTO_W / 2; return Array.from({ length: AUTO_W }, (_, i) => i < mid ? 0 : (i - mid) / (mid - 1)); }
+
+function repeatWithFixedStride(arr, repeats) {
+  if (repeats < 1) return [];
+  const out = [];
+  for (let r = 0; r < repeats; r++)
+    for (let i = 0; i < arr.length; i += repeats) out.push(arr[i]);
+  return out;
+}
+
+function recalcPreset() {
+  let result;
+  switch (preset.type) {
+    case 'ramp':     result = genRamp(); break;
+    case 'halfRamp': result = genHalfRamp(); break;
+    case 'steps':    result = genSteps(); break;
+    case 'drop':     result = genShelf(); break;
+  }
+  if (preset.reverse) result = result.slice().reverse();
+  const distance = preset.top - preset.bottom;
+  result = result.map(v => v * distance + preset.bottom);
+  selectedPreset = repeatWithFixedStride(result, preset.frequency);
+}
+
+selectedPreset = genRamp();
+
+function applyPresetToLane() {
+  const lane = patterns[5].lane;
+  const count = lane.length;
+  for (let i = 0; i < count; i++) {
+    const idx = count > 1 ? Math.floor(i / (count - 1) * (selectedPreset.length - 1)) : 0;
+    const v = selectedPreset[Math.max(0, Math.min(idx, selectedPreset.length - 1))];
+    lane[i] = Math.round(Math.max(0, Math.min(1, v)) * 255);
+  }
+  audio.sendHatLane();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Audio — kick_engine WASM worklet (harness protocol from index-interactive.html)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const P = {
+  SubGain:0, SubDecay:1, TransientGain:2, TransientDecay:3,
+  NoiseGain:4, NoiseDecay:5, NoiseLowPass:6, NoiseHighPass:7,
+  NoiseResonance:8, OverdriveAmt:9, ReverbSend:10,
+};
+const DEF_BASE = [
+  [1.0,  0.35, 1.0,  0.08, 0.25, 0.06, 0.50, 0.20, 0.30, 0.0, 0.0],  // kick
+  [0.0,  0.2,  0.0,  0.05, 0.9,  0.08, 0.88, 0.65, 0.65, 0.0, 0.0],  // hat
+  [0.45, 0.18, 0.35, 0.05, 1.0,  0.22, 0.78, 0.35, 0.52, 0.0, 0.15], // snare
+];
+const SW_P = { SPREAD:0, DRIFT:1, DECAY:2, CUTOFF:3, REVERB:4, GAIN:5, DELAY:6, ENV_AMT:7 };
+
+const audio = {
+  actx: null, wNode: null, playing: false, failed: false,
+  // conductor
+  mode: { type: 'none' },           // none | pattern {pid} | group {idx} | song {startGroup}
+  pos: { sectionIdx: 0, groupIdx: 0 },
+  current: null,                    // what's sounding this bar {patternPages:{pid:page}, sectionKey, laneOn}
+  pending: null,
+  step: -1,
+
+  // resume() can stay pending indefinitely when the browser withholds audio
+  // permission — never let it block navigation, just nudge it and move on.
+  nudgeResume() {
+    if (this.actx && this.actx.state !== 'running') this.actx.resume().catch(() => {});
+  },
+
+  async init() {
+    if (this.actx) { this.nudgeResume(); return; }
+    if (this.failed) return;
+    try {
+      this.actx = new AudioContext({ sampleRate: 48000 });
+      const gain = this.actx.createGain();
+      gain.gain.value = 1;
+      gain.connect(this.actx.destination);
+      this.nudgeResume();
+      await this.actx.audioWorklet.addModule('kick-worklet-bundle.js');
+      const wasmBuf = await fetch('kick_engine.wasm').then(r => {
+        if (!r.ok) throw new Error('wasm missing');
+        return r.arrayBuffer();
+      });
+      this.wNode = new AudioWorkletNode(this.actx, 'kick-processor', {
+        outputChannelCount: [2], numberOfOutputs: 1,
+      });
+      this.wNode.port.onmessage = ({ data }) => {
+        if (data.type === 'step') this.onStep(data.step);
+      };
+      this.wNode.connect(gain);
+      this.wNode.port.postMessage({ type: 'init', sr: this.actx.sampleRate, wasmBuf }, [wasmBuf]);
+      this.send({ type: 'set_bpm', bpm: BPM });
+      this.send({ type: 'set_swing', amount: SWING });
+      this.send({ type: 'set_reverb', decay: 0.994, lowPass: 20 * Math.pow(1200, 0.7) / 48000, preDelay: 0.5, ret: 1.0 });
+      for (let v = 0; v < 3; v++)
+        for (let p = 0; p < 11; p++)
+          this.send({ type: 'set_base', v, param: p, value: DEF_BASE[v][p] });
+      this.pushDialParams();
+      const swarmDefs = { SPREAD:0.35, DRIFT:0.25, DECAY:0.3, CUTOFF:0.6, REVERB:0.4, GAIN:0.8, DELAY:0.0, ENV_AMT:0.0 };
+      for (const [k, v] of Object.entries(swarmDefs))
+        this.send({ type: 'set_swarm_param', param: SW_P[k], value: v });
+      this.sendHatLane();
+    } catch (e) {
+      console.warn('Audio init failed (visual-only mode):', e);
+      this.failed = true;
+      this.actx = null;
+      this.wNode = null;
+    }
+  },
+
+  send(msg) { if (this.wNode) this.wNode.port.postMessage(msg); },
+
+  pushDialParams() {
+    // screen-4 dials → engine approximations
+    this.send({ type: 'set_base', v: 0, param: P.OverdriveAmt, value: inst0.harmonics * 0.5 });
+    this.send({ type: 'set_base', v: 2, param: P.NoiseDecay, value: 0.08 + inst2.morph * 0.3 });
+  },
+  pushHatDecayFrom(v) {
+    this.send({ type: 'set_base', v: 1, param: P.NoiseDecay, value: 0.02 + v * 0.3 });
+  },
+
+  sendHatLane() {
+    // Pattern lane scaled by the laneOne mod amount (screen 7's dial)
+    const amt = inst3.laneOne;
+    const buf = new Uint8Array(128);
+    const laneActive = this.current && this.current.laneOn;
+    for (let i = 0; i < 128; i++) {
+      const v = laneActive ? 128 + (patterns[5].lane[i] - 128) * amt : 128;
+      buf[i] = Math.max(0, Math.min(255, Math.round(v)));
+    }
+    this.send({ type: 'set_lane', v: 1, buf: buf.buffer });
+  },
+
+  setMode(mode) {
+    this.mode = mode;
+    this.pos = { sectionIdx: 0, groupIdx: mode.type === 'song' ? (mode.startGroup ?? 0) : (mode.idx ?? 0) };
+    if (mode.type === 'none') {
+      if (this.playing) { this.send({ type: 'stop' }); this.playing = false; }
+      this.step = -1;
+      this.current = null;
+      widgets.forEach(w => w.draw && w.draw());
+      return;
+    }
+    this.programBar(true);
+    this.current = this.pending;
+    this.sendHatLane();
+    if (!this.playing && this.wNode) { this.send({ type: 'play' }); this.playing = true; }
+  },
+
+  // Compute the bar that should sound next and push it to the engine
+  programBar(immediate) {
+    const kick = new Array(16).fill(false);
+    const hat = new Array(16).fill(false);
+    const snare = new Array(16).fill(false);
+    const swarm = new Array(16).fill(null);
+    const patternPages = {};
+    let laneOn = false;
+    let sectionKey = null;
+
+    const addPattern = (pid, page) => {
+      const p = patterns[pid];
+      if (!p || page >= p.pages) return;
+      patternPages[pid] = page;
+      if (pid === 5) laneOn = true;
+      for (let s = 0; s < 16; s++) {
+        const st = p.steps[page][s];
+        if (!st.on) continue;
+        if (st.inst === 0) kick[s] = true;
+        else if (st.inst === 1 || st.inst === 3) hat[s] = true;
+        else if (st.inst === 2) snare[s] = true;
+        else if (st.inst === 4) swarm[s] = p.notes[page][s].active ? p.notes[page][s].note : INSTRUMENTS[4].note;
+      }
+    };
+
+    const m = this.mode;
+    if (m.type === 'pattern') {
+      addPattern(m.pid, 0);
+    } else if (m.type === 'group' || m.type === 'song') {
+      let gIdx = m.type === 'group' ? m.idx : this.pos.groupIdx;
+      gIdx = ((gIdx % loopGroups.length) + loopGroups.length) % loopGroups.length;
+      const g = loopGroups[gIdx];
+      const len = g.sections.length;
+      const sIdx = ((this.pos.sectionIdx % len) + len) % len;
+      sectionKey = gIdx + ':' + sIdx;
+      for (let v = 0; v < VOICE_COUNT; v++) {
+        const cell = resolveCell(g, sIdx, v);
+        if (cell.type !== 'empty') addPattern(cell.pid, cell.page);
+      }
+    }
+
+    for (let s = 0; s < 16; s++) {
+      this.send({ type: 'set_step', v: 0, step: s, active: kick[s], vel: 0.85 });
+      this.send({ type: 'set_step', v: 1, step: s, active: hat[s], vel: 0.6 });
+      this.send({ type: 'set_step', v: 2, step: s, active: snare[s], vel: 0.8 });
+      this.send({ type: 'set_swarm_step', step: s, active: swarm[s] !== null, note: swarm[s] ?? 48, vel: 0.7 });
+    }
+    this.pending = { patternPages, sectionKey, laneOn };
+    if (immediate) this.current = this.pending;
+  },
+
+  advance() {
+    const m = this.mode;
+    if (m.type === 'group') {
+      const g = loopGroups[Math.min(m.idx, loopGroups.length - 1)];
+      this.pos.sectionIdx = (this.pos.sectionIdx + 1) % g.sections.length;
+    } else if (m.type === 'song') {
+      const g = loopGroups[this.pos.groupIdx];
+      this.pos.sectionIdx++;
+      if (this.pos.sectionIdx >= g.sections.length) {
+        this.pos.sectionIdx = 0;
+        if (sel.loopGroup !== null) {
+          this.pos.groupIdx = sel.loopGroup;      // opened group loops
+        } else {
+          this.pos.groupIdx = (this.pos.groupIdx + 1) % loopGroups.length;
+        }
+      }
+    }
+  },
+
+  // Screen index the pending bar was programmed for (null = programmed for the
+  // current screen). The visual flip at step 0 must only happen when the bar that
+  // is starting was actually armed for the target — a click landing between
+  // step 15 and step 0 waits one more bar, keeping audio and visuals in sync.
+  armedFor: null,
+
+  onStep(step) {
+    this.step = step;
+    if (step === 15) {
+      // Pre-arm: a queued screen switch changes the audio just before the bar line
+      if (nav.changingTo !== null) {
+        const target = SCREENS[nav.changingTo];
+        this.applyScreenAudio(target, true);
+        this.armedFor = nav.changingTo;
+      } else {
+        this.advance();
+        this.armedFor = null;
+      }
+      this.programBar(false);
+    } else if (step === 0) {
+      this.current = this.pending || this.current;
+      this.sendHatLane();
+      if (nav.changingTo !== null && this.armedFor === nav.changingTo) {
+        this.armedFor = null;
+        nav.completeTransition();
+      }
+    }
+    widgets.forEach(w => w.onStep && w.onStep(step));
+  },
+
+  applyScreenAudio(screen, preArm) {
+    const qa = screen.audio;
+    if (!qa || qa.type === 'none') {
+      if (!preArm) this.setMode({ type: 'none' });
+      return;
+    }
+    if (qa.type === 'pattern') {
+      this.mode = { type: 'pattern', pid: qa.pid };
+      this.pos = { sectionIdx: 0, groupIdx: 0 };
+    } else if (qa.type === 'group') {
+      this.mode = { type: 'group', idx: qa.idx };
+      this.pos = { sectionIdx: 0, groupIdx: qa.idx };
+    } else if (qa.type === 'song') {
+      this.mode = { type: 'song', startGroup: 0 };
+      this.pos = { sectionIdx: 0, groupIdx: 0 };
+    }
+    if (!preArm) {
+      this.programBar(true);
+      this.sendHatLane();
+      if (!this.playing && this.wNode) { this.send({ type: 'play' }); this.playing = true; }
+    }
+  },
+
+  // The app's forceReset: hard-restart the transport at the start of the focused
+  // group so selecting a group is audible immediately, not at the next wrap.
+  restartGroup(idx) {
+    if (this.mode.type === 'group') this.mode.idx = idx;
+    this.pos = { sectionIdx: 0, groupIdx: idx };
+    this.forceRestart();
+  },
+
+  forceRestart() {
+    if (!this.wNode) return;
+    this.programBar(true);
+    this.sendHatLane();
+    this.send({ type: 'stop' });
+    this.send({ type: 'play' });
+    this.step = -1;
+    this.playing = true;
+    this.armedFor = null;
+    widgets.forEach(w => w.draw && w.draw());
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DOM helpers
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function h(tag, attrs = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') el.className = v;
+    else if (k === 'style') el.style.cssText = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v);
+  }
+  for (const ch of children) {
+    if (ch == null) continue;
+    el.append(ch instanceof Node ? ch : document.createTextNode(ch));
+  }
+  return el;
+}
+
+function tbtn(label, opts = {}) {
+  const b = h('button', { class: 'tbtn' + (opts.small ? ' small' : '') + (opts.caption ? ' caption' : '') });
+  const ti = h('span', { class: 'ti' });
+  if (typeof label === 'string') ti.textContent = label; else ti.append(label);
+  b.append(ti);
+  if (opts.color) b.style.setProperty('--btnc', opts.color);
+  if (opts.selected) b.classList.add('selected');
+  if (opts.onclick) b.addEventListener('click', opts.onclick);
+  return b;
+}
+
+function textPanel(title, lines = []) {
+  const p = h('div', { class: 'tpanel' }, h('h1', {}, title));
+  for (const line of lines) {
+    const el = h('p');
+    if (line === '') el.innerHTML = '&nbsp;';
+    else el.textContent = line;
+    p.append(el);
+  }
+  return p;
+}
+
+const SVG_WAVEFORM = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="10" x2="3" y2="14"/><line x1="7.5" y1="6" x2="7.5" y2="18"/><line x1="12" y1="2.5" x2="12" y2="21.5"/><line x1="16.5" y1="7" x2="16.5" y2="17"/><line x1="21" y1="10.5" x2="21" y2="13.5"/></svg>`;
+const SVG_SWAP = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 4 21 8 17 12"/><line x1="21" y1="8" x2="7" y2="8"/><polyline points="7 12 3 16 7 20"/><line x1="3" y1="16" x2="17" y2="16"/></svg>`;
+const SVG_DUP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 4H6a2 2 0 0 0-2 2v10"/></svg>`;
+const SVG_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Widgets (canvas components) — registry redrawn on engine steps
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let widgets = [];
+
+/* ── CanvasSequencerPage: one row of 8 steps ─────────────────────────────── */
+function seqRowWidget(pid, offset, steps = 8) {
+  const wrap = h('div', { class: 'seqrow' });
+  const canvas = h('canvas');
+  wrap.append(canvas);
+  const SEP = 2;
+  let geom = null;
+
+  function layout() {
+    const w = canvas.offsetWidth || wrap.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    const totalSep = steps > 8 ? SEP * 3 : SEP;
+    const stepSize = Math.floor(Math.min((w - totalSep) / steps, 9999));
+    const hgt = stepSize;
+    canvas.style.height = hgt + 'px';
+    canvas.width = Math.round(w * DPR());
+    canvas.height = Math.round(hgt * DPR());
+    geom = { w, h: hgt, stepSize };
+    draw();
+  }
+
+  function stepX(i) {
+    // gutter before every 4th step
+    return i * geom.stepSize + Math.floor(i / 4) * SEP - (i % 4 === 0 && i > 0 ? 0 : 0);
+  }
+
+  function draw() {
+    if (!geom) return;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    ctx.clearRect(0, 0, geom.w, geom.h);
+    const p = patterns[pid];
+    const size = geom.stepSize;
+    const ch = size * 0.2;
+    const playingPage = audio.current ? audio.current.patternPages[pid] : undefined;
+    const showPlay = playingPage === 0 && audio.step >= offset && audio.step < offset + steps && audio.playing;
+
+    let x = 0;
+    for (let i = 0; i < steps; i++) {
+      const sIdx = offset + i;
+      if (i > 0 && i % 4 === 0) x += SEP;
+      // playhead square (drawn under the chamfered cell)
+      if (showPlay && audio.step === sIdx) {
+        ctx.fillStyle = C.lightg;
+        ctx.fillRect(x, 0, size, size);
+      }
+      const st = p.steps[0][sIdx];
+      ctx.fillStyle = st.on ? instColor(st.inst) : C.lightg;
+      chamPath(ctx, x, 0, size, size, ch);
+      ctx.fill();
+      if (st.on) {
+        const inset = size * 0.25;
+        drawIcon(ctx, INSTRUMENTS[st.inst].icon, x + inset, 0 + inset, size - 2 * inset, C.bg);
+      }
+      x += size;
+    }
+  }
+
+  function hit(e) {
+    if (!geom) return -1;
+    const r = canvas.getBoundingClientRect();
+    const cx = e.clientX - r.left, cy = e.clientY - r.top;
+    if (cy < 0 || cy > geom.stepSize) return -1;
+    let x = 0;
+    for (let i = 0; i < steps; i++) {
+      if (i > 0 && i % 4 === 0) x += SEP;
+      if (cx >= x && cx < x + geom.stepSize) return offset + i;
+      x += geom.stepSize;
+    }
+    return -1;
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    const s = hit(e);
+    if (s < 0) return;
+    const st = patterns[pid].steps[0][s];
+    if (st.on && st.inst === sel.inst) st.on = false;
+    else { st.on = true; st.inst = sel.inst; }
+    draw();
+    if (audio.current && audio.current.patternPages[pid] !== undefined) audio.programBar(true);
+  });
+
+  const wdg = { el: wrap, layout, draw, onStep: () => draw() };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ── Instrument chip list ────────────────────────────────────────────────── */
+function instrumentChips(list) {
+  const row = h('div', { class: 'chiprow' });
+  const btns = list.map(i => {
+    const b = h('button', { class: 'ichip tbtn small' });
+    b.style.setProperty('--chipc', instColor(i));
+    const ti = h('span', { class: 'ti' });
+    ti.innerHTML = iconSvg(INSTRUMENTS[i].icon, 24);
+    b.append(ti);
+    b.addEventListener('click', () => { sel.inst = i; update(); });
+    row.append(b);
+    return b;
+  });
+  function update() {
+    btns.forEach((b, k) => b.classList.toggle('selected', sel.inst === list[k]));
+  }
+  update();
+  return row;
+}
+
+/* ── Dial (Dial.swift): 270° ring, gap at 6 o'clock ──────────────────────── */
+function dialWidget(cfg) {
+  // cfg: {caption, get(), set(v), defaultValue, modGet(), modSet(v), selectedMod() -> bool}
+  const box = h('div', { class: 'dialbox' });
+  const canvas = h('canvas');
+  box.append(canvas);
+  if (cfg.caption) box.append(h('div', { class: 'dial-caption' }, cfg.caption));
+
+  let size = 0;
+  let dragging = null;
+
+  function layout() {
+    const w = box.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    size = Math.min(w, isRegular() ? 112 : 80);
+    const lw = size * 0.32;
+    canvas.style.width = size + 'px';
+    canvas.style.height = (size + lw * 0.5) + 'px';
+    canvas.width = Math.round(size * DPR());
+    canvas.height = Math.round((size + lw * 0.5) * DPR());
+    draw();
+  }
+
+  const deg = d => d * Math.PI / 180;
+  const START = 135, ARC = 270, END = 405, OVER = 4;
+
+  function draw() {
+    if (!size) return;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    const lw = size * 0.32;
+    ctx.clearRect(0, 0, size, size + lw);
+    const cx = size / 2, cy = size / 2 + lw * 0.5;
+    const rBase = (size - lw) / 2;
+    const value = cfg.get();
+    const modOn = cfg.selectedMod && cfg.selectedMod();
+    const modAmt = cfg.modGet ? cfg.modGet() : 0;
+    const hasRing = cfg.modGet && (modAmt !== 0 || (dragging && modOn));
+
+    // track
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = C.mid;
+    ctx.beginPath(); ctx.arc(cx, cy, rBase, deg(START), deg(END)); ctx.stroke();
+    // value
+    if (value > 0.001) {
+      ctx.strokeStyle = C.lightg;
+      ctx.beginPath(); ctx.arc(cx, cy, rBase, deg(START), deg(START + value * ARC)); ctx.stroke();
+    }
+    // mod ring (laneOne = orange), anchored at the value, sweeping ± amount
+    if (hasRing) {
+      const slots = 1;
+      const thick = lw / (slots + 1);
+      const rRing = (size - thick) / 2;
+      const anchor = START + value * ARC;
+      const rawFar = anchor + modAmt * ARC;
+      const far = Math.max(START - OVER, Math.min(END + OVER, rawFar));
+      const a0 = Math.min(anchor, far), a1 = Math.max(anchor, far);
+      ctx.lineWidth = thick;
+      ctx.strokeStyle = C.orange;
+      ctx.beginPath(); ctx.arc(cx, cy, rRing, deg(a0), deg(a1)); ctx.stroke();
+      if (far !== rawFar) {
+        ctx.fillStyle = C.orange;
+        ctx.beginPath();
+        ctx.arc(cx + rRing * Math.cos(deg(far)), cy + rRing * Math.sin(deg(far)), thick * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    // readout
+    const active = modOn ? modAmt : value;
+    ctx.fillStyle = modOn ? C.orange : C.text;
+    ctx.font = `500 ${Math.max(10, Math.round(size * 0.125))}px 'Geist Mono', monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(Math.round(active * 100)), cx, cy);
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    const modOn = cfg.selectedMod && cfg.selectedMod();
+    dragging = {
+      x: e.clientX, y: e.clientY,
+      v: modOn ? cfg.modGet() : cfg.get(),
+      mod: modOn,
+    };
+    capture(canvas, e);
+    e.preventDefault();
+    draw();
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dy = (dragging.y - e.clientY) * 0.006;
+    const dx = (e.clientX - dragging.x) * 0.0025;
+    let v = dragging.v + dy + dx;
+    const minV = dragging.mod ? -1 : 0;
+    v = Math.min(Math.max(v, minV), 1.04);
+    if (v >= 0.5 && v < 0.54) v = 0.5;
+    else if (v >= 0.54) v -= 0.04;
+    if (!dragging.mod) {
+      v = Math.min(Math.max(v, 0), 1);
+      if (v < 0.03) v = 0;
+      else if (v > 0.97) v = 1;
+    } else {
+      if (Math.abs(v) < 0.03) v = 0;
+      else if (v > 0.97) v = 1;
+      else if (v < -0.97) v = -1;
+    }
+    v = Math.round(v * 255) / 255;
+    if (dragging.mod) cfg.modSet(v); else cfg.set(v);
+    draw();
+    e.preventDefault();
+  });
+  const stop = () => { dragging = null; draw(); };
+  canvas.addEventListener('pointerup', stop);
+  canvas.addEventListener('pointercancel', stop);
+  canvas.addEventListener('dblclick', () => {
+    if (cfg.selectedMod && cfg.selectedMod()) cfg.modSet(0);
+    else cfg.set(cfg.defaultValue ?? 0);
+    draw();
+  });
+
+  const wdg = { el: box, layout, draw };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ── Automation editor (MultiPageNoteEntry, mode .automation, 16 steps) ──── */
+function autoEditorWidget(pid, opts = {}) {
+  // opts: {drawing: () => bool, interactive: bool}
+  const wrap = h('div', { class: 'auto-ed' });
+  const laneCanvas = h('canvas');
+  const stepCanvas = h('canvas');
+  wrap.append(laneCanvas, stepCanvas);
+  const LANE_H = 160;
+  let geom = null;
+
+  function layout() {
+    const w = wrap.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    const cellW = Math.floor(w / 16);
+    const stepH = Math.min(cellW, 40);
+    laneCanvas.style.height = LANE_H + 'px';
+    laneCanvas.width = Math.round(w * DPR());
+    laneCanvas.height = Math.round(LANE_H * DPR());
+    stepCanvas.style.height = stepH + 'px';
+    stepCanvas.width = Math.round(w * DPR());
+    stepCanvas.height = Math.round(stepH * DPR());
+    geom = { w, cellW, stepH };
+    draw();
+  }
+
+  function drawLane() {
+    const ctx = laneCanvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    const { w, cellW } = geom;
+    const H = LANE_H;
+    ctx.clearRect(0, 0, w, H);
+
+    // playhead column (accent 20%)
+    if (audio.playing && audio.current && audio.current.patternPages[pid] !== undefined && audio.step >= 0) {
+      ctx.fillStyle = 'rgba(125,251,253,0.2)';
+      ctx.fillRect(cellW * audio.step, 0, cellW, H);
+    }
+    // odd-beat shading
+    for (let i = 0; i < 16; i++) {
+      if (Math.floor(i / 4) % 2 === 1) {
+        ctx.fillStyle = 'rgba(58,63,75,0.4)';
+        ctx.fillRect(cellW * i, 0, cellW, H);
+      }
+    }
+    // dashed quarter lines
+    ctx.strokeStyle = 'rgba(58,63,75,0.9)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 2]);
+    for (let d = 1; d < 4; d++) {
+      ctx.beginPath();
+      ctx.moveTo(0, H * d / 4); ctx.lineTo(cellW * 16, H * d / 4);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    // vertical cell lines
+    ctx.strokeStyle = 'rgba(58,63,75,0.7)';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 16; i++) {
+      ctx.beginPath(); ctx.moveTo(cellW * i, 0); ctx.lineTo(cellW * i, H); ctx.stroke();
+    }
+    // orange automation polyline (128 sub-values)
+    const lane = patterns[pid].lane;
+    ctx.strokeStyle = C.orange;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < 128; i++) {
+      const x = cellW * (Math.floor(i / 8) + (i % 8) / 8);
+      const y = H * (1 - lane[i] / 255);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    // beat separators
+    drawBeatSeparators(ctx, cellW, H);
+  }
+
+  function drawBeatSeparators(ctx, cellW, H) {
+    for (let i = 4; i < 16; i += 4) {
+      const x = cellW * i;
+      ctx.strokeStyle = C.bg; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      ctx.strokeStyle = 'rgba(139,147,166,0.5)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+  }
+
+  function drawSteps() {
+    const ctx = stepCanvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    const { w, cellW, stepH } = geom;
+    ctx.clearRect(0, 0, w, stepH);
+    const p = patterns[pid];
+    const ch = stepH * 0.2;
+    const playing = audio.playing && audio.current && audio.current.patternPages[pid] !== undefined;
+    for (let i = 0; i < 16; i++) {
+      const x = cellW * i;
+      if (playing && audio.step === i) {
+        ctx.fillStyle = C.lightg;
+        ctx.fillRect(x, 0, cellW, stepH);
+      }
+      const st = p.steps[0][i];
+      ctx.fillStyle = st.on ? instColor(st.inst) : C.lightg;
+      chamPath(ctx, x, 0, cellW, stepH, ch);
+      ctx.fill();
+      if (st.on) {
+        const inset = Math.min(cellW, stepH) * 0.25;
+        drawIcon(ctx, INSTRUMENTS[st.inst].icon,
+          x + (cellW - (Math.min(cellW, stepH) - 2 * inset)) / 2, inset,
+          Math.min(cellW, stepH) - 2 * inset, C.bg);
+      }
+    }
+  }
+
+  function draw() { if (geom) { drawLane(); drawSteps(); } }
+
+  // Lane interaction: drawing mode = freehand; otherwise vertical bar-drag on one step
+  if (opts.interactive !== false) {
+    let drag = null;
+    const setAt = (x, y) => {
+      const sub = Math.max(0, Math.min(127, Math.floor(x / (geom.cellW * 16) * 128)));
+      const v = Math.max(0, Math.min(1, (LANE_H - y) / LANE_H));
+      patterns[pid].lane[sub] = Math.round(v * 255);
+      return sub;
+    };
+    const setRange = (x0, y0, x1, y1) => {
+      let a = Math.floor(x0 / (geom.cellW * 16) * 128), b = Math.floor(x1 / (geom.cellW * 16) * 128);
+      let ya = y0, yb = y1;
+      if (a > b) { [a, b] = [b, a]; [ya, yb] = [yb, ya]; }
+      a = Math.max(0, Math.min(127, a)); b = Math.max(0, Math.min(127, b));
+      const n = Math.max(1, b - a);
+      for (let i = a; i <= b; i++) {
+        const t = (i - a) / n;
+        const y = ya + (yb - ya) * t;
+        patterns[pid].lane[i] = Math.round(Math.max(0, Math.min(1, (LANE_H - y) / LANE_H)) * 255);
+      }
+    };
+    laneCanvas.addEventListener('pointerdown', e => {
+      if (!geom) return;
+      const r = laneCanvas.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const drawingMode = opts.drawing ? opts.drawing() : false;
+      if (drawingMode) {
+        setAt(x, y);
+        drag = { mode: 'draw', last: { x, y } };
+      } else {
+        // single-bar mode: lock to the starting step, drag sets its 8 sub-values
+        const step = Math.max(0, Math.min(15, Math.floor(x / geom.cellW)));
+        const v = Math.max(0, Math.min(1, (LANE_H - y) / LANE_H));
+        for (let k = 0; k < 8; k++) patterns[pid].lane[step * 8 + k] = Math.round(v * 255);
+        drag = { mode: 'bar', step };
+      }
+      capture(laneCanvas, e);
+      audio.sendHatLane();
+      drawLane();
+      e.preventDefault();
+    });
+    laneCanvas.addEventListener('pointermove', e => {
+      if (!drag || !geom) return;
+      const r = laneCanvas.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      if (drag.mode === 'draw') {
+        setRange(drag.last.x, drag.last.y, x, y);
+        drag.last = { x, y };
+      } else {
+        const v = Math.max(0, Math.min(1, (LANE_H - y) / LANE_H));
+        for (let k = 0; k < 8; k++) patterns[pid].lane[drag.step * 8 + k] = Math.round(v * 255);
+      }
+      audio.sendHatLane();
+      drawLane();
+      e.preventDefault();
+    });
+    const end = () => { drag = null; };
+    laneCanvas.addEventListener('pointerup', end);
+    laneCanvas.addEventListener('pointercancel', end);
+
+    stepCanvas.addEventListener('pointerdown', e => {
+      if (!geom) return;
+      const r = stepCanvas.getBoundingClientRect();
+      const i = Math.max(0, Math.min(15, Math.floor((e.clientX - r.left) / geom.cellW)));
+      const st = patterns[pid].steps[0][i];
+      if (st.on && st.inst === sel.inst) st.on = false;
+      else { st.on = true; st.inst = sel.inst; }
+      drawSteps();
+      if (audio.current && audio.current.patternPages[pid] !== undefined) audio.programBar(true);
+    });
+  } else {
+    laneCanvas.style.pointerEvents = 'none';
+    stepCanvas.style.pointerEvents = 'none';
+  }
+
+  const wdg = { el: wrap, layout, draw, onStep: () => draw() };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ── Preset panel (NoteEntryPresetPanel) ─────────────────────────────────── */
+function presetPanelWidget(onApply, onCancel) {
+  const panel = h('div', { class: 'preset-panel' });
+  const chart = h('div', { class: 'pp-chart' });
+  const chartCanvas = h('canvas');
+  const topHandle = h('div', { class: 'pp-handle' });
+  const botHandle = h('div', { class: 'pp-handle' });
+  chart.append(chartCanvas, topHandle, botHandle);
+
+  const btnX2 = tbtn('x2', { small: true, onclick: () => { preset.frequency = Math.min(8, preset.frequency * 2); refresh(); } });
+  const btnD2 = tbtn('/2', { small: true, onclick: () => { preset.frequency = Math.max(1, Math.floor(preset.frequency / 2)); refresh(); } });
+  const revLbl = h('span'); revLbl.innerHTML = SVG_SWAP;
+  const btnRev = tbtn(revLbl, { small: true, onclick: () => { preset.reverse = !preset.reverse; refresh(); } });
+
+  const shapes = [
+    { key: 'ramp',     d: 'M2 2 L18 18' },
+    { key: 'halfRamp', d: 'M2 2 L10 18 L18 18' },
+    { key: 'steps',    d: 'M2 18 L6 18 L6 10 L10 10 L10 2 L14 2 L14 10 L18 10' },
+    { key: 'drop',     d: 'M2 18 L10 18 L10 2 L18 2' },
+  ];
+  const shapeBtns = shapes.map(s => {
+    const icon = h('span', { class: 'pp-shape' });
+    icon.innerHTML = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="${s.d}"/></svg>`;
+    return tbtn(icon, { small: true, onclick: () => { preset.type = s.key; refresh(); } });
+  });
+
+  const left = h('div', { class: 'pp-left' }, btnX2, btnD2, btnRev);
+  const right = h('div', { class: 'pp-right' }, ...shapeBtns);
+  panel.append(
+    h('div', { class: 'pp-top' }, left, chart, right),
+    h('div', { class: 'pp-div' }),
+    h('div', { class: 'pp-bottom' },
+      tbtn('Cancel', { small: true, onclick: onCancel }),
+      tbtn('Apply', { small: true, onclick: onApply })),
+  );
+
+  function layout() {
+    const w = chart.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    chartCanvas.width = Math.round(w * DPR());
+    chartCanvas.height = Math.round(120 * DPR());
+    draw();
+  }
+
+  function draw() {
+    const w = chart.offsetWidth;
+    if (!w) return;
+    const ctx = chartCanvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    ctx.clearRect(0, 0, w, 120);
+    ctx.strokeStyle = C.orange;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < selectedPreset.length; i++) {
+      const x = i * (w / (selectedPreset.length - 1));
+      const y = 120 - selectedPreset[i] * 120;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    // handles: top at the curve's end, bottom at the start (flipping with reverse)
+    topHandle.style.left = (preset.reverse ? 0 : w) + 'px';
+    topHandle.style.top = (120 * (1 - preset.top)) + 'px';
+    botHandle.style.left = (preset.reverse ? w : 0) + 'px';
+    botHandle.style.top = (120 * (1 - preset.bottom)) + 'px';
+  }
+
+  function refresh() {
+    btnX2.classList.toggle('disabled', preset.frequency > 4);
+    btnD2.classList.toggle('disabled', preset.frequency < 2);
+    btnRev.classList.toggle('selected', preset.reverse);
+    shapeBtns.forEach((b, i) => b.classList.toggle('selected', preset.type === shapes[i].key));
+    recalcPreset();
+    draw();
+  }
+
+  const round02 = v => Math.round(v / 0.2) * 0.2;
+  function handleDrag(handle, which) {
+    handle.addEventListener('pointerdown', e => {
+      capture(handle, e);
+      e.preventDefault();
+    });
+    handle.addEventListener('pointermove', e => {
+      if (!handle.hasPointerCapture || !handle.hasPointerCapture(e.pointerId)) return;
+      const r = chart.getBoundingClientRect();
+      const v = Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / 120));
+      if (which === 'top') {
+        preset.top = round02(v);
+        if (preset.top < preset.bottom) preset.bottom = preset.top;
+      } else {
+        preset.bottom = round02(v);
+        if (preset.top < preset.bottom) preset.top = preset.bottom;
+      }
+      refresh();
+    });
+  }
+  handleDrag(topHandle, 'top');
+  handleDrag(botHandle, 'bottom');
+
+  refresh();
+  const wdg = { el: panel, layout, draw };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ── Note grid (MultiPageNoteEntry, mode .notes, 2 pages) ────────────────── */
+const SCALE_MINOR = [0, 2, 3, 5, 7, 8, 10];
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const midiName = n => NOTE_NAMES[n % 12] + Math.floor(n / 12);
+
+function buildNotes(offset) {
+  // NoteGridState.buildNotes: scale rows from baseNote 48 (C), count = scale+1
+  const base = 48;
+  const count = SCALE_MINOR.length + 1;
+  let idx = 0 + offset;
+  let octave = Math.floor(base / 12);
+  const notes = [];
+  for (let k = 0; k < count; k++) {
+    while (idx >= SCALE_MINOR.length) { octave++; idx -= SCALE_MINOR.length; }
+    while (idx < 0) { octave--; idx += SCALE_MINOR.length; }
+    notes.push(SCALE_MINOR[idx] + octave * 12);
+    idx++;
+  }
+  return notes;   // ascending
+}
+
+function noteGridWidget(pid, onPageChange) {
+  const wrap = h('div', { class: 'note-ed' });
+  const gridCanvas = h('canvas');
+  const stepCanvas = h('canvas');
+  wrap.append(gridCanvas, stepCanvas);
+  const GRID_H = 208;
+  let geom = null;
+  const p = patterns[pid];
+  const totalSteps = p.pages * 16;
+
+  function rows() { return buildNotes(notesScrollNote); }
+
+  function layout() {
+    const w = wrap.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    const cellW = Math.floor(w / 16);
+    const stepH = Math.min(cellW, 40);
+    gridCanvas.style.height = GRID_H + 'px';
+    gridCanvas.width = Math.round(w * DPR());
+    gridCanvas.height = Math.round(GRID_H * DPR());
+    stepCanvas.style.height = stepH + 'px';
+    stepCanvas.width = Math.round(w * DPR());
+    stepCanvas.height = Math.round(stepH * DPR());
+    geom = { w, cellW, stepH, cellH: GRID_H / rows().length };
+    draw();
+  }
+
+  function stepAt(absStep) {
+    const page = Math.floor(absStep / 16);
+    return { st: p.steps[page][absStep % 16], nt: p.notes[page][absStep % 16], page };
+  }
+
+  function reportPages() {
+    const first = Math.floor(notesScrollStep / 16);
+    const last = Math.floor((notesScrollStep + 15) / 16);
+    notesVisiblePages = new Set();
+    for (let k = first; k <= last; k++) notesVisiblePages.add(Math.min(k, p.pages - 1));
+    notesPageId = Math.floor(notesScrollStep / 16);
+    if (onPageChange) onPageChange();
+  }
+
+  function drawGrid() {
+    const ctx = gridCanvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    const { w, cellW } = geom;
+    const notes = rows();
+    const nRows = notes.length;
+    const cellH = GRID_H / nRows;
+    geom.cellH = cellH;
+    ctx.clearRect(0, 0, w, GRID_H);
+
+    // playhead column
+    const playPage = audio.current ? audio.current.patternPages[pid] : undefined;
+    if (audio.playing && playPage !== undefined && audio.step >= 0) {
+      const abs = playPage * 16 + audio.step;
+      const xi = abs - notesScrollStep;
+      if (xi >= 0 && xi < 16) {
+        ctx.fillStyle = 'rgba(125,251,253,0.2)';
+        ctx.fillRect(cellW * xi, 0, cellW, GRID_H);
+      }
+    }
+
+    for (let xi = 0; xi < 16; xi++) {
+      const abs = notesScrollStep + xi;
+      if (abs >= totalSteps) break;
+      const { st, nt } = stepAt(abs);
+      for (let y = 0; y < nRows; y++) {
+        const note = notes[nRows - y - 1];
+        const isActive = st.on && ((nt.active && nt.note === note) ||
+          (!nt.active && note === INSTRUMENTS[st.inst].note));
+        const rx = cellW * xi, ry = cellH * y;
+        if (!isActive) {
+          if (xi === 0) {
+            const isRoot = note % 12 === 0;
+            ctx.fillStyle = isRoot ? C.lightg : C.mid;
+            ctx.font = `500 10px 'Geist Mono', monospace`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(midiName(note), rx + cellW / 2, ry + cellH / 2 - 1);
+          }
+          continue;
+        }
+        ctx.fillStyle = instColor(st.inst);
+        ctx.fillRect(rx, ry, cellW, cellH);
+        ctx.fillStyle = C.bg;
+        ctx.font = `500 10px 'Geist Mono', monospace`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(midiName(note), rx + cellW / 2, ry + cellH / 2 - 1);
+      }
+      // out-of-view indicators
+      if (st.on && nt.active) {
+        const lo = notes[0], hi = notes[nRows - 1];
+        if (nt.note > hi) { ctx.fillStyle = instColor(st.inst); ctx.fillRect(cellW * xi, 0, cellW, cellH * 0.2); }
+        if (nt.note < lo) { ctx.fillStyle = instColor(st.inst); ctx.fillRect(cellW * xi, GRID_H - cellH * 0.2, cellW, cellH * 0.2); }
+      }
+    }
+    // ghost while moving a note
+    if (moveDrag) {
+      const gAbs = moveDrag.srcAbs + moveDrag.dStep;
+      const xi = gAbs - notesScrollStep;
+      const kIdx = moveDrag.srcRowK + moveDrag.dRow;
+      if (xi >= 0 && xi < 16 && kIdx >= 0 && kIdx < nRows) {
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = instColor(4);
+        ctx.fillRect(cellW * xi, cellH * (nRows - kIdx - 1), cellW, cellH);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // odd-beat shading over cells (drawGrid comes after notes in the app)
+    for (let xi = 0; xi < 16; xi++) {
+      const abs = notesScrollStep + xi;
+      if (Math.floor(abs / 4) % 2 === 1) {
+        ctx.fillStyle = 'rgba(58,63,75,0.25)';
+        ctx.fillRect(cellW * xi, 0, cellW, GRID_H);
+      }
+    }
+    // horizontal lines
+    ctx.strokeStyle = C.mid;
+    ctx.lineWidth = 1;
+    for (let y = 0; y <= nRows; y++) {
+      ctx.beginPath(); ctx.moveTo(0, cellH * y); ctx.lineTo(cellW * 16, cellH * y); ctx.stroke();
+    }
+    // vertical lines
+    ctx.strokeStyle = 'rgba(58,63,75,0.7)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x <= 16; x++) {
+      ctx.beginPath(); ctx.moveTo(cellW * x, 0); ctx.lineTo(cellW * x, GRID_H); ctx.stroke();
+    }
+    // beat + page separators
+    for (let xi = 1; xi < 16; xi++) {
+      const abs = notesScrollStep + xi;
+      const isPage = abs % 16 === 0;
+      const isBeat = abs % 4 === 0;
+      if (!isPage && !isBeat) continue;
+      const x = cellW * xi;
+      if (isPage) {
+        ctx.strokeStyle = C.bg; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, GRID_H); ctx.stroke();
+        ctx.strokeStyle = C.lightg; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x - 2, 0); ctx.lineTo(x - 2, GRID_H); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x + 2, 0); ctx.lineTo(x + 2, GRID_H); ctx.stroke();
+      } else {
+        ctx.strokeStyle = C.bg; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, GRID_H); ctx.stroke();
+        ctx.strokeStyle = 'rgba(139,147,166,0.5)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, GRID_H); ctx.stroke();
+      }
+    }
+  }
+
+  function drawSteps() {
+    const ctx = stepCanvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    const { w, cellW, stepH } = geom;
+    ctx.clearRect(0, 0, w, stepH);
+    const ch = stepH * 0.2;
+    const playPage = audio.current ? audio.current.patternPages[pid] : undefined;
+    for (let xi = 0; xi < 16; xi++) {
+      const abs = notesScrollStep + xi;
+      if (abs >= totalSteps) break;
+      const { st, page } = stepAt(abs);
+      const x = cellW * xi;
+      if (audio.playing && playPage === page && audio.step === abs % 16) {
+        ctx.fillStyle = C.lightg;
+        ctx.fillRect(x, 0, cellW, stepH);
+      }
+      ctx.fillStyle = st.on ? instColor(st.inst) : C.lightg;
+      chamPath(ctx, x, 0, cellW, stepH, ch);
+      ctx.fill();
+      if (st.on) {
+        const s = Math.min(cellW, stepH);
+        const inset = s * 0.25;
+        drawIcon(ctx, INSTRUMENTS[st.inst].icon, x + (cellW - (s - 2 * inset)) / 2, inset, s - 2 * inset, C.bg);
+      }
+    }
+  }
+
+  function draw() { if (geom) { drawGrid(); drawSteps(); } }
+
+  // interactions
+  let pdrag = null;      // scroll drag
+  let moveDrag = null;   // note move drag
+
+  function cellFromEvent(e) {
+    const r = gridCanvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const xi = Math.floor(x / geom.cellW);
+    const yi = Math.floor(y / geom.cellH);
+    const notes = rows();
+    if (xi < 0 || xi >= 16 || yi < 0 || yi >= notes.length) return null;
+    return { xi, yi, note: notes[notes.length - yi - 1], rowK: notes.length - yi - 1 };
+  }
+
+  gridCanvas.addEventListener('pointerdown', e => {
+    if (!geom) return;
+    const cell = cellFromEvent(e);
+    pdrag = {
+      x: e.clientX, y: e.clientY,
+      startStep: notesScrollStep, startNote: notesScrollNote,
+      moved: false, cell,
+    };
+    if (cell) {
+      const abs = notesScrollStep + cell.xi;
+      if (abs < totalSteps) {
+        const { st, nt } = stepAt(abs);
+        if (st.on && nt.active && nt.note === cell.note) {
+          pdrag.candidateMove = { srcAbs: abs, srcNote: cell.note, srcRowK: cell.rowK };
+        }
+      }
+    }
+    capture(gridCanvas, e);
+    e.preventDefault();
+  });
+
+  gridCanvas.addEventListener('pointermove', e => {
+    if (!pdrag || !geom) return;
+    const dx = e.clientX - pdrag.x;
+    const dy = e.clientY - pdrag.y;
+    if (!pdrag.moved && Math.hypot(dx, dy) < 8) return;
+    pdrag.moved = true;
+
+    if (pdrag.candidateMove) {
+      moveDrag = {
+        ...pdrag.candidateMove,
+        dStep: Math.round(dx / geom.cellW),
+        dRow: Math.round(-dy / geom.cellH),
+      };
+      drawGrid();
+      return;
+    }
+    // scroll: horizontal steps + vertical scale degrees
+    const maxOff = Math.max(0, totalSteps - 16);
+    notesScrollStep = Math.max(0, Math.min(maxOff, pdrag.startStep + Math.round(dx / geom.cellW) * -1));
+    const nOff = pdrag.startNote + Math.round(dy / geom.cellH) * -1 * -1;
+    // vertical: dragging up shows higher notes (offset up)
+    notesScrollNote = Math.max(-14, Math.min(21, pdrag.startNote + Math.round(dy / geom.cellH)));
+    reportPages();
+    draw();
+  });
+
+  gridCanvas.addEventListener('pointerup', e => {
+    if (!pdrag) return;
+    if (moveDrag) {
+      // commit note move
+      const src = stepAt(moveDrag.srcAbs);
+      const tgtAbs = moveDrag.srcAbs + moveDrag.dStep;
+      const notes = rows();
+      const kIdx = moveDrag.srcRowK + moveDrag.dRow;
+      if (tgtAbs >= 0 && tgtAbs < totalSteps && kIdx >= 0 && kIdx < notes.length &&
+          (tgtAbs !== moveDrag.srcAbs || kIdx !== moveDrag.srcRowK)) {
+        const tgt = stepAt(tgtAbs);
+        src.st.on = false; src.nt.active = false;
+        tgt.st.on = true; tgt.st.inst = 4;
+        tgt.nt.active = true; tgt.nt.note = notes[kIdx];
+      }
+      moveDrag = null;
+      if (audio.current) audio.programBar(true);
+      draw();
+    } else if (!pdrag.moved && pdrag.cell) {
+      // tap: toggle note
+      const abs = notesScrollStep + pdrag.cell.xi;
+      if (abs < totalSteps) {
+        const { st, nt } = stepAt(abs);
+        const note = pdrag.cell.note;
+        if (!st.on) {
+          st.on = true; st.inst = sel.inst;
+          nt.active = true; nt.note = note;
+        } else {
+          const activeNote = nt.active ? nt.note : INSTRUMENTS[st.inst].note;
+          if (activeNote === note && st.inst === sel.inst) {
+            st.on = false; nt.active = false;
+          } else {
+            st.on = true; st.inst = sel.inst;
+            nt.active = true; nt.note = note;
+          }
+        }
+        if (audio.current) audio.programBar(true);
+        draw();
+      }
+    }
+    pdrag = null;
+  });
+  gridCanvas.addEventListener('pointercancel', () => { pdrag = null; moveDrag = null; });
+
+  stepCanvas.addEventListener('pointerdown', e => {
+    if (!geom) return;
+    const r = stepCanvas.getBoundingClientRect();
+    const xi = Math.max(0, Math.min(15, Math.floor((e.clientX - r.left) / geom.cellW)));
+    const abs = notesScrollStep + xi;
+    if (abs >= totalSteps) return;
+    const { st, nt } = stepAt(abs);
+    if (st.on && st.inst === sel.inst) { st.on = false; }
+    else {
+      st.on = true; st.inst = sel.inst;
+      if (!nt.active) { nt.active = true; nt.note = INSTRUMENTS[sel.inst].note; }
+    }
+    if (audio.current) audio.programBar(true);
+    draw();
+  });
+
+  const wdg = {
+    el: wrap, layout, draw,
+    onStep: () => draw(),
+    scrollToPage(page) {
+      notesScrollStep = page * 16;
+      reportPages();
+      draw();
+    },
+  };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ── Page selector (UnifiedPatternView.PageSelector, allowsResize: false) ── */
+function pageSelectorWidget(pid, onSelect) {
+  const p = patterns[pid];
+  const wrap = h('div', { class: 'pagesel' });
+  wrap.append(h('span', { class: 'ps-chip' }, 'Page'));
+  const btns = [];
+  for (let i = 0; i < p.pages; i++) {
+    const b = h('button', { class: 'ps-btn' }, String(i + 1));
+    const bar = h('span', { class: 'playbar' });
+    b.append(bar);
+    b.addEventListener('click', () => onSelect(i));
+    btns.push({ b, bar });
+    wrap.append(b);
+  }
+  function update() {
+    const playPage = audio.playing && audio.current ? audio.current.patternPages[pid] : undefined;
+    btns.forEach(({ b, bar }, i) => {
+      b.classList.toggle('hl', notesVisiblePages.has(i));
+      bar.classList.toggle('on', playPage === i);
+    });
+  }
+  update();
+  const wdg = { el: wrap, layout() {}, draw: update, onStep: update };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ── Mod source selector (screen 7) ──────────────────────────────────────── */
+let selectedMod = null; // null | 'laneOne'
+function modSelectorWidget(dial) {
+  const wrapper = h('div', { class: 'modsel-wrap' });
+  const btn = tbtn('Modulation', { small: true });
+  const menu = h('div', { class: 'modsel-menu' });
+  const optNone = h('div', { class: 'modsel-item' }, 'None');
+  const optLane = h('div', { class: 'modsel-item lane1' }, 'Pattern Lane');
+  menu.append(optNone, optLane);
+  wrapper.append(btn, menu, dial.el);
+
+  function setMod(m) {
+    selectedMod = m;
+    btn.querySelector('.ti').textContent = m === 'laneOne' ? 'Pattern Lane' : 'Modulation';
+    btn.style.color = m === 'laneOne' ? C.orange : '';
+    menu.classList.remove('open');
+    dial.draw();
+  }
+  btn.addEventListener('click', () => menu.classList.toggle('open'));
+  optNone.addEventListener('click', () => setMod(null));
+  optLane.addEventListener('click', () => setMod('laneOne'));
+  return { el: wrapper, layout() { dial.layout(); }, draw() { dial.draw(); } };
+}
+
+/* ── Pattern grid (CanvasPatternGrid, segmentCount 1, embedded) ──────────── */
+function patternGridWidget() {
+  const wrap = h('div', { class: 'grid-wrap' });
+  const canvas = h('canvas');
+  wrap.append(canvas);
+  const CELL = 44, FOOTER = 12, CHAM = 8;
+  const SEG_W = CELL * 4, GRID_H = CELL * 4 + FOOTER;
+  let geom = null;
+  let hold = null, drag = null;
+
+  function layout() {
+    const w = wrap.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    canvas.style.height = GRID_H + 'px';
+    canvas.width = Math.round(w * DPR());
+    canvas.height = Math.round(GRID_H * DPR());
+    geom = { w, offX: Math.max(0, (w - SEG_W) / 2) };
+    draw();
+  }
+
+  function draw() {
+    if (!geom) return;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    ctx.clearRect(0, 0, geom.w, GRID_H);
+    const ox = geom.offX;
+
+    let dropTarget = null;
+    if (drag && !drag.external) dropTarget = hitCell(drag.x, drag.y);
+
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        const x = ox + col * CELL + 1, y = row * CELL + 1;
+        const cw = CELL - 2, chh = CELL - 2;
+        const pid = grid[row][col];
+        const isSource = drag && drag.srcRow === row && drag.srcCol === col;
+        if (isSource) {
+          ctx.fillStyle = 'rgba(58,63,75,0.3)';
+          chamPath(ctx, x, y, cw, chh, CHAM); ctx.fill();
+        } else if (pid !== null) {
+          const p = patterns[pid];
+          const isSel = sel.pattern === pid;
+          const multi = p.pages > 1;
+          ctx.fillStyle = ROW_COLORS[p.color];
+          if (isSel) { ctx.fillRect(x, y, cw, chh); }
+          else { chamPath(ctx, x, y, cw, chh, CHAM, { skipBottomRight: multi }); ctx.fill(); }
+          if (isSel) {
+            ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, cw, chh);
+          }
+          const icon = patternIcon(p);
+          if (icon) {
+            const pad = cw * 0.25;
+            drawIcon(ctx, icon, x + pad, y + pad, cw - 2 * pad, C.bg);
+          }
+          if (multi) {
+            ctx.fillStyle = C.bg;
+            ctx.font = `700 ${Math.max(8, cw * 0.3)}px 'Geist Mono', monospace`;
+            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+            ctx.fillText(String(p.pages), x + cw - cw * 0.08, y + chh - cw * 0.08);
+          }
+        } else {
+          ctx.fillStyle = C.mid;
+          chamPath(ctx, x, y, cw, chh, CHAM); ctx.fill();
+        }
+        if (dropTarget && dropTarget.row === row && dropTarget.col === col && !isSource) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2;
+          chamPath(ctx, x, y, cw, chh, CHAM); ctx.stroke();
+        }
+      }
+    }
+    // footer
+    ctx.fillStyle = GROUP_COLORS[0];
+    chamPath(ctx, ox, 4 * CELL, SEG_W, FOOTER, Math.min(CHAM, FOOTER / 2));
+    ctx.fill();
+
+    // internal drag ghost
+    if (drag && !drag.external) {
+      const p = patterns[drag.pid];
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = ROW_COLORS[p.color];
+      chamPath(ctx, drag.x - CELL / 2, drag.y - CELL / 2, CELL, CELL, CHAM);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 2;
+      chamPath(ctx, drag.x - CELL / 2, drag.y - CELL / 2, CELL, CELL, CHAM);
+      ctx.stroke();
+      const icon = patternIcon(p);
+      if (icon) drawIcon(ctx, icon, drag.x - CELL / 4, drag.y - CELL / 4, CELL / 2, C.bg);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function hitCell(x, y) {
+    const col = Math.floor((x - geom.offX) / CELL);
+    const row = Math.floor(y / CELL);
+    if (col < 0 || col > 3 || row < 0 || row > 3) return null;
+    return { row, col };
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (!geom) return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const cell = hitCell(x, y);
+    // The hold replaces the app's haptic: when it fires on a pattern, the drag
+    // starts right away (ghost under the finger) so it's obvious it's armed.
+    hold = {
+      x, y, cell, fired: false, gx: e.clientX, gy: e.clientY,
+      timer: setTimeout(() => {
+        if (!hold) return;
+        hold.fired = true;
+        if (!hold.cell) return;
+        const pid = grid[hold.cell.row][hold.cell.col];
+        if (pid === null) return;
+        drag = { pid, srcRow: hold.cell.row, srcCol: hold.cell.col, x: hold.x, y: hold.y, gx: hold.gx, gy: hold.gy, external: false };
+        hold = null;
+        draw();
+      }, 250),
+    };
+    capture(canvas, e);
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!geom) return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    if (drag) {
+      drag.x = x; drag.y = y;
+      drag.gx = e.clientX; drag.gy = e.clientY;
+      drag.external = y < 0 && !!externalDropTarget;
+      if (drag.external) drawOverlayGhost(drag);
+      else hideOverlayGhost();
+      if (externalDropTarget) externalDropTarget.onExternalDrag(drag);
+      draw();
+      return;
+    }
+    // Moving before the hold fires is a swipe, not a hold — abandon it (app
+    // behaviour: >12pt during .pending cancels the hold timer).
+    if (hold && !hold.fired && Math.hypot(x - hold.x, y - hold.y) > 12) {
+      clearTimeout(hold.timer);
+      hold = null;
+    }
+  });
+
+  canvas.addEventListener('pointerup', e => {
+    if (drag) {
+      if (drag.external && externalDropTarget) {
+        externalDropTarget.onExternalDrop(drag);
+      } else {
+        const tgt = hitCell(drag.x, drag.y);
+        if (tgt && (tgt.row !== drag.srcRow || tgt.col !== drag.srcCol)) {
+          const displaced = grid[tgt.row][tgt.col];
+          grid[tgt.row][tgt.col] = drag.pid;
+          grid[drag.srcRow][drag.srcCol] = displaced;
+          syncGridColors();
+          sel.pattern = drag.pid;
+          const d = dominantInstrument(patterns[drag.pid]);
+          if (d !== null) sel.inst = d;
+        }
+      }
+      hideOverlayGhost();
+      drag = null;
+      if (externalDropTarget) externalDropTarget.onExternalDrag(null);
+      draw();
+      widgets.forEach(w => w !== wdg && w.draw && w.draw());
+      if (hold) { clearTimeout(hold.timer); hold = null; }
+      return;
+    }
+    if (hold) {
+      clearTimeout(hold.timer);
+      if (!hold.fired && hold.cell) {
+        // tap: select
+        const pid = grid[hold.cell.row][hold.cell.col];
+        if (pid !== null) {
+          sel.pattern = pid;
+          const d = dominantInstrument(patterns[pid]);
+          if (d !== null) sel.inst = d;
+        }
+        draw();
+        widgets.forEach(w => w !== wdg && w.draw && w.draw());
+      }
+      hold = null;
+    }
+  });
+  canvas.addEventListener('pointercancel', () => {
+    if (hold) clearTimeout(hold.timer);
+    hold = null; drag = null; hideOverlayGhost();
+    if (externalDropTarget) externalDropTarget.onExternalDrag(null);
+    draw();
+  });
+
+  const wdg = { el: wrap, layout, draw, onStep() {} };
+  widgets.push(wdg);
+  return wdg;
+}
+
+// Cross-grid drag plumbing (pattern grid → loop group editor)
+let externalDropTarget = null;
+const overlayCanvas = document.getElementById('drag-overlay');
+function drawOverlayGhost(drag) {
+  overlayCanvas.classList.add('on');
+  overlayCanvas.width = Math.round(window.innerWidth * DPR());
+  overlayCanvas.height = Math.round(window.innerHeight * DPR());
+  const ctx = overlayCanvas.getContext('2d');
+  ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  const p = patterns[drag.pid];
+  const s = 44;
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = ROW_COLORS[p.color];
+  chamPath(ctx, drag.gx - s / 2, drag.gy - s / 2, s, s, 8);
+  ctx.fill();
+  const icon = patternIcon(p);
+  if (icon) drawIcon(ctx, icon, drag.gx - s / 4, drag.gy - s / 4, s / 2, C.bg);
+  ctx.globalAlpha = 1;
+}
+function hideOverlayGhost() {
+  overlayCanvas.classList.remove('on');
+}
+
+/* ── Loop group carousel (CanvasLoopGroupCarousel / CanvasLoopGroupEdit) ─── */
+function loopGroupCarouselWidget(cfg) {
+  // cfg: {groups: () => [{group, index}], height, single: bool, onCentered(idx)}
+  const wrap = h('div', { class: 'lg-wrap' });
+  const canvas = h('canvas');
+  wrap.append(canvas);
+  const HEIGHT = cfg.height || 200;
+  const CELL = 36, PAD = 8, SPACING = 8, PROG_H = 20;
+  let geom = null;
+  let scroll = { offset: 0, centered: cfg.initialCentered ?? 0 };
+  let touch = null;
+  let cellDrag = null;   // dragging a placed pattern within the editor
+  let hoverCell = null;  // drop-target cell during an internal drag
+  let extHover = null;   // {groupI, s, v, pid} during an external (grid) drag
+
+  const itemH = () => PAD + VOICE_COUNT * CELL + PROG_H + PAD;
+
+  function items() { return cfg.groups(); }
+  function layouts() {
+    let x = 0;
+    return items().map(it => {
+      const w = it.group.sections.length * CELL + 2 * PAD;
+      const l = { x, w, it };
+      x += w + SPACING;
+      return l;
+    });
+  }
+  function centeredOffset(idx, ls) {
+    const l = ls[idx];
+    return l.x + l.w / 2 - geom.w / 2;
+  }
+
+  function layout() {
+    const w = wrap.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    canvas.style.height = HEIGHT + 'px';
+    canvas.width = Math.round(w * DPR());
+    canvas.height = Math.round(HEIGHT * DPR());
+    geom = { w };
+    const ls = layouts();
+    scroll.centered = Math.min(scroll.centered, ls.length - 1);
+    scroll.offset = centeredOffset(scroll.centered, ls);
+    draw();
+  }
+
+  function startTimes() { return calcStartTimes(); }
+
+  function draw() {
+    if (!geom) return;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    ctx.clearRect(0, 0, geom.w, HEIGHT);
+    const ls = layouts();
+    const top = (HEIGHT - itemH()) / 2;
+    const times = startTimes();
+
+    ls.forEach((l, i) => {
+      const sx = l.x - scroll.offset;
+      if (sx + l.w < -CELL || sx > geom.w + CELL) return;
+      const isCentered = i === scroll.centered;
+      ctx.globalAlpha = isCentered ? 1 : 0.5;
+      drawItem(ctx, l, sx, top, times[l.it.index], isCentered);
+      ctx.globalAlpha = 1;
+    });
+
+    // drop-target footprint (pattern preview, like the composer's drawHoverFootprint)
+    const hov = cellDrag && hoverCell ? { ...hoverCell, pid: cellDrag.pid } : extHover;
+    if (hov) drawFootprint(ctx, ls, top, hov);
+
+    // internal cell-drag ghost
+    if (cellDrag) {
+      const p = patterns[cellDrag.pid];
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = ROW_COLORS[p.color];
+      chamPath(ctx, cellDrag.x - CELL / 2, cellDrag.y - CELL / 2, CELL, CELL, 8);
+      ctx.fill();
+      const icon = patternIcon(p);
+      if (icon) drawIcon(ctx, icon, cellDrag.x - CELL / 4, cellDrag.y - CELL / 4, CELL / 2, C.bg);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawItem(ctx, l, sx, top, startTime, isCentered) {
+    const g = l.it.group;
+    // card
+    ctx.fillStyle = C.lightg;
+    chamPath(ctx, sx, top, l.w, itemH(), 8);
+    ctx.fill();
+
+    for (let s = 0; s < g.sections.length; s++) {
+      for (let v = 0; v < VOICE_COUNT; v++) {
+        const cx = sx + PAD + s * CELL;
+        const cy = top + PAD + v * CELL + 1;
+        const chh = CELL - 2;
+        const cell = resolveCell(g, s, v);
+        if (cell.type === 'empty') {
+          ctx.fillStyle = C.mid;
+          chamPath(ctx, cx, cy, CELL, chh, 8); ctx.fill();
+        } else if (cell.type === 'direct') {
+          const p = patterns[cell.pid];
+          const multi = p.pages > 1;
+          const dim = cellDrag && cellDrag.srcGroupI === l.it.index && cellDrag.srcS === s && cellDrag.srcV === v;
+          ctx.globalAlpha *= dim ? 0.35 : 1;
+          ctx.fillStyle = ROW_COLORS[p.color];
+          chamPath(ctx, cx, cy, CELL, chh, 8, { skipBottomRight: multi }); ctx.fill();
+          const icon = patternIcon(p);
+          if (icon) { const pad = CELL * 0.25; drawIcon(ctx, icon, cx + pad, cy + pad - 1, CELL - 2 * pad, C.bg); }
+          if (multi) {
+            ctx.fillStyle = C.bg;
+            ctx.font = `700 10px 'Geist Mono', monospace`;
+            ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+            ctx.fillText(String(p.pages), cx + CELL - 3, cy + chh - 2);
+          }
+          ctx.globalAlpha = isCentered ? 1 : 0.5;
+        } else {
+          const p = patterns[cell.pid];
+          ctx.globalAlpha *= 0.3;
+          ctx.fillStyle = ROW_COLORS[p.color];
+          chamPath(ctx, cx, cy, CELL, chh, 8); ctx.fill();
+          const icon = patternIcon(p);
+          if (icon) { const pad = CELL * 0.25; drawIcon(ctx, icon, cx + pad, cy + pad - 1, CELL - 2 * pad, C.bg); }
+          ctx.globalAlpha = isCentered ? 1 : 0.5;
+        }
+      }
+    }
+
+    // start time
+    ctx.fillStyle = C.bg;
+    ctx.font = `10px 'Geist Mono', monospace`;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(startTime, sx + PAD + 2, top + itemH() - PAD - PROG_H / 2);
+
+    // playing-section progress in the bottom strip
+    if (audio.playing && audio.current && audio.current.sectionKey) {
+      const [gi, si] = audio.current.sectionKey.split(':').map(Number);
+      if (gi === l.it.index && audio.step >= 0) {
+        const barW = (l.w - 2 * PAD);
+        const segW = barW / g.sections.length;
+        const px = sx + PAD + si * segW;
+        const pw = segW * (audio.step + 1) / 16;
+        ctx.fillStyle = C.mid;
+        chamPath(ctx, px, top + itemH() - PAD - 8, pw, 6, 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function hitCell(x, y) {
+    const ls = layouts();
+    const top = (HEIGHT - itemH()) / 2;
+    for (const l of ls) {
+      const sx = l.x - scroll.offset;
+      const lx = x - sx, ly = y - top - PAD;
+      if (lx >= PAD && lx < PAD + l.it.group.sections.length * CELL && ly >= 0 && ly < VOICE_COUNT * CELL) {
+        return { groupI: l.it.index, s: Math.floor((lx - PAD) / CELL), v: Math.floor(ly / CELL) };
+      }
+    }
+    return null;
+  }
+
+  // Preview of the pattern as it would sit if dropped: first cell in the direct
+  // style, multi-page continuation cells as ghosts, capped at the next occupied
+  // cell in the same voice row (CanvasLoopGroupCarousel.drawHoverFootprint).
+  function drawFootprint(ctx, ls, top, hov) {
+    const l = ls.find(L => L.it.index === hov.groupI);
+    if (!l) return;
+    const g = l.it.group;
+    const p = patterns[hov.pid];
+    if (!p) return;
+    let droppable = g.sections.length - hov.s;
+    for (let k = 1; k < droppable; k++) {
+      const nxt = g.sections[hov.s + k][hov.v];
+      if (nxt !== null && nxt !== undefined) { droppable = k; break; }
+    }
+    const count = Math.max(1, Math.min(p.pages, droppable));
+    const sx = l.x - scroll.offset;
+    const icon = patternIcon(p);
+    ctx.save();
+    ctx.globalAlpha = 0.65;
+    for (let k = 0; k < count; k++) {
+      const cx = sx + PAD + (hov.s + k) * CELL;
+      const cy = top + PAD + hov.v * CELL + 1;
+      const chh = CELL - 2;
+      if (k > 0) ctx.globalAlpha = 0.65 * 0.3;
+      ctx.fillStyle = ROW_COLORS[p.color];
+      chamPath(ctx, cx, cy, CELL, chh, 8, { skipBottomRight: k === 0 && count > 1 });
+      ctx.fill();
+      if (icon) { const pad = CELL * 0.25; drawIcon(ctx, icon, cx + pad, cy + pad - 1, CELL - 2 * pad, C.bg); }
+      if (k === 0 && count > 1) {
+        ctx.fillStyle = C.bg;
+        ctx.font = `700 10px 'Geist Mono', monospace`;
+        ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+        ctx.fillText(String(p.pages), cx + CELL - 3, cy + chh - 2);
+      }
+    }
+    ctx.restore();
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (!geom) return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const cell = hitCell(x, y);
+    touch = {
+      x, y, startOffset: scroll.offset, cell, moved: false, fired: false,
+      // Hold fired on a placed pattern → drag starts immediately (the web
+      // stand-in for the app's haptic-then-drag).
+      timer: setTimeout(() => {
+        if (!touch || touch.moved) return;
+        touch.fired = true;
+        if (!touch.cell) return;
+        const pid = loopGroups[touch.cell.groupI].sections[touch.cell.s][touch.cell.v];
+        if (pid === null || pid === undefined) return;
+        cellDrag = { pid, srcGroupI: touch.cell.groupI, srcS: touch.cell.s, srcV: touch.cell.v, x: touch.x, y: touch.y };
+        hoverCell = touch.cell;
+        draw();
+      }, 250),
+    };
+    capture(canvas, e);
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!touch || !geom) return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    if (cellDrag) {
+      cellDrag.x = x; cellDrag.y = y;
+      hoverCell = hitCell(x, y);
+      draw();
+      return;
+    }
+    const dx = x - touch.x, dy = y - touch.y;
+    if (!touch.moved && Math.hypot(dx, dy) < 10) return;
+    // Movement before the hold fires cancels it: this is a swipe/scroll
+    clearTimeout(touch.timer);
+    touch.moved = true;
+    if (!cfg.single) {
+      scroll.offset = touch.startOffset - dx;
+      const ls = layouts();
+      // live nearest highlight
+      const center = scroll.offset + geom.w / 2;
+      let best = 0, bd = Infinity;
+      ls.forEach((l, i) => { const d = Math.abs(l.x + l.w / 2 - center); if (d < bd) { bd = d; best = i; } });
+      scroll.centered = best;
+      draw();
+    }
+  });
+
+  canvas.addEventListener('pointerup', e => {
+    if (!touch) return;
+    clearTimeout(touch.timer);
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+
+    if (cellDrag) {
+      const tgt = hitCell(x, y);
+      const srcG = loopGroups[cellDrag.srcGroupI];
+      if (tgt) {
+        const tgtG = loopGroups[tgt.groupI];
+        if (tgt.groupI === cellDrag.srcGroupI && tgt.s === cellDrag.srcS && tgt.v === cellDrag.srcV) {
+          // dropped back — no-op
+        } else {
+          const displaced = tgtG.sections[tgt.s][tgt.v];
+          tgtG.sections[tgt.s][tgt.v] = cellDrag.pid;
+          srcG.sections[cellDrag.srcS][cellDrag.srcV] = displaced ?? null;
+        }
+      } else {
+        // dragged out — remove
+        srcG.sections[cellDrag.srcS][cellDrag.srcV] = null;
+      }
+      cellDrag = null;
+      hoverCell = null;
+      touch = null;
+      if (audio.playing) audio.programBar(true);
+      draw();
+      return;
+    }
+
+    if (!touch.moved && !touch.fired && touch.cell) {
+      // tap on a cell
+      const g = loopGroups[touch.cell.groupI];
+      const pid = g.sections[touch.cell.s][touch.cell.v];
+      if (sel.pattern !== null) {
+        if (pid === sel.pattern) {
+          g.sections[touch.cell.s][touch.cell.v] = null;
+        } else {
+          const row = g.sections[touch.cell.s];
+          const firstIdx = row.indexOf(sel.pattern);
+          if (firstIdx >= 0) row[firstIdx] = null;
+          g.sections[touch.cell.s][touch.cell.v] = sel.pattern;
+        }
+        if (audio.playing) audio.programBar(true);
+      } else if (pid !== null && pid !== undefined) {
+        sel.pattern = pid;
+      }
+      draw();
+      widgets.forEach(w => w !== wdg && w.draw && w.draw());
+    } else if (!touch.moved && !touch.fired && !touch.cell) {
+      // tap outside cells: deselect pattern
+      if (sel.pattern !== null) {
+        sel.pattern = null;
+        widgets.forEach(w => w.draw && w.draw());
+      } else if (cfg.onDeselect) cfg.onDeselect();
+    } else if (touch.moved && !cfg.single) {
+      // snap to nearest
+      const ls = layouts();
+      scroll.offset = centeredOffset(scroll.centered, ls);
+      if (cfg.onCentered) cfg.onCentered(items()[scroll.centered].index);
+      draw();
+    }
+    touch = null;
+  });
+  canvas.addEventListener('pointercancel', () => { touch = null; cellDrag = null; hoverCell = null; draw(); });
+
+  const wdg = {
+    el: wrap, layout, draw, onStep: () => draw(),
+    // external drag (from pattern grid) support
+    onExternalDrag(drag) {
+      if (!drag || !drag.external) { if (extHover) { extHover = null; draw(); } return; }
+      const r = canvas.getBoundingClientRect();
+      const x = drag.gx - r.left, y = drag.gy - r.top;
+      const cell = (x >= 0 && x <= r.width && y >= 0 && y <= r.height) ? hitCell(x, y) : null;
+      extHover = cell ? { ...cell, pid: drag.pid } : null;
+      draw();
+    },
+    onExternalDrop(drag) {
+      const r = canvas.getBoundingClientRect();
+      const x = drag.gx - r.left, y = drag.gy - r.top;
+      const cell = (x >= 0 && x <= r.width && y >= 0 && y <= r.height) ? hitCell(x, y) : null;
+      if (cell) {
+        const g = loopGroups[cell.groupI];
+        const row = g.sections[cell.s];
+        const firstIdx = row.indexOf(drag.pid);
+        if (firstIdx >= 0 && firstIdx !== cell.v) row[firstIdx] = null;
+        g.sections[cell.s][cell.v] = drag.pid;
+        if (audio.playing) audio.programBar(true);
+      }
+      extHover = null;
+      draw();
+    },
+  };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ── Song overview (CanvasLoopGroupView) — screen 12 ─────────────────────── */
+function songOverviewWidget(onOpenGroup) {
+  const wrap = h('div', { class: 'song-wrap' });
+  const canvas = h('canvas');
+  wrap.append(canvas);
+  const HEIGHT = 200;
+  const SP_V = 2, PAD_H = 10, PAD_V = 10, SPACING = 8;
+  const PROG_H = 6, TIME_H = 12, PLAY_S = 36;
+  let geom = null;
+  let scroll = { offset: 0 };
+  let touch = null, cardDrag = null;
+  const menu = document.getElementById('holdmenu');
+
+  function cellSize() {
+    const fill = isRegular() ? 0.6 : 0.4;
+    const target = HEIGHT * fill;
+    const fixed = 2 * PAD_V + 4 + TIME_H + 4 + PROG_H;
+    return Math.max(14, (target - fixed - (VOICE_COUNT - 1) * SP_V) / VOICE_COUNT);
+  }
+  const gridH = () => VOICE_COUNT * cellSize() + (VOICE_COUNT - 1) * SP_V;
+  const itemH = () => PAD_V + gridH() + 4 + TIME_H + 4 + PROG_H + PAD_V;
+  const itemW = g => 2 * PAD_H + g.sections.length * cellSize();
+
+  function layouts() {
+    let x = 0;
+    return loopGroups.map(g => {
+      const w = itemW(g);
+      const l = { x, w, g };
+      x += w + SPACING;
+      return l;
+    });
+  }
+  function clampOffset(off, ls) {
+    const minOff = -(geom.w / 2 - ls[0].w / 2);
+    const total = ls[ls.length - 1].x + ls[ls.length - 1].w + SPACING + 52;
+    const maxOff = Math.max(minOff, total - geom.w / 2);
+    return Math.max(minOff, Math.min(maxOff, off));
+  }
+  function centeredOffset(idx, ls) {
+    return ls[idx].x + ls[idx].w / 2 - geom.w / 2;
+  }
+
+  function layout() {
+    const w = wrap.offsetWidth;
+    if (!w) { setTimeout(layout, 60); return; }
+    canvas.style.height = HEIGHT + 'px';
+    canvas.width = Math.round(w * DPR());
+    canvas.height = Math.round(HEIGHT * DPR());
+    geom = { w };
+    const ls = layouts();
+    sel.highlightedGroup = Math.min(sel.highlightedGroup, ls.length - 1);
+    scroll.offset = clampOffset(centeredOffset(sel.highlightedGroup, ls), ls);
+    draw();
+  }
+
+  function draw() {
+    if (!geom) return;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
+    ctx.clearRect(0, 0, geom.w, HEIGHT);
+    const ls = layouts();
+    const top = (HEIGHT - itemH()) / 2;
+    const cs = cellSize();
+    const times = calcStartTimes();
+
+    // insertion line while reordering
+    if (cardDrag) {
+      const idx = insertionIndex(cardDrag.x, ls);
+      let lineX;
+      if (idx === 0) lineX = ls[0].x - scroll.offset - SPACING / 2;
+      else if (idx < ls.length) lineX = (ls[idx - 1].x + ls[idx - 1].w + ls[idx].x) / 2 - scroll.offset;
+      else lineX = ls[ls.length - 1].x + ls[ls.length - 1].w + SPACING / 2 - scroll.offset;
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(lineX, top - 4); ctx.lineTo(lineX, top + itemH() + 4); ctx.stroke();
+    }
+
+    ls.forEach((l, i) => {
+      const sx = l.x - scroll.offset;
+      if (sx + l.w < -cs || sx > geom.w + cs) return;
+      const isHl = sel.highlightedGroup === i;
+      ctx.globalAlpha = isHl ? 1 : 0.45;
+      drawCard(ctx, l.g, sx, top, cs, isHl, times[i]);
+      ctx.globalAlpha = 1;
+    });
+
+    // add / duplicate buttons after content
+    const afterX = ls[ls.length - 1].x + ls[ls.length - 1].w + SPACING - scroll.offset;
+    if (afterX < geom.w) {
+      const gap = 8;
+      const startY = top + (itemH() - (2 * PLAY_S + gap)) / 2;
+      [['plus', 0], ['dup', 1]].forEach(([kind, i]) => {
+        const by = startY + i * (PLAY_S + gap);
+        ctx.fillStyle = C.mid;
+        chamPath(ctx, afterX, by, PLAY_S, PLAY_S, 8); ctx.fill();
+        ctx.strokeStyle = C.lightg; ctx.lineWidth = 2; ctx.fillStyle = C.lightg;
+        const cx = afterX + PLAY_S / 2, cy = by + PLAY_S / 2;
+        if (kind === 'plus') {
+          ctx.beginPath(); ctx.moveTo(cx - 7, cy); ctx.lineTo(cx + 7, cy);
+          ctx.moveTo(cx, cy - 7); ctx.lineTo(cx, cy + 7); ctx.stroke();
+        } else {
+          ctx.strokeRect(cx - 2, cy - 7, 9, 9);
+          ctx.strokeRect(cx - 7, cy - 2, 9, 9);
+        }
+      });
+    }
+
+    // drag ghost card
+    if (cardDrag) {
+      const g = loopGroups[cardDrag.idx];
+      ctx.globalAlpha = 0.75;
+      drawCard(ctx, g, cardDrag.x - itemW(g) / 2, top, cs, false, calcStartTimes()[cardDrag.idx]);
+      ctx.globalAlpha = 1;
+    }
+
+    // progress bar on playing section
+    if (audio.playing && audio.current && audio.current.sectionKey && audio.step >= 0) {
+      const [gi, si] = audio.current.sectionKey.split(':').map(Number);
+      if (gi < ls.length) {
+        const l = ls[gi];
+        const sx = l.x - scroll.offset;
+        const barY = top + PAD_V + gridH() + 4 + TIME_H + 4;
+        const barW = l.w - 2 * PAD_H;
+        const segW = barW / l.g.sections.length;
+        const pw = segW * (audio.step + 1) / 16;
+        ctx.fillStyle = C.lightg;
+        chamPath(ctx, sx + PAD_H + si * segW, barY, pw, PROG_H, 2);
+        ctx.fill();
+      }
+    }
+
+    // play button under highlighted card
+    const hlL = ls[sel.highlightedGroup];
+    if (hlL) {
+      const cx = hlL.x + hlL.w / 2 - scroll.offset;
+      const cy = top + itemH() + 8 + PLAY_S / 2;
+      ctx.fillStyle = C.mid;
+      ctx.beginPath(); ctx.arc(cx, cy, PLAY_S / 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = C.lightg;
+      ctx.beginPath();
+      ctx.moveTo(cx - 4, cy - 6); ctx.lineTo(cx + 7, cy); ctx.lineTo(cx - 4, cy + 6);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  function drawCard(ctx, g, sx, top, cs, isHl, startTime) {
+    ctx.fillStyle = isHl ? C.mid : C.dark;
+    chamPath(ctx, sx, top, itemW(g), itemH(), 8);
+    ctx.fill();
+    if (isHl) {
+      ctx.strokeStyle = 'rgba(139,147,166,0.5)'; ctx.lineWidth = 1.5;
+      chamPath(ctx, sx, top, itemW(g), itemH(), 8); ctx.stroke();
+    }
+    for (let s = 0; s < g.sections.length; s++) {
+      for (let v = 0; v < VOICE_COUNT; v++) {
+        const cx = sx + PAD_H + s * cs;
+        const cy = top + PAD_V + v * (cs + SP_V) + 0.5;
+        const cell = resolveCell(g, s, v);
+        const ch = cs * 0.2;
+        if (cell.type === 'empty') {
+          ctx.fillStyle = 'rgba(30,34,44,0.6)';
+          chamPath(ctx, cx, cy, cs, cs - 1, ch); ctx.fill();
+        } else if (cell.type === 'direct') {
+          ctx.fillStyle = ROW_COLORS[patterns[cell.pid].color];
+          chamPath(ctx, cx, cy, cs, cs - 1, ch); ctx.fill();
+        } else {
+          ctx.globalAlpha *= 0.3;
+          ctx.fillStyle = ROW_COLORS[patterns[cell.pid].color];
+          chamPath(ctx, cx, cy, cs, cs - 1, ch); ctx.fill();
+          ctx.globalAlpha /= 0.3;
+        }
+      }
+    }
+    ctx.fillStyle = C.lightg;
+    ctx.font = `9px 'Geist Mono', monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(startTime, sx + itemW(g) / 2, top + PAD_V + gridH() + 4 + TIME_H / 2);
+  }
+
+  function hitCard(x, y, ls) {
+    const top = (HEIGHT - itemH()) / 2;
+    if (y < top || y > top + itemH()) return null;
+    for (let i = 0; i < ls.length; i++) {
+      const sx = ls[i].x - scroll.offset;
+      if (x >= sx && x < sx + ls[i].w) return i;
+    }
+    return null;
+  }
+  function insertionIndex(x, ls) {
+    for (let i = 0; i < ls.length; i++) {
+      let gapCenter;
+      if (i === 0) gapCenter = ls[0].x - scroll.offset - SPACING / 2;
+      else gapCenter = (ls[i - 1].x + ls[i - 1].w + ls[i].x) / 2 - scroll.offset;
+      if (x < gapCenter) return i;
+    }
+    return ls.length;
+  }
+
+  function showMenu(idx, clientX, clientY) {
+    menu.innerHTML = '';
+    const dup = h('div', { class: 'hm-btn' });
+    dup.innerHTML = SVG_DUP;
+    dup.addEventListener('click', () => {
+      const copy = JSON.parse(JSON.stringify(loopGroups[idx]));
+      loopGroups.splice(idx + 1, 0, copy);
+      hideMenu(); layout();
+    });
+    const del = h('div', { class: 'hm-btn danger' });
+    del.innerHTML = SVG_TRASH;
+    del.addEventListener('click', () => {
+      if (loopGroups.length > 1) {
+        loopGroups.splice(idx, 1);
+        if (sel.highlightedGroup >= loopGroups.length) sel.highlightedGroup = loopGroups.length - 1;
+        if (audio.pos.groupIdx >= loopGroups.length) audio.pos.groupIdx = 0;
+      }
+      hideMenu(); layout();
+    });
+    menu.append(dup, del);
+    menu.classList.add('open');
+    const mw = 104;
+    menu.style.left = Math.max(4, Math.min(window.innerWidth - mw - 4, clientX - mw / 2)) + 'px';
+    menu.style.top = (clientY - 64) + 'px';
+    const dismiss = ev => {
+      if (!menu.contains(ev.target)) { hideMenu(); window.removeEventListener('pointerdown', dismiss, true); }
+    };
+    setTimeout(() => window.addEventListener('pointerdown', dismiss, true), 0);
+  }
+  function hideMenu() { menu.classList.remove('open'); }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (!geom) return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    touch = {
+      x, y, cx: e.clientX, cy: e.clientY, startOffset: scroll.offset, moved: false, fired: false,
+      timer: setTimeout(() => { if (touch && !touch.moved) touch.fired = true; }, 300),
+    };
+    capture(canvas, e);
+    e.preventDefault();
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (!touch || !geom) return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    if (cardDrag) { cardDrag.x = x; draw(); return; }
+    const dx = x - touch.x;
+    if (!touch.moved && Math.abs(dx) < 10 && Math.hypot(dx, y - touch.y) < 10) return;
+    const ls = layouts();
+    if (touch.fired) {
+      // Hold has fired on a card: further movement means reorder-drag, never scroll
+      const idx = hitCard(touch.x, touch.y, ls);
+      if (idx !== null) {
+        if (Math.hypot(dx, y - touch.y) > 15) {
+          cardDrag = { idx, x };
+          draw();
+        }
+        return;
+      }
+    }
+    // Movement before the hold fires cancels it — this is a scroll
+    clearTimeout(touch.timer);
+    touch.moved = true;
+    scroll.offset = clampOffset(touch.startOffset - dx, ls);
+    // live highlight follows nearest
+    const center = scroll.offset + geom.w / 2;
+    let best = 0, bd = Infinity;
+    ls.forEach((l, i) => { const d = Math.abs(l.x + l.w / 2 - center); if (d < bd) { bd = d; best = i; } });
+    sel.highlightedGroup = best;
+    draw();
+  });
+  canvas.addEventListener('pointerup', e => {
+    if (!touch) return;
+    clearTimeout(touch.timer);
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const ls = layouts();
+
+    if (cardDrag) {
+      let idx = insertionIndex(x, ls);
+      const [g] = loopGroups.splice(cardDrag.idx, 1);
+      if (idx > cardDrag.idx) idx--;
+      loopGroups.splice(idx, 0, g);
+      sel.highlightedGroup = idx;
+      cardDrag = null; touch = null;
+      layout();
+      return;
+    }
+
+    if (!touch.moved) {
+      if (touch.fired) {
+        const idx = hitCard(touch.x, touch.y, ls);
+        if (idx !== null) showMenu(idx, touch.cx, touch.cy);
+      } else {
+        const idx = hitCard(x, y, ls);
+        const top = (HEIGHT - itemH()) / 2;
+        // play button?
+        const hlL = ls[sel.highlightedGroup];
+        const pcx = hlL.x + hlL.w / 2 - scroll.offset;
+        const pcy = top + itemH() + 8 + PLAY_S / 2;
+        if (Math.hypot(x - pcx, y - pcy) <= PLAY_S / 2) {
+          // Play the song from the highlighted group, restarting immediately
+          audio.mode = { type: 'song', startGroup: sel.highlightedGroup };
+          sel.loopGroup = null;
+          audio.pos = { sectionIdx: 0, groupIdx: sel.highlightedGroup };
+          if (nav.changingTo === null) audio.forceRestart();
+        } else if (idx !== null && idx === sel.highlightedGroup) {
+          onOpenGroup(idx);
+          return;
+        } else if (idx !== null) {
+          sel.highlightedGroup = idx;
+          scroll.offset = clampOffset(centeredOffset(idx, ls), ls);
+        } else {
+          // add/dup buttons after content
+          const afterX = ls[ls.length - 1].x + ls[ls.length - 1].w + SPACING - scroll.offset;
+          const gap = 8;
+          const startY = top + (itemH() - (2 * PLAY_S + gap)) / 2;
+          if (x >= afterX && x < afterX + PLAY_S) {
+            if (y >= startY && y < startY + PLAY_S) {
+              loopGroups.push({ sections: [[null, null, null]] });
+              layout();
+            } else if (y >= startY + PLAY_S + gap && y < startY + 2 * PLAY_S + gap) {
+              loopGroups.push(JSON.parse(JSON.stringify(loopGroups[sel.highlightedGroup])));
+              layout();
+            }
+          }
+        }
+        draw();
+      }
+    } else {
+      scroll.offset = clampOffset(centeredOffset(sel.highlightedGroup, ls), ls);
+      draw();
+    }
+    touch = null;
+  });
+  canvas.addEventListener('pointercancel', () => { touch = null; cardDrag = null; draw(); });
+
+  const wdg = { el: wrap, layout, draw, onStep: () => draw() };
+  widgets.push(wdg);
+  return wdg;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Screens — order and content from Onboarding.swift
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function olayout(info, contentChildren) {
+  return h('div', { class: 'olayout' },
+    h('div', { class: 'ol-info' }, info),
+    h('div', { class: 'ol-content' },
+      h('div', { class: 'ol-content-inner' }, ...contentChildren)));
+}
+
+const SCREENS = [
+  { // 0 — welcome
+    audio: { type: 'none' },
+    build() {
+      return h('div', { class: 'fullpage' },
+        textPanel('Welcome to JOLT', [
+          'Thank you for testing this early beta',
+          "We're missing a few features, but we hope you enjoy what's already in place",
+          '',
+          'Feedback is extremely welcome',
+          'Please send feedback to hi@joltgroovebox.com',
+        ]));
+    },
+  },
+  { // 1 — intro
+    audio: { type: 'pattern', pid: 1 },
+    onEnter() { sel.inst = 0; },
+    build() {
+      return olayout(
+        textPanel('This is a pattern', ['Tap the steps to toggle beats']),
+        [seqRowWidget(1, 0).el, seqRowWidget(1, 8).el]);
+    },
+  },
+  { // 2 — patternsAreMixed
+    audio: { type: 'pattern', pid: 2 },
+    build() {
+      return olayout(
+        textPanel('Patterns can contain a mix of instruments',
+          ['Only one instrument can play at once in a single pattern']),
+        [seqRowWidget(2, 0).el, seqRowWidget(2, 8).el, instrumentChips([0, 1])]);
+    },
+  },
+  { // 3 — multipleVoices
+    audio: { type: 'group', idx: 0 },
+    build() {
+      return olayout(
+        textPanel('Jolt has many voices',
+          ['Voices can play many instruments', 'So complex songs are possible']),
+        [
+          seqRowWidget(3, 0).el, seqRowWidget(3, 8).el,
+          h('div', { class: 'vdivider' }),
+          seqRowWidget(4, 0).el, seqRowWidget(4, 8).el,
+          instrumentChips([0, 1, 2]),
+        ]);
+    },
+  },
+  { // 4 — multipleVoicesEditable
+    audio: { type: 'group', idx: 0 },
+    build() {
+      const mkSwatch = i => {
+        const sw = h('div', { class: 'iswatch', style: `background:${instColor(i)}` });
+        sw.innerHTML = iconSvg(INSTRUMENTS[i].icon, 24);
+        return sw;
+      };
+      const dial0 = dialWidget({
+        caption: 'Overdrive', defaultValue: 0.6,
+        get: () => inst0.harmonics,
+        set: v => { inst0.harmonics = v; audio.pushDialParams(); },
+      });
+      const dial1 = dialWidget({
+        caption: 'Decay', defaultValue: 0.3,
+        get: () => inst1.morph,
+        set: v => { inst1.morph = v; audio.pushHatDecayFrom(v); },
+      });
+      const dial2 = dialWidget({
+        caption: 'Decay', defaultValue: 0.4,
+        get: () => inst2.morph,
+        set: v => { inst2.morph = v; audio.pushDialParams(); },
+      });
+      return olayout(
+        textPanel('Each instrument is tweakable in real-time',
+          ['Dials let you change the sound', 'Hold and drag up + down to adjust']),
+        [
+          seqRowWidget(3, 0).el, seqRowWidget(3, 8).el,
+          h('div', { class: 'vdivider' }),
+          seqRowWidget(4, 0).el, seqRowWidget(4, 8).el,
+          instrumentChips([0, 1, 2]),
+          h('div', { class: 'vdivider', style: 'margin-bottom:16px' }),
+          h('div', { class: 'dialgroup-row' },
+            h('div', { class: 'dialcol' }, mkSwatch(0), dial0.el),
+            h('div', { class: 'dialcol' }, mkSwatch(1), dial1.el),
+            h('div', { class: 'dialcol' }, mkSwatch(2), dial2.el)),
+        ]);
+    },
+  },
+  { // 5 — automationPresets
+    audio: { type: 'group', idx: 1 },
+    onEnter() { sel.inst = 3; showPresetPanel = true; },
+    build() {
+      const container = h('div', { style: 'width:100%;display:flex;flex-direction:column;gap:8px;align-items:center' });
+      const wfIcon = h('span'); wfIcon.innerHTML = SVG_WAVEFORM;
+      const toggle = tbtn(wfIcon, {
+        small: true, selected: showPresetPanel,
+        onclick: () => {
+          showPresetPanel = !showPresetPanel;
+          toggle.classList.toggle('selected', showPresetPanel);
+          pp.el.style.display = showPresetPanel ? '' : 'none';
+          if (showPresetPanel) pp.layout();
+        },
+      });
+      const ed = autoEditorWidget(5, { drawing: () => false });
+      const pp = presetPanelWidget(
+        () => { applyPresetToLane(); ed.draw(); },      // stays open (onboarding tweak)
+        () => { showPresetPanel = false; toggle.classList.remove('selected'); pp.el.style.display = 'none'; });
+      pp.el.style.display = showPresetPanel ? '' : 'none';
+      container.append(
+        h('div', { class: 'toolrow' }, toggle, h('span', { class: 'sp' })),
+        ed.el, pp.el);
+      return olayout(
+        textPanel('Changes can be automated', [
+          "This is a pattern's automation lane — we've pre-filled a ramp",
+          'Presets fill the lane with a shape',
+          'Adjust the shape, then tap Apply',
+        ]),
+        [container]);
+    },
+  },
+  { // 6 — automationDraw
+    audio: { type: 'group', idx: 1 },
+    onEnter() { sel.inst = 3; isDrawingAutomation = true; },
+    build() {
+      const drawBtn = tbtn('Draw', {
+        small: true, caption: true, color: C.orange, selected: isDrawingAutomation,
+        onclick: () => {
+          isDrawingAutomation = !isDrawingAutomation;
+          drawBtn.classList.toggle('selected', isDrawingAutomation);
+        },
+      });
+      const ed = autoEditorWidget(5, { drawing: () => isDrawingAutomation });
+      return olayout(
+        textPanel('Automations can also be drawn in', [
+          'Drawing mode is on — drag across the lane to shape the automation',
+          'Toggle "Draw" off to drag single bars instead',
+        ]),
+        [
+          h('div', { class: 'toolrow' }, h('span', { class: 'sp' }), drawBtn),
+          ed.el,
+        ]);
+    },
+  },
+  { // 7 — automationBinding
+    audio: { type: 'group', idx: 1 },
+    onEnter() { selectedMod = null; },
+    build() {
+      const ed = autoEditorWidget(5, { interactive: false });
+      const dial = dialWidget({
+        caption: 'Hi hat duration', defaultValue: 0.5,
+        get: () => inst3.morph,
+        set: v => { inst3.morph = v; },
+        modGet: () => inst3.laneOne,
+        modSet: v => { inst3.laneOne = v; audio.sendHatLane(); },
+        selectedMod: () => selectedMod === 'laneOne',
+      });
+      const selWrap = modSelectorWidget(dial);
+      return olayout(
+        textPanel("Automations are mapped using dials' color modes", [
+          'Try selecting "Pattern Lane" from the dropdown',
+          'Then hold and drag to change the amount of automation applied',
+        ]),
+        [ed.el, selWrap.el]);
+    },
+  },
+  { // 8 — notes
+    audio: { type: 'group', idx: 3 },
+    onEnter() { sel.inst = 4; notesScrollStep = 0; notesPageId = 0; notesVisiblePages = new Set([0]); },
+    build() {
+      let pageSel;
+      const ng = noteGridWidget(8, () => pageSel && pageSel.draw());
+      pageSel = pageSelectorWidget(8, page => ng.scrollToPage(page));
+      return olayout(
+        textPanel('Instruments can also play notes', [
+          'This synth melody was generated with the Euclidean arp — you\'ll find it under "GEN"',
+          'Tap the grid to add or remove notes, and drag notes to move them',
+          'The pattern is two pages long — tap the page buttons or scroll across to see the second half',
+        ]),
+        [pageSel.el, ng.el]);
+    },
+  },
+  { // 9 — patternGrid
+    audio: { type: 'group', idx: 2 },
+    build() {
+      return olayout(
+        textPanel('Patterns live in the pattern grid', [
+          'Each pattern is assigned an icon and a color',
+          'Tap a pattern to select it',
+          'Hold one, then drag, to rearrange the grid',
+        ]),
+        [patternGridWidget().el]);
+    },
+  },
+  { // 10 — loopGroups
+    audio: { type: 'group', idx: DRAG_DROP_GROUP },
+    onEnter() { ensureDragDropGroupExists(); sel.pattern = null; },
+    build() {
+      const carousel = loopGroupCarouselWidget({
+        groups: () => [{ group: loopGroups[DRAG_DROP_GROUP], index: DRAG_DROP_GROUP }],
+        single: true,
+        height: 200,
+      });
+      externalDropTarget = carousel;
+      return olayout(
+        textPanel('Patterns combine into "Loop Groups" to build the song', [
+          'Each row of the loop group is a voice — its columns play in order',
+          'Hold a pattern in the grid, then drag it up onto the loop group',
+          'Hold a placed pattern and drag it out again to remove it',
+        ]),
+        [carousel.el, patternGridWidget().el]);
+    },
+  },
+  { // 11 — loopGroupChain
+    audio: { type: 'group', idx: 0 },
+    onEnter() { chainScroll = { offset: 0, centered: 0 }; },
+    build() {
+      const carousel = loopGroupCarouselWidget({
+        groups: () => loopGroups.map((g, i) => ({ group: g, index: i })),
+        single: false,
+        height: 200,
+        onCentered(idx) {
+          if (nav.changingTo === null) audio.restartGroup(idx);
+        },
+      });
+      return olayout(
+        textPanel('Loop Groups chain together to form the song', [
+          'In the song, each group plays in order — the time underneath shows where it starts',
+          'Swipe across to see every group — the one you just built plays last',
+          'The selected group loops, so you can hear each part on its own',
+        ]),
+        [carousel.el]);
+    },
+  },
+  { // 12 — songComposer
+    audio: { type: 'song' },
+    onEnter() { sel.loopGroup = null; sel.pattern = null; sel.highlightedGroup = 0; },
+    build() {
+      const holder = h('div', { style: 'width:100%;display:flex;flex-direction:column;gap:8px;align-items:center' });
+      const gridW = patternGridWidget();
+      let currentTop = null;
+
+      function mountOverview() {
+        if (currentTop) currentTop.el.remove();
+        const ov = songOverviewWidget(idx => {
+          // Opening a group loops it straight away (app: selection onChange →
+          // startPointLoopGroupId + forceReset)
+          sel.loopGroup = idx;
+          if (nav.changingTo === null) audio.restartGroup(idx);
+          mountEditor(idx);
+        });
+        currentTop = ov;
+        holder.prepend(ov.el);
+        ov.layout();
+      }
+      function mountEditor(idx) {
+        if (currentTop) currentTop.el.remove();
+        const ed = loopGroupCarouselWidget({
+          groups: () => loopGroups.map((g, i) => ({ group: g, index: i })),
+          single: false,
+          height: 200,
+          initialCentered: idx,
+          onCentered(i) {
+            // Swiping to another group in the sub-editor re-focuses the loop on it
+            sel.loopGroup = i;
+            sel.highlightedGroup = i;
+            if (nav.changingTo === null) audio.restartGroup(i);
+          },
+          onDeselect() {
+            // Back to the overview: the song chains on from the current group
+            sel.loopGroup = null;
+            mountOverview();
+          },
+        });
+        currentTop = ed;
+        holder.prepend(ed.el);
+        ed.layout();
+      }
+
+      holder.append(gridW.el);
+      mountOverview();
+
+      return olayout(
+        textPanel('Loop Groups live in the song view', [
+          'Tap the highlighted group to open it — tap outside the cells to come back',
+          'Hold a group to duplicate or delete it, hold and drag to reorder the song',
+          'The play button starts the song from the highlighted group',
+        ]),
+        [holder]);
+    },
+  },
+  { // 13 — getStarted
+    audio: { type: 'none' },
+    build() {
+      return h('div', { class: 'fullpage' },
+        textPanel('Hope you enjoyed the onboarding!', [
+          "There's plenty of other features available",
+          '',
+          'Please experiment, and make some great beats',
+          'You can take this tutorial again from the home screen',
+        ]));
+    },
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Navigation — bar-quantised transitions (Onboarding.transition(to:))
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const nav = {
+  current: 0,
+  changingTo: null,
+  fallbackTimer: null,
+  // Synchronous re-entry guard: `changingTo` is only set after the async
+  // audio.init() await, so without this a second click in that window would
+  // pass the changingTo check and race the first.
+  busy: false,
+
+  async go(target) {
+    if (this.busy) return;
+    this.busy = true;
+    try {
+      await audio.init();
+    } finally {
+      this.busy = false;
+    }
+    if (!audio.playing || !audio.wNode) {
+      clearTimeout(this.fallbackTimer);
+      audio.armedFor = null;
+      this.current = target;
+      this.changingTo = null;
+      renderScreen();
+      audio.applyScreenAudio(SCREENS[target], false);
+      this.updateButtons();
+      return;
+    }
+    // Playing: queue for the next bar start (audio pre-armed at step 15). If step
+    // messages stop arriving (suspended tab, engine stall), force-complete after
+    // ~2 bars so the Back/Next buttons can never be stranded disabled.
+    this.changingTo = target;
+    this.updateButtons();
+    clearTimeout(this.fallbackTimer);
+    const barMs = 16 * (60 / BPM / 4) * 1000;
+    this.fallbackTimer = setTimeout(() => {
+      if (this.changingTo !== target) return;
+      audio.applyScreenAudio(SCREENS[target], false);
+      audio.armedFor = null;
+      this.completeTransition();
+    }, barMs * 2 + 400);
+  },
+
+  completeTransition() {
+    if (this.changingTo === null) return;
+    clearTimeout(this.fallbackTimer);
+    this.current = this.changingTo;
+    this.changingTo = null;
+    renderScreen();
+    const scr = SCREENS[this.current];
+    if (!scr.audio || scr.audio.type === 'none') audio.setMode({ type: 'none' });
+    this.updateButtons();
+  },
+
+  updateButtons() {
+    const back = document.getElementById('btn-back');
+    const next = document.getElementById('btn-next');
+    back.classList.toggle('hidden', this.current === 0 && this.changingTo === null);
+    const busy = this.changingTo !== null;
+    back.classList.toggle('disabled', busy);
+    next.classList.toggle('disabled', busy);
+  },
+};
+
+function leaveOnboarding() {
+  if (audio.playing) audio.send({ type: 'stop' });
+  window.location.href = '/';
+}
+
+document.getElementById('btn-back').addEventListener('click', () => {
+  if (nav.changingTo !== null || nav.busy) return;
+  if (nav.current > 0) nav.go(nav.current - 1);
+});
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (nav.changingTo !== null || nav.busy) return;
+  if (nav.current < SCREENS.length - 1) nav.go(nav.current + 1);
+  else leaveOnboarding();
+});
+
+function renderScreen() {
+  widgets = [];
+  externalDropTarget = null;
+  document.getElementById('holdmenu').classList.remove('open');
+  const scr = SCREENS[nav.current];
+  if (scr.onEnter) scr.onEnter();
+  const root = document.getElementById('screen-root');
+  root.innerHTML = '';
+  root.append(scr.build());
+  widgets.forEach(w => w.layout && w.layout());
+  requestAnimationFrame(() => widgets.forEach(w => w.layout && w.layout()));
+  nav.updateButtons();
+}
+
+/* ── Resize / init ───────────────────────────────────────────────────────── */
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => widgets.forEach(w => w.layout && w.layout()), 120);
+});
+
+document.fonts.ready.then(() => widgets.forEach(w => w.draw && w.draw()));
+
+renderScreen();
+</script>
+</body>
+</html>

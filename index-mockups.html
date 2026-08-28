@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Jolt Groovebox | iOS Groovebox for iPad and iPhone</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="mockup-screens.css">
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="nav-logo">
+        <img src="images/logo.svg" />
+    </div>
+    <ul class="nav-menu">
+        <li><a href="/">Home</a></li>
+        <li><a href="/privacy">Privacy Policy</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero">
+    <h1>Jolt Groovebox</h1>
+    <div>
+      <p>Jolt is a mobile beat machine, designed for building percussive grooves and electric melodies</p>
+      <p>Inspired by modular synthesizers and hardware grooveboxes</p>
+      <p>Designed and built for iOS</p>
+    </div>
+  </div>
+</header>
+
+
+<section>
+  <h2>Pocket beats, massive sound</h2>
+  <div class="feature-split">
+    <div>
+      <p>Jolt was designed from the ground up to be the mobile beat station that you keep coming back to.</p>
+      <p>8 voices, each with their own step sequencer, per-section/per-sequence automation, per-instrument LFOs.</p>
+    </div>
+    <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-editor">
+      <div class="bar top">
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+        <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+        <span class="song-title" style="margin-left:4px">Pattern</span>
+        <span class="spacer"></span>
+        <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+        <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+      </div>
+      <div class="edit-body">
+          <div class="subnav">
+            <span class="name">Pattern</span>
+            <span class="icons">
+              <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+              <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+              <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+            </span>
+          </div>
+          <div class="pagebar">
+            <div class="pageseq">
+              <span class="pg label">Page</span>
+              <span class="pg num on">1</span>
+              <span class="pg num playing">2</span>
+              <span class="pg num">3</span>
+              <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/></svg></span>
+            </div>
+            <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+          </div>
+          <div class="steps" id="stepgrid"></div>
+          <div class="instr-strip">
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+            <div class="chips">
+              <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+              <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+              <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+              <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+              <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+              <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+            </div>
+          </div>
+          <div class="tabcard">
+            <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+            <div class="panel">
+              <div class="dial-row">
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+              </div>
+              <div class="dial-row">
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Tune</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+              </div>
+            </div>
+            <div class="foot"><span class="on">Sound</span><span>Filter</span><span>F. Env</span><span>Noise</span><span>Amp</span></div>
+          </div>
+      </div>
+      <div class="bar bottom">
+        <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+        <span class="chip txt"><i>Solo</i></span>
+        <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+        <span class="spacer"></span>
+        <span class="chip txt"><i>VIZ</i></span>
+        <span class="chip txt"><i>FX</i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+
+<section>
+  <h2>Samples or synths, you choose</h2>
+  <p>Each voice can play any built-in instrument per step</p>
+  <p>Mix multiple instruments into a single pattern</p>
+
+  <div class="feature-split">
+  <div class="two-column">
+    <div>
+        <h3>Classic Synth</h3>
+        <p>Wavetable synth with 4 modes: spread, 2-op FM, paraphony, in-scale chords</p>
+    </div>
+    <div>
+        <h3>Macro Synth</h3>
+        <p>16 sub-synths based on a classic Eurorack module</p>
+    </div>
+
+    <div>
+        <h3>Sampler</h3>
+        <p>Pitched or slicing sampler, old-skool repitching, per-step reversing, mic recording, mp3/wav loading</p>
+    </div>
+    <div>
+        <h3>Drum Synth</h3>
+        <p>Simple x0x-style percussion synth, for hi-hats, snares, or heavy kicks</p>
+    </div>
+  </div>
+  <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-notes">
+      <div class="bar top">
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+        <div class="pattern-tile" style="background:#EA3EE7"><span class="ink" style="--ic:var(--ic-chord)"></span></div>
+        <span class="song-title" style="margin-left:4px">Notes</span>
+        <span class="spacer"></span>
+        <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+        <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+      </div>
+      <div class="edit-body">
+        <div class="notesmode">
+          <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+          <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M3.5 12.5 12.5 3.5"/><circle cx="4.6" cy="4.6" r="1.9"/><circle cx="11.4" cy="11.4" r="1.9"/></svg></i></span>
+          <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2.5 11.5a6 6 0 0 1 11 0"/><path d="M8 11.5 10.8 7"/><circle class="f" cx="8" cy="11.5" r="1.2"/></svg></i></span>
+          <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg></i></span>
+          <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><circle cx="3.5" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="12.5" cy="8" r="1.2"/></g></svg></i></span>
+        </div>
+        <div class="pagebar">
+          <div class="pageseq">
+            <span class="pg label">Page</span>
+            <span class="pg num on playing">1</span>
+            <span class="pg num last">2<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/></svg></span>
+          </div>
+          <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+        </div>
+        <div class="scale-row">
+          <span class="chip txt scale-chip"><i>C&nbsp;&nbsp;Minor</i></span>
+        </div>
+        <div class="lanes" id="notelanes"></div>
+        <div class="notes-picker">
+          <div class="chips">
+            <span class="ichip" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+            <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+            <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+            <span class="ichip sel" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+            <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+            <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+          </div>
+        </div>
+      </div>
+      <div class="bar bottom">
+        <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+        <span class="chip txt"><i>Solo</i></span>
+        <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+        <span class="spacer"></span>
+        <span class="chip txt"><i>VIZ</i></span>
+        <span class="chip txt"><i>FX</i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+
+<section>
+  <h2>Effect Chain</h2>
+  <p>Any instrument can have any number of effects in any order</p>
+
+  <div class="two-column side-by-side">
+    <div>
+      <h3>Overdrive</h3>
+      <p>Crushing distortion for leads or drums.</p>
+    </div>
+    <div>
+      <h3>Saturator</h3>
+      <p>Warmth or heavy saturation.</p>
+    </div>
+    <div>
+      <h3>Chorus</h3>
+      <p>Shimmering pads, bubbling basses.</p>
+    </div>
+    <div>
+      <h3>Filter</h3>
+      <p>4-stage ladder or resonant SVF (LP/HP/BP), with mod envelope.</p>
+    </div>
+    <div>
+      <h3>Band/EQ</h3>
+      <p>4-band EQ or custom band shaping.</p>
+    </div>
+    <div>
+      <h3>Erode</h3>
+      <p>Grainy lo-fi textures.</p>
+    </div>
+    <div>
+      <h3>Bitcrush</h3>
+      <p>Old-school bit-depth reduction.</p>
+    </div>
+    <div>
+      <h3>Sample Rate Reduction</h3>
+      <p>Lower the sample rate for gritty textures.</p>
+    </div>
+    <div>
+      <h3>Phaser</h3>
+      <p>Movement for pads or bass.</p>
+    </div>
+    <div>
+      <h3>Gater</h3>
+      <p>16-step synced gate for stutters or trance-gates.</p>
+    </div>
+    <div>
+      <h3>Stereo Pan</h3>
+      <p>Stereo width and panning control.</p>
+    </div>
+  </div>
+</section>
+
+
+<section>
+  <h2>Send effects</h2>
+  <p>Each instrument can be sent to global FX</p>
+
+  <div class="feature-split">
+  <div class="two-column">
+    <div>
+        <h3>Reverb</h3>
+        <p>Classic plate, short to long tails.</p>
+    </div>
+
+    <div>
+        <h3>Delay</h3>
+        <p>Synced with ping-pong & feedback.</p>
+    </div>
+
+    <div>
+        <h3>Multi-tap</h3>
+        <p>8-tap rhythmic delay.</p>
+    </div>
+
+    <div>
+        <h3>Sidechain</h3>
+        <p>Kick-based sidechain for pumping or space.</p>
+    </div>
+  </div>
+  <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-mixer">
+      <div class="app-header">
+        <div class="left"><span class="chip flat"><i>&#8592;</i></span></div>
+        <div class="title">Mixer</div>
+      </div>
+      <div class="mixer-body">
+        <div class="strip-grid" id="voices"></div>
+      </div>
+      <div class="mixtabs"><span class="on">Voices</span><span>FX</span></div>
+    </div></div></div>
+  </div>
+</section>
+
+
+<section>
+  <h2>Global Effect Macros</h2>
+  <p>Up to 5 macro controls for one-touch build-ups & breakdowns.</p>
+
+  <div class="feature-split">
+    <ul class="features">
+      <li>Reverb</li>
+      <li>Delay</li>
+      <li>Phaser</li>
+      <li>Beat repeat</li>
+      <li>Resonant LP DJ filter</li>
+      <li>Resonant HP DJ filter</li>
+    </ul>
+    <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-macro">
+      <div class="app-header">
+        <div class="left"><span class="chip"><i>&#8592;</i></span></div>
+        <div class="right"><span class="chip"><i>&#9998;</i></span></div>
+      </div>
+      <div class="macro-body">
+        <div class="macro-row">
+          <div class="macro lane" style="--v:0.42"><div class="fill"></div><span class="qrule" style="top:25%"></span><span class="qrule" style="top:50%"></span><span class="qrule" style="top:75%"></span>
+            <div class="caption"><span>Group</span><span>Automation</span><span>Override</span></div></div>
+          <div class="macro" style="--v:0.63"><div class="fill"></div><span class="qrule" style="top:25%"></span><span class="qrule" style="top:50%"></span><span class="qrule" style="top:75%"></span>
+            <div class="caption"><span>Reverb</span><span>Delay</span></div></div>
+          <div class="macro" style="--v:0"><div class="fill"></div><span class="qrule" style="top:25%"></span><span class="qrule" style="top:50%"></span><span class="qrule" style="top:75%"></span>
+            <div class="caption"><span>Low Pass</span></div></div>
+        </div>
+        <div class="macro-row">
+          <div class="macro" style="--v:0.28"><div class="fill"></div><span class="qrule" style="top:25%"></span><span class="qrule" style="top:50%"></span><span class="qrule" style="top:75%"></span>
+            <div class="caption"><span>Beat Repeat</span></div></div>
+          <div class="macro" style="--v:0"><div class="fill"></div><span class="qrule" style="top:25%"></span><span class="qrule" style="top:50%"></span><span class="qrule" style="top:75%"></span>
+            <div class="caption"><span>Phaser</span><span>Gater</span></div></div>
+          <div class="macro" style="--v:0"><div class="fill"></div><span class="qrule" style="top:25%"></span><span class="qrule" style="top:50%"></span><span class="qrule" style="top:75%"></span>
+            <div class="caption"><span>High Pass</span></div></div>
+        </div>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+
+<section>
+  <h2>Modulate and automate everything</h2>
+  <p>All instrument and global FX parameters can be automated with multi-source modulation.</p>
+
+  <h3>Per-instrument LFO</h3>
+  <p>Sine, ramp, random, freely assignable.</p>
+
+  <h3>Pattern automation lane</h3>
+  <p>Draw synced automation tied to instruments.</p>
+
+  <h3>Song automation lane</h3>
+  <p>Bar-to-bar automation or real-time fader overrides.</p>
+</section>
+
+
+<section>
+  <h2>Explore, sequence, jam</h2>
+  <p>Build patterns up to 64 steps: programmed, MIDI input, or generative</p>
+  <p>Chain patterns into songs with automation</p>
+  <p>Jam in performance mode with live parameter control</p>
+  <div class="mock-wide">
+  <div class="jolt-mock device"><div class="viewport"><div class="screen pad" id="scr-composer-pad">
+      <div class="bar top">
+        <span class="chip"><i>&#8592;</i></span>
+        <span class="song-title">Midnight Taxi</span>
+        <span class="spacer"></span>
+        <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+        <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+      </div>
+      <div class="pad-mid">
+        <div class="groups-band" id="groups-pad"></div>
+        <div class="fx-sidebar">
+          <span class="ft">Effects</span>
+          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.35"></span><span class="val">35</span></span><span class="cap">Delay</span></div>
+          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Reverb</span></div>
+          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.2"></span><span class="val">20</span></span><span class="cap">Multitap</span></div>
+        </div>
+      </div>
+      <div class="pgrid-band" id="pgrid-pad" style="margin-top:8px"></div>
+      <div class="bar bottom" style="margin-top:8px">
+        <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+        <span class="spacer"></span>
+        <span class="chip txt"><i>VIZ</i></span>
+        <span class="chip txt"><i>FX</i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+      </div>
+    </div></div></div>
+  </div>
+</section>
+
+
+<footer>
+  <p>Copyright © 2026 EdJ / Jolt Groovebox</p>
+</footer>
+
+<script src="mockup-screens.js"></script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt Groovebox — Groovebox simplicity, Tracker flexibility</title>
+<meta name="description" content="Eight voices. Any voice plays any instrument, on any step. Tracker semantics in a groovebox interface. iPad and iPhone.">
+
+<!-- shared mockup styles: real app tokens, fonts and icons, scoped under .jolt-mock -->
+<link rel="stylesheet" href="../mockup-screens.css">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   JOLT GROOVEBOX — concept 01 "FIGURES", v2
+   Every claim is discharged by a numbered figure. Four figures, no more.
+   Page classes are prefixed j- so they cannot collide with the shared
+   mockup stylesheet, which owns .device / .screen / .step / .chip / …
+   ═══════════════════════════════════════════════════════════════════ */
+
+@font-face{font-family:'Geist Mono';src:url('../geist/GeistMono/webfonts/GeistMono-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Geist Mono';src:url('../geist/GeistMono/webfonts/GeistMono-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Geist Mono';src:url('../geist/GeistMono/webfonts/GeistMono-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra Petch';src:url('../fonts/ChakraPetch-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra Petch';src:url('../fonts/ChakraPetch-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+
+:root{
+  /* elevation ramp: ground → panel */
+  --e0:#0B0C0F; --e1:#101219; --e2:#14161D; --e3:#181B24; --e4:#1E222C;
+  --line:#3A3F4B;
+  --hair:rgba(58,63,75,.42);
+
+  --text:#EDEFF3;
+  --muted:#8B93A6;
+  --dim:#5C6373;
+
+  --cyan:#7DFBFD;        /* house / state. never decorative */
+  --orange:#FF6A00;      /* subordinate */
+
+  /* instrument colours — InstrumentColors.fixed, via mockup-screens.js */
+  --i-kick:#7DFBFD; --i-snare:#CFFB52; --i-hat:#FF9500; --i-chord:#EA3EE7;
+
+  /* modulation layers */
+  --mod-lfo:#BF5AF2; --mod-pat:#FF6A00; --mod-song:#FF2D8C;
+
+  --display:'Chakra Petch',system-ui,sans-serif;
+  --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  --maxw:1180px;
+  --pad-sec:clamp(5rem,10vw,9rem);
+}
+
+/* the embedded screens keep the app's own font stack */
+.jolt-mock.j-device{
+  --display:'ChakraPetch-Bold','Chakra Petch',sans-serif;
+  --display-semi:'ChakraPetch-SemiBold','Chakra Petch',sans-serif;
+  --mono:'GeistMono-Regular','Geist Mono',ui-monospace,monospace;
+  --mono-med:'GeistMono-Medium','Geist Mono',ui-monospace,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--e0);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--e0);color:var(--text);
+  font-family:var(--mono);font-size:14px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+
+/* grain — the reason near-black reads engineered */
+.j-grain{position:relative}
+.j-grain::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:6;
+  background-image:var(--grain);background-size:180px 180px;
+  mix-blend-mode:overlay;opacity:.14;
+}
+
+.j-wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ── nav ───────────────────────────────────────────────────────── */
+.j-nav{position:sticky;top:0;z-index:40;background:rgba(11,12,15,.82);
+  backdrop-filter:blur(14px) saturate(1.2);border-bottom:1px solid var(--hair)}
+.j-nav-in{max-width:var(--maxw);margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;gap:20px}
+.j-logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.j-logo img{height:15px;width:auto}
+.j-logo span.r{width:1px;height:15px;background:var(--line)}
+.j-logo b{font-weight:500;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.j-navlinks{margin-left:auto;display:flex;align-items:center;gap:22px}
+.j-navlinks a{font-size:10.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .15s}
+.j-navlinks a:hover{color:var(--text)}
+@media(max-width:640px){.j-navlinks a.j-hs{display:none}}
+
+/* ── buttons ───────────────────────────────────────────────────── */
+.j-btn{--c:9px;display:inline-flex;text-decoration:none;flex:none;background:var(--line);padding:1px;transition:background .15s;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-btn>span{--c:9px;background:var(--e2);color:var(--text);display:flex;align-items:center;gap:10px;padding:0 22px;height:46px;
+  font-size:11px;letter-spacing:.17em;text-transform:uppercase;font-weight:500;white-space:nowrap;transition:background .15s,color .15s;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-btn:hover{background:var(--cyan)}
+.j-btn:hover>span{background:var(--e3)}
+.j-btn.j-pri{background:var(--cyan)}
+.j-btn.j-pri>span{background:var(--cyan);color:#04252b;font-weight:700}
+.j-btn.j-pri:hover>span{background:#a6fdff}
+.j-btn .j-k{font-size:14px;line-height:1}
+
+/* ── hero ──────────────────────────────────────────────────────── */
+.j-hero{position:relative;padding:clamp(3.5rem,6vw,5.5rem) 0 0;overflow:hidden}
+.j-hero::before{content:'';position:absolute;inset:-40% 0 auto 0;height:120%;z-index:0;pointer-events:none;
+  background:radial-gradient(60% 42% at 50% 0%,rgba(125,251,253,.075),transparent 68%),linear-gradient(180deg,var(--e1),var(--e0) 62%)}
+.j-hero-in{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:64px;align-items:end}
+@media(max-width:1040px){.j-hero-in{grid-template-columns:1fr}.j-sum{display:none}}
+.j-eyebrow{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--cyan);margin:0 0 20px;display:flex;align-items:center;gap:12px}
+.j-eyebrow::after{content:'';height:1px;flex:1;max-width:220px;background:linear-gradient(90deg,rgba(125,251,253,.5),transparent)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,5.8vw,68px);line-height:1;letter-spacing:-.005em;
+  margin:0 0 24px;text-transform:uppercase;text-wrap:balance;max-width:16ch}
+h1 .j-tone{display:block;color:var(--muted)}
+.j-lede{font-size:15px;line-height:1.75;color:var(--muted);max-width:54ch;margin:0 0 30px}
+.j-lede b{color:var(--text);font-weight:500}
+.j-cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.j-ctanote{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);max-width:48ch;line-height:1.7;margin:18px 0 0}
+.j-sum{padding-bottom:6px}
+.j-sum .hd{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);opacity:.4;padding-bottom:10px;border-bottom:1px solid var(--hair);margin-bottom:4px}
+.j-sum .l{display:flex;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid rgba(58,63,75,.22)}
+.j-sum .l span{font-size:9.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--dim)}
+.j-sum .l b{margin-left:auto;font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:.05em;color:var(--text)}
+
+/* ── section chrome ────────────────────────────────────────────── */
+.j-sec{padding-top:var(--pad-sec)}
+.j-sechead{display:flex;align-items:flex-end;gap:22px;border-bottom:1px solid var(--hair);padding-bottom:14px;margin-bottom:26px}
+.j-idx{font-size:10.5px;letter-spacing:.2em;color:var(--cyan);padding-bottom:3px}
+.j-sechead h2{font-family:var(--display);font-weight:600;font-size:clamp(19px,2.6vw,28px);letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1.05}
+.j-sechead .as{margin-left:auto;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);text-align:right;padding-bottom:4px}
+@media(max-width:760px){.j-sechead .as{display:none}}
+.j-say{font-size:14.5px;line-height:1.78;color:var(--muted);max-width:62ch;margin:0 0 30px}
+.j-say b{color:var(--text);font-weight:500}
+
+/* ── figure shell ──────────────────────────────────────────────── */
+.j-fig{margin:0}
+.j-figbody{position:relative;background:var(--line);padding:1px;--c:16px;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-figbody>.in{--c:16px;background:var(--e1);padding:26px;position:relative;overflow:hidden;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+@media(max-width:600px){.j-figbody>.in{padding:16px}}
+figcaption{display:flex;gap:14px;align-items:baseline;margin-top:12px;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);opacity:.4}
+figcaption .n{font-weight:700;letter-spacing:.2em;flex:none}
+figcaption .t{font-weight:400;letter-spacing:.1em;text-transform:none;font-size:11px;line-height:1.55;max-width:82ch}
+
+.j-rl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+
+/* ── FIG 0.1 · step lane, 2 rows of 8 ──────────────────────────── */
+.j-lanehead{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.j-chip{--c:6px;background:var(--line);padding:1px;flex:none;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-chip>i{--c:6px;background:var(--e4);color:var(--muted);font-style:normal;display:flex;align-items:center;height:26px;padding:0 12px;
+  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-lanehead .m{margin-left:auto;display:flex;gap:18px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.j-lanehead .m b{color:var(--muted);font-weight:400}
+
+.j-laneblock{max-width:872px;margin:0 auto}
+.j-grid{display:flex;flex-direction:column;gap:12px}
+.j-grow{display:flex;align-items:center;gap:14px}
+.j-grow .rn{width:16px;flex:none;font-size:9.5px;letter-spacing:.1em;color:var(--dim);text-align:right}
+.j-cells{flex:1;min-width:0;display:grid;grid-template-columns:repeat(4,1fr) 6px repeat(4,1fr);gap:6px}
+.j-gut{background:transparent}
+.j-cw{position:relative;aspect-ratio:1}
+.j-cw.play::before{content:'';position:absolute;inset:-4px;background:var(--muted);opacity:.9}
+.j-cell{position:absolute;inset:0;background:var(--e3);display:flex;align-items:center;justify-content:center;
+  --c:15px;clip-path:polygon(var(--c) 0,calc(100% - var(--c)) 0,100% var(--c),100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,var(--c) 100%,0 calc(100% - var(--c)),0 var(--c))}
+.j-cell.on{background:var(--k)}
+.j-cell.slice{--c:15px;clip-path:polygon(var(--c) 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)),0 var(--c))}
+.j-cell .ink{width:44%;height:44%}
+.j-cell .rat{position:absolute;bottom:11%;left:0;right:0;display:flex;gap:3px;justify-content:center}
+.j-cell .rat b{width:4px;height:4px;border-radius:50%;background:var(--e0)}
+.j-cell .sl{position:absolute;right:7%;bottom:3%;font-family:var(--mono);font-weight:500;font-size:11px;color:var(--e0)}
+.j-nums{display:grid;grid-template-columns:repeat(4,1fr) 6px repeat(4,1fr);gap:6px;margin-left:30px;margin-top:2px}
+.j-nums span{text-align:center;font-size:9.5px;color:var(--dim)}
+.j-nums span.q{color:var(--muted)}
+
+.j-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:18px;border-top:1px solid var(--hair)}
+.j-lg{display:flex;align-items:center;gap:10px;padding:7px 14px 7px 8px;background:var(--e2);--c:7px;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-lg .sw{width:18px;height:18px;background:var(--k);display:flex;align-items:center;justify-content:center;flex:none;--c:20%;
+  clip-path:polygon(var(--c) 0,calc(100% - var(--c)) 0,100% var(--c),100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,var(--c) 100%,0 calc(100% - var(--c)),0 var(--c))}
+.j-lg .sw .ink{width:11px;height:11px}
+.j-lg em{font-style:normal;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text)}
+.j-lg i{font-style:normal;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.j-legnote{margin:12px 0 0;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim)}
+
+/* ── FIG 0.2 · embedded real screen ────────────────────────────── */
+.j-shot{display:grid;grid-template-columns:400px minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center}
+@media(max-width:860px){.j-shot{grid-template-columns:1fr;gap:34px}}
+.j-screenhold{width:100%}
+.j-notes{display:flex;flex-direction:column;gap:24px;max-width:56ch}
+.j-aside{display:flex;gap:20px;padding-top:20px;border-top:1px solid var(--hair)}
+.j-aside .k{flex:none;width:104px;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);padding-top:3px}
+.j-aside p{margin:0;font-size:13px;line-height:1.75;color:var(--muted)}
+.j-aside p b{color:var(--text);font-weight:500}
+@media(max-width:640px){.j-aside{flex-direction:column;gap:10px}.j-aside .k{width:auto}}
+
+/* ── §03 instruments — the one list on this page ───────────────── */
+.j-list{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+@media(max-width:900px){.j-list{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.j-list{grid-template-columns:1fr}}
+.j-list .it{background:var(--e1);padding:20px 20px 24px;display:flex;flex-direction:column;gap:10px}
+.j-list .it h3{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.05em;text-transform:uppercase;margin:0;display:flex;align-items:baseline;gap:12px}
+.j-list .it h3 s{margin-left:auto;text-decoration:none;font-family:var(--mono);font-weight:400;font-size:9px;letter-spacing:.2em;color:var(--dim)}
+.j-list .it p{margin:0;font-size:12px;line-height:1.72;color:var(--muted)}
+
+/* ── FIG 0.3 · signal path ─────────────────────────────────────── */
+.j-chain{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.j-node{--c:8px;background:var(--line);padding:1px;flex:none;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-node>i{--c:8px;background:var(--e3);color:var(--muted);font-style:normal;height:36px;padding:0 15px;display:flex;align-items:center;gap:9px;
+  font-size:10px;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap;
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c))}
+.j-node.src{background:var(--k)}
+.j-node.src>i{background:var(--k);color:#04252b;font-weight:700}
+.j-node.mod{background:var(--mod-lfo)}
+.j-node.mod>i{color:var(--text)}
+.j-node.mod .n{color:var(--mod-lfo)}
+.j-node.more>i{color:var(--dim);border:0}
+.j-node .n{font-size:9px;color:var(--dim)}
+.j-arrow{color:var(--line);font-size:12px;flex:none;line-height:1}
+.j-split{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:28px;padding-top:24px;border-top:1px solid var(--hair)}
+@media(max-width:760px){.j-split{grid-template-columns:1fr;gap:26px}}
+.j-sr{display:flex;align-items:center;gap:12px;margin-top:11px}
+.j-sr .nm{width:92px;flex:none;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.j-meter{flex:1;height:8px;background:var(--e3);position:relative}
+.j-meter b{position:absolute;inset:0 auto 0 0;width:calc(var(--v)*100%);background:var(--muted)}
+.j-macros{display:flex;gap:10px;margin-top:11px}
+.j-mac{flex:1;height:62px;background:var(--e2);position:relative;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:flex-end}
+.j-mac b{display:block;height:calc(var(--v)*100%);background:rgba(139,147,166,.26)}
+.j-mac.hot b{background:rgba(125,251,253,.3)}
+.j-mac .cp{position:absolute;left:0;right:0;bottom:7px;text-align:center;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text)}
+
+/* ── close + footer ────────────────────────────────────────────── */
+.j-close{position:relative;margin-top:clamp(3rem,4.5vw,4rem);padding:clamp(2.5rem,4vw,3.5rem) 0;border-top:1px solid var(--hair);overflow:hidden}
+.j-close::before{content:'';position:absolute;inset:0;background:radial-gradient(52% 70% at 50% 100%,rgba(125,251,253,.08),transparent 70%);pointer-events:none}
+.j-close-in{position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}
+.j-close h2{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,46px);line-height:1;text-transform:uppercase;margin:0;max-width:14ch}
+.j-close p{margin:0;color:var(--muted);font-size:14px;max-width:46ch}
+footer{border-top:1px solid var(--hair);padding:20px 0 28px}
+.j-foot{display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.j-foot .sp{flex:1}
+.j-foot a{color:var(--muted);text-decoration:none}
+.j-foot a:hover{color:var(--text)}
+.j-endorse{display:flex;align-items:center;gap:9px;color:var(--dim)}
+.j-endorse img{height:13px;width:auto;filter:invert(1);opacity:.55}
+.j-endorse img.wm{height:8px}
+
+</style>
+</head>
+<body class="jolt-mock">
+
+<nav class="j-nav">
+  <div class="j-nav-in">
+    <a class="j-logo" href="#top"><img src="assets/marks/jolt-wordmark.svg" alt="Jolt"><span class="r"></span><b>Groovebox</b></a>
+    <div class="j-navlinks">
+      <a href="#figures" class="j-hs">Figures</a>
+      <a href="../onboarding2.html">Demo</a>
+      <a href="#appstore">App&nbsp;Store</a>
+    </div>
+  </div>
+</nav>
+
+<header class="j-hero j-grain" id="top">
+  <div class="j-wrap j-hero-in">
+    <div>
+      <p class="j-eyebrow">Jolt Groovebox — iPad &amp; iPhone</p>
+      <h1>Groovebox simplicity,<span class="j-tone">Tracker flexibility</span></h1>
+      <p class="j-lede">Eight voices, each with its own step sequencer. <b>Any voice plays any instrument, on any step.</b> Tracker semantics, groovebox interface.</p>
+      <div class="j-cta">
+        <a class="j-btn j-pri" href="#appstore"><span><span class="j-k">&#63743;</span> Download on the App&nbsp;Store</span></a>
+        <a class="j-btn" href="../onboarding2.html"><span>Play the browser demo</span></a>
+      </div>
+      <p class="j-ctanote">The demo is a slice of the engine: real DSP, compiled to WebAssembly.</p>
+    </div>
+    <aside class="j-sum">
+      <div class="hd">Summary</div>
+      <div class="l"><span>Voices</span><b>8</b></div>
+      <div class="l"><span>Steps / pattern</span><b>1–64</b></div>
+      <div class="l"><span>Instruments</span><b>4</b></div>
+      <div class="l"><span>Insert FX</span><b>11</b></div>
+      <div class="l"><span>Sends</span><b>4</b></div>
+      <div class="l"><span>Global macros</span><b>5</b></div>
+      <div class="l"><span>Platform</span><b>iOS</b></div>
+    </aside>
+  </div>
+</header>
+
+<main id="figures">
+
+  <!-- ═══ 01 ═══════════════════════════════════════════════════ -->
+  <section class="j-sec j-wrap">
+    <div class="j-sechead">
+      <span class="j-idx">01</span>
+      <h2>The step owns the instrument</h2>
+      <span class="as">One voice · 16 steps</span>
+    </div>
+    <p class="j-say">On most grooveboxes a track is one sound for the whole pattern. Here the assignment lives on the step. <b>One lane can hold a kick, a hat, a snare and a chord</b> — and eight lanes run in parallel.</p>
+
+    <figure class="j-fig">
+      <div class="j-figbody">
+        <div class="in j-grain">
+          <div class="j-laneblock">
+          <div class="j-lanehead">
+            <span class="j-chip"><i>Voice 01</i></span>
+            <span class="j-rl">Page 2 &middot; 16 steps</span>
+            <span class="m"><span>Instruments <b>4</b></span><span style="color:var(--cyan)">&#9679; Playing</span></span>
+          </div>
+          <div class="j-grid" id="f1-grid"></div>
+          <div class="j-nums" id="f1-nums"></div>
+          <div class="j-legend" id="f1-legend"></div>
+          <p class="j-legnote">Four engines are available. This pattern uses two.</p>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">FIG 0.1</span><span class="t">One voice's lane, sixteen steps laid out as two rows of eight, as the editor draws it. Colour and icon are the instrument's identity. Dots are a ratchet count; the cut corner and letter are a sampler slice. The pale square is the playhead.</span></figcaption>
+    </figure>
+  </section>
+
+  <!-- ═══ 02 ═══════════════════════════════════════════════════ -->
+  <section class="j-sec j-wrap">
+    <div class="j-sechead">
+      <span class="j-idx">02</span>
+      <h2>The same sixteen steps, in the app</h2>
+      <span class="as">Pattern editor · iPhone</span>
+    </div>
+    <p class="j-say">The mechanic is not buried in a menu. It is the grid you spend your time in: <b>tap an instrument, tap a step.</b> Everything that shapes that instrument sits beside it.</p>
+
+    <figure class="j-fig">
+      <div class="j-figbody">
+        <div class="in j-grain" style="background:var(--e0);padding:26px 26px 30px">
+          <div class="j-shot">
+          <div class="j-screenhold">
+            <div class="jolt-mock j-device device"><div class="viewport"><div class="screen" id="scr-editor">
+      <div class="bar top">
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+        <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+        <span class="song-title" style="margin-left:4px">Pattern</span>
+        <span class="spacer"></span>
+        <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+        <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+      </div>
+      <div class="edit-body">
+          <div class="subnav">
+            <span class="name">Pattern</span>
+            <span class="icons">
+              <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+              <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+              <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+            </span>
+          </div>
+          <div class="pagebar">
+            <div class="pageseq">
+              <span class="pg label">Page</span>
+              <span class="pg num on">1</span>
+              <span class="pg num playing">2</span>
+              <span class="pg num">3</span>
+              <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/></svg></span>
+            </div>
+            <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+          </div>
+          <div class="steps" id="stepgrid"></div>
+          <div class="instr-strip">
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+            <div class="chips">
+              <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+              <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+              <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+              <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+              <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+              <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+            </div>
+          </div>
+          <div class="tabcard">
+            <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+            <div class="panel">
+              <div class="dial-row">
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+              </div>
+              <div class="dial-row">
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Tune</span></div>
+                <div class="dial"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+              </div>
+            </div>
+            <div class="foot"><span class="on">Sound</span><span>Filter</span><span>F. Env</span><span>Noise</span><span>Amp</span></div>
+          </div>
+      </div>
+      <div class="bar bottom">
+        <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+        <span class="chip txt"><i>Solo</i></span>
+        <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+        <span class="spacer"></span>
+        <span class="chip txt"><i>VIZ</i></span>
+        <span class="chip txt"><i>FX</i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+        <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+      </div>
+    </div></div></div>
+          </div>
+          <div class="j-notes">
+            <div class="j-aside">
+              <span class="k">Note 02.1</span>
+              <p>Sixteen chamfered cells, two rows of eight. <b>The palette sits directly under the grid</b> — putting a different instrument on a single step is two taps, not a menu.</p>
+            </div>
+            <div class="j-aside">
+              <span class="k">Note 02.2</span>
+              <p>An earlier build drew all eight voices at once. It was removed. <b>Once songs got complex it stopped being possible to follow what any interaction had done</b> — so the editor shows one voice at a time, and the overview went in the bin. Legibility beat density.</p>
+            </div>
+            <div class="j-aside">
+              <span class="k">Note 02.3</span>
+              <p>On iPad the five parameter tabs below stop being tabs: the clusters sit on one surface beside the grid.</p>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">FIG 0.2</span><span class="t">Pattern editor. The same sixteen steps as FIG 0.1, drawn by the app: two rows of eight, each cell carrying its instrument's icon in its instrument's colour, with the instrument palette beneath. Built from the app's colour tokens, fonts and icon assets; pattern content is staged.</span></figcaption>
+    </figure>
+  </section>
+
+  <!-- ═══ 03 ═══════════════════════════════════════════════════ -->
+  <section class="j-sec j-wrap">
+    <div class="j-sechead">
+      <span class="j-idx">03</span>
+      <h2>Four instruments, one grammar</h2>
+      <span class="as">Assignable to any step of any voice</span>
+    </div>
+    <p class="j-say">Every instrument is edited through the same panel, the same dials, the same chips. Learn one and you have learned all four.</p>
+
+    <div class="j-list">
+      <div class="it"><h3>Classic Synth<s>Ins 01</s></h3><p>Wavetable. Spread, 2-op FM, paraphony, in-scale chords.</p></div>
+      <div class="it"><h3>Macro Synth<s>Ins 02</s></h3><p>Sixteen sub-synths, after a classic Eurorack module.</p></div>
+      <div class="it"><h3>Sampler<s>Ins 03</s></h3><p>Pitched or slicing. Old-skool repitching, per-step reverse, mic recording.</p></div>
+      <div class="it"><h3>Drum Synth<s>Ins 04</s></h3><p>x0x-style percussion.</p></div>
+    </div>
+  </section>
+
+  <!-- ═══ 04 ═══════════════════════════════════════════════════ -->
+  <section class="j-sec j-wrap">
+    <div class="j-sechead">
+      <span class="j-idx">04</span>
+      <h2>Signal path</h2>
+      <span class="as">11 inserts &middot; 4 sends &middot; 5 macros</span>
+    </div>
+    <p class="j-say">Any instrument takes any number of insert effects, in any order — overdrive, filter, gater and eight more. Four sends run in parallel; up to five macros sit over the whole mix. <b>Three layers of modulation point at any of it:</b> an LFO per instrument, a drawn pattern lane, a song lane.</p>
+
+    <figure class="j-fig">
+      <div class="j-figbody">
+        <div class="in j-grain">
+          <div class="j-rl" style="margin-bottom:14px">Insert chain — Voice 08 &middot; Chord</div>
+          <div class="j-chain">
+            <span class="j-node src" style="--k:var(--i-chord)"><i>Chord &mdash; Classic Synth</i></span>
+            <span class="j-arrow">&#9656;</span>
+            <span class="j-node"><i>Overdrive <b class="n">42</b></i></span>
+            <span class="j-arrow">&#9656;</span>
+            <span class="j-node mod"><i>Filter&nbsp;LP4 <b class="n">LFO</b></i></span>
+            <span class="j-arrow">&#9656;</span>
+            <span class="j-node"><i>Gater <b class="n">1/16</b></i></span>
+            <span class="j-arrow">&#9656;</span>
+            <span class="j-node more"><i>+ 8 more available</i></span>
+          </div>
+
+          <div class="j-split">
+            <div>
+              <div class="j-rl">Sends &mdash; four, in parallel</div>
+              <div class="j-sr"><span class="nm">Reverb</span><span class="j-meter"><b style="--v:.46"></b></span></div>
+              <div class="j-sr"><span class="nm">Delay</span><span class="j-meter"><b style="--v:.72"></b></span></div>
+              <div class="j-sr"><span class="nm">Multi-tap</span><span class="j-meter"><b style="--v:.18"></b></span></div>
+              <div class="j-sr"><span class="nm">Sidechain</span><span class="j-meter"><b style="--v:.6"></b></span></div>
+            </div>
+            <div>
+              <div class="j-rl">Global macros &mdash; up to five</div>
+              <div class="j-macros">
+                <span class="j-mac" style="--v:.3"><b></b><span class="cp">Verb</span></span>
+                <span class="j-mac" style="--v:.55"><b></b><span class="cp">Delay</span></span>
+                <span class="j-mac hot" style="--v:.86"><b></b><span class="cp">LP&nbsp;DJ</span></span>
+                <span class="j-mac" style="--v:.12"><b></b><span class="cp">HP&nbsp;DJ</span></span>
+                <span class="j-mac" style="--v:.4"><b></b><span class="cp">Repeat</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption><span class="n">FIG 0.3</span><span class="t">Insert chain, send buses and performance macros. Violet marks anything the LFO is driving; cyan marks the macro currently under a finger.</span></figcaption>
+    </figure>
+  </section>
+
+</main>
+
+<section class="j-close j-grain">
+  <div class="j-wrap j-close-in">
+    <h2>A groovebox you don't outgrow</h2>
+    <p>Fun in the first five minutes. Still deep in the fifth year.</p>
+    <div class="j-cta" style="justify-content:center">
+      <a class="j-btn j-pri" href="#appstore"><span><span class="j-k">&#63743;</span> Download on the App&nbsp;Store</span></a>
+      <a class="j-btn" href="../onboarding2.html"><span>Play the browser demo</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="j-wrap j-foot">
+    <span class="j-endorse"><img src="assets/marks/lhmp-dial-jolt.svg" alt=""> An instrument by <img class="wm" src="assets/marks/lhmp-wordmark-chamfer.svg" alt="LHMP"></span>
+    <span class="sp"></span>
+    <a href="../privacy.html">Privacy</a>
+    <a href="../onboarding2.html">Demo</a>
+    <a href="#appstore">App Store</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ── FIG 0.1 ─────────────────────────────────────────────────────
+     Same sixteen steps the embedded editor in FIG 0.2 draws.
+     Colours are InstrumentColors.fixed; icons are the app's assets. */
+  var INS={
+    kick :{c:'#7DFBFD',ic:'kick', name:'Kick', eng:'Drum Synth'},
+    snare:{c:'#CFFB52',ic:'snare',name:'Snare',eng:'Drum Synth'},
+    hihat:{c:'#FF9500',ic:'hihat',name:'Hat',  eng:'Drum Synth'},
+    chord:{c:'#EA3EE7',ic:'chord',name:'Chord',eng:'Classic Synth'}
+  };
+  var ROWS=[
+    [{i:'kick'},null,{i:'hihat',rat:3},null,{i:'snare'},null,{i:'hihat'},{i:'kick',slice:'A'}],
+    [{i:'kick'},null,{i:'hihat'},{i:'chord'},{i:'snare'},{i:'hihat',rat:2},null,{i:'kick'}]
+  ];
+
+  var grid=document.getElementById('f1-grid');
+  if(grid){
+    ROWS.forEach(function(row,r){
+      var g=document.createElement('div');g.className='j-grow';
+      var rn=document.createElement('span');rn.className='rn';rn.textContent=r?'B':'A';
+      var cells=document.createElement('div');cells.className='j-cells';
+      row.forEach(function(s,i){
+        if(i===4){var gu=document.createElement('span');gu.className='j-gut';cells.appendChild(gu);}
+        var w=document.createElement('span');w.className='j-cw';
+        w.setAttribute('data-step',String(r*8+i));
+        var c=document.createElement('span');
+        if(!s){c.className='j-cell';}
+        else{
+          var d=INS[s.i];
+          c.className='j-cell on'+(s.slice?' slice':'');
+          c.style.setProperty('--k',d.c);
+          c.innerHTML='<span class="ink" style="--ic:var(--ic-'+d.ic+')"></span>'
+            +(s.rat?'<span class="rat">'+'<b></b>'.repeat(s.rat)+'</span>':'')
+            +(s.slice?'<span class="sl">'+s.slice+'</span>':'');
+        }
+        w.appendChild(c);cells.appendChild(w);
+      });
+      g.appendChild(rn);g.appendChild(cells);grid.appendChild(g);
+    });
+
+    var nums=document.getElementById('f1-nums');
+    for(var n=0;n<9;n++){
+      if(n===4){var gu2=document.createElement('span');gu2.className='j-gut';nums.appendChild(gu2);continue;}
+      var idx=n<4?n:n-1;
+      var s2=document.createElement('span');
+      s2.className=idx%4===0?'q':'';
+      s2.textContent=String(idx+1).padStart(2,'0')+' / '+String(idx+9).padStart(2,'0');
+      nums.appendChild(s2);
+    }
+
+    var seen={},lg=document.getElementById('f1-legend');
+    ROWS.forEach(function(row){row.forEach(function(s){
+      if(!s||seen[s.i])return;seen[s.i]=1;
+      var d=INS[s.i],e=document.createElement('div');
+      e.className='j-lg';e.style.setProperty('--k',d.c);
+      e.innerHTML='<span class="sw"><span class="ink" style="--ic:var(--ic-'+d.ic+')"></span></span>'
+        +'<em>'+d.name+'</em><i>'+d.eng+'</i>';
+      lg.appendChild(e);
+    });});
+
+    /* playhead */
+    var wraps=grid.querySelectorAll('.j-cw'),p=0;
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+      wraps[4].classList.add('play');p=4;
+      setInterval(function(){
+        wraps[p].classList.remove('play');
+        p=(p+1)%16;
+        wraps[p].classList.add('play');
+      },210);
+    }else{wraps[4].classList.add('play');}
+  }
+
+})();
+</script>
+<script src="../mockup-screens.js"></script>
+</body>
+</html>

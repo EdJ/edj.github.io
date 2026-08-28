@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt Groovebox — Groovebox simplicity, Tracker flexibility</title>
+<meta name="description" content="Jolt Groovebox for iPhone and iPad. Eight voices. Any voice plays any instrument on any step.">
+<link rel="stylesheet" href="../mockup-screens.css">
+<style>
+/* ══════════════════════════════════════════════════════════════
+   CONCEPT 04 — GALLERY · v2
+   The page as a gallery floorplan: colour-blocked panels, one idea
+   and one arrow each, enormous display type carrying the load.
+
+   Held from v1 (do not re-derive):
+     · tone-on-tone ink — display type is a tonal step of its own
+       ground, never accent-on-dark. Full-strength cyan is spent
+       exactly once, on the App Store line in panel 08.
+     · the arrow cut once as an SVG symbol; glyphs as sole ornament
+     · scroll reveal that fails open (hidden state under a JS class)
+     · orange #FF6A00 structural only; acid #E8FF00 once
+     · panel 04 (acid) is unchanged from v1 by instruction
+
+   New in v2:
+     · 12 panels → 8. One list on the page (the spec plate, 02).
+     · Fig. 01 rebuilt as 2 rows of 8 — the real editor geometry —
+       and recoloured to InstrumentColors.fixed.
+     · Panel 05 embeds the real Pattern Editor mockup as live DOM
+       (../mockup-screens.css + ../mockup-screens.js) in place of
+       the stale jolt-a.png, and states the honest platform claim.
+     · The Designers Republic register — corporate/technical
+       apparatus at rave intensity — run hard on 02 and 06.
+
+   NAMESPACE NOTE: mockup-screens.css ships UNSCOPED .lane/.lanes/
+   .steps/.step/.dial. Everything of ours that would collide is
+   prefixed fg- / mk-.
+   ══════════════════════════════════════════════════════════════ */
+
+@font-face{font-family:'Chakra';src:url('../fonts/ChakraPetch-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra';src:url('../fonts/ChakraPetch-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('../geist/GeistMono/webfonts/GeistMono-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('../geist/GeistMono/webfonts/GeistMono-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('../geist/GeistMono/webfonts/GeistMono-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'GeistPixel';src:url('../geist/GeistPixel/webfonts/GeistPixel-Grid.woff2') format('woff2');font-weight:400;font-display:swap}
+
+:root{
+  /* house tokens */
+  --ground:#0B0C0F; --s1:#14161D; --s2:#1E222C; --line:#3A3F4B;
+  --text:#EDEFF3;  --muted:#8B93A6;
+  --cyan:#7DFBFD;  --orange:#FF6A00; --acid:#E8FF00;
+
+  /* tone-on-tone: the accent stepped toward its own ground */
+  --cyan-quiet:color-mix(in srgb, var(--cyan) 70%, var(--ground));
+
+  /* InstrumentColors.fixed — the only colour source for Fig. 01 */
+  --i-kick:#7DFBFD; --i-snare:#CFFB52; --i-hat:#FF9500; --i-chord:#EA3EE7;
+
+  --display:'Chakra','Chakra Petch',system-ui,sans-serif;
+  --mono:'GeistMono',ui-monospace,SFMono-Regular,monospace;
+  --pixel:'GeistPixel','GeistMono',ui-monospace,monospace;
+
+  --pad:clamp(20px,4.2vw,68px);
+  --chrome:52px;
+  /* capped, never bare vh — a headless render sets the window to the
+     full page height and an uncapped panel balloons to thousands of px */
+  --panelh:min(100svh, 446px);
+}
+
+*{box-sizing:border-box}
+html{
+  background:var(--ground);
+  scroll-behavior:smooth;
+  scroll-snap-type:y proximity;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--text);
+  font-family:var(--mono);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ── PANEL ─────────────────────────────────────────────────── */
+.panel{
+  position:relative;
+  min-height:var(--panelh);
+  scroll-snap-align:start;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:calc(var(--chrome) + clamp(18px,2.6vh,32px)) var(--pad) clamp(20px,2.8vh,34px);
+  background:var(--bg);
+  color:var(--ink);
+  overflow:hidden;
+  isolation:isolate;
+}
+.panel > *{position:relative;z-index:2}
+
+/* Duotone pairs. Each panel is a deliberate colour event. */
+.t-ground { --bg:#0B0C0F; --ink:#EDEFF3; --dim:#8B93A6; --hi:#7DFBFD; --rule:#3A3F4B; }
+.t-s1     { --bg:#14161D; --ink:#EDEFF3; --dim:#8B93A6; --hi:#7DFBFD; --rule:#333846; }
+.t-s2     { --bg:#1E222C; --ink:#EDEFF3; --dim:#8B93A6; --hi:#FF6A00; --rule:#3A3F4B; }
+.t-cyanq  { --bg:#0A1215; --ink:var(--cyan-quiet); --dim:#4B7B7E; --hi:#EDEFF3; --rule:#1E3A3C; }
+.t-acid   { --bg:#E8FF00; --ink:#0B0C0F; --dim:#4B520A; --hi:#0B0C0F; --rule:rgba(11,12,15,.34); }
+.t-orange { --bg:#FF6A00; --ink:#0B0C0F; --dim:#5A2703; --hi:#0B0C0F; --rule:rgba(11,12,15,.36); }
+.t-plate  { --bg:#0B0C0F; --ink:#EDEFF3; --dim:rgba(237,239,243,.66); --hi:#7DFBFD; --rule:rgba(237,239,243,.34); }
+
+/* ── TYPE ──────────────────────────────────────────────────── */
+.d{
+  font-family:var(--display);
+  font-weight:700;
+  text-transform:uppercase;
+  line-height:.85;
+  letter-spacing:-.022em;
+  margin:0;
+  text-wrap:balance;
+}
+.d.xl{font-size:clamp(2.4rem,7.8vw,6.9rem)}
+.d.lg{font-size:clamp(2.1rem,6.2vw,5.1rem)}
+.d.md{font-size:clamp(1.7rem,4.1vw,3.3rem)}
+/* panel 04 holds v1's display scale exactly — it is the page's loudest moment */
+#p04 .d.xl{font-size:clamp(2.75rem,11.2vw,10.5rem)}
+
+.eyebrow{
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(9.5px,1vw,11px);
+  letter-spacing:.28em;text-transform:uppercase;
+  color:var(--dim);
+  margin:0 0 clamp(11px,1.7vh,19px);
+  display:flex;align-items:center;gap:14px;
+}
+.eyebrow b{font-family:var(--pixel);font-weight:400;letter-spacing:.1em;color:var(--ink)}
+.eyebrow i{flex:1;height:1px;background:var(--rule);font-style:normal;max-width:150px}
+.eyebrow .tail{margin-left:auto;opacity:.7;font-size:.92em;letter-spacing:.2em}
+
+.note{
+  margin:clamp(11px,1.6vh,17px) 0 0;
+  font-size:clamp(10px,1.02vw,12px);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  max-width:62ch;line-height:1.75;
+}
+.note em{font-style:normal;color:var(--ink)}
+/* technical-manual register: figures are captioned, not decorated */
+.fig{
+  margin:clamp(10px,1.4vh,16px) 0 0;
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(9px,.9vw,10.5px);letter-spacing:.24em;text-transform:uppercase;
+  color:var(--dim);opacity:.85;
+}
+
+/* ── LINK — a discreet arrow. Never a filled button. ───────── */
+.arrow{
+  display:inline-flex;align-items:center;gap:.8em;
+  margin-top:clamp(15px,2.2vh,27px);
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(11px,1.2vw,13.5px);
+  letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink);
+  padding-bottom:7px;
+  border-bottom:1px solid transparent;
+  width:fit-content;
+  transition:border-color .18s ease;
+}
+.arrow .arr{width:1.9em;height:.62em;flex:none;overflow:visible}
+.arrow .arr svg{width:100%;height:100%;display:block;transition:transform .24s cubic-bezier(.2,.7,.3,1)}
+.arrow:hover{border-bottom-color:currentColor}
+.arrow:hover .arr svg{transform:translateX(.28em)}
+.arrow:focus-visible{outline:2px solid currentColor;outline-offset:6px}
+.arrow.big{font-size:clamp(13px,1.65vw,19px);letter-spacing:.14em;gap:.55em}
+.arrows{display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,48px);align-items:center}
+
+/* ── FIXED CHROME ──────────────────────────────────────────── */
+.chrome{
+  position:fixed;inset:0 0 auto 0;height:var(--chrome);z-index:60;
+  display:flex;align-items:center;gap:16px;
+  padding:0 var(--pad);
+  font-size:clamp(9px,.95vw,10.5px);font-weight:500;
+  letter-spacing:.24em;text-transform:uppercase;
+  color:#EDEFF3;
+  pointer-events:none;
+}
+.chrome > *{pointer-events:auto}
+.chrome .mark{display:flex;align-items:center;gap:10px}
+.chrome .mark img{height:13px;width:auto;filter:var(--logofx,none)}
+.chrome .mark b{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.06em}
+.chrome .mark sup{font-family:var(--mono);font-size:7px;letter-spacing:0;vertical-align:super;opacity:.65}
+.chrome .code{font-family:var(--pixel);letter-spacing:.12em;opacity:.42;white-space:nowrap}
+.chrome .sp{flex:1}
+.chrome a{opacity:.7;transition:opacity .16s ease;white-space:nowrap}
+.chrome a:hover{opacity:1}
+.chrome a.store{opacity:1;border-bottom:1px solid currentColor;padding-bottom:2px}
+.chrome::after{
+  content:'';position:absolute;left:var(--pad);right:var(--pad);bottom:0;height:1px;
+  background:currentColor;opacity:.22;
+}
+
+/* Right-edge floorplan index */
+.floorplan{
+  position:fixed;right:calc(var(--pad) - 6px);top:50%;transform:translateY(-50%);
+  z-index:60;display:flex;flex-direction:column;gap:9px;align-items:flex-end;
+  font-family:var(--pixel);font-size:10px;letter-spacing:.08em;color:#EDEFF3;
+}
+.floorplan a{display:flex;align-items:center;gap:8px;opacity:.28;transition:opacity .18s ease}
+.floorplan a i{display:block;width:13px;height:1px;background:currentColor;font-style:normal;transition:width .18s ease}
+.floorplan a:hover{opacity:.7}
+.floorplan a[aria-current="true"]{opacity:1}
+.floorplan a[aria-current="true"] i{width:28px}
+
+/* Grain — the print register, one layer over the whole page. */
+.grain{
+  position:fixed;inset:0;z-index:55;pointer-events:none;
+  opacity:.15;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── PANEL TEXTURES ────────────────────────────────────────── */
+.tex{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.tex-node{opacity:.55}
+.tex-halftone{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(currentColor 1.35px,transparent 1.5px);
+  background-size:11px 11px;opacity:.28;
+  -webkit-mask-image:linear-gradient(200deg,#000 0%,transparent 62%);
+          mask-image:linear-gradient(200deg,#000 0%,transparent 62%);
+}
+.tex-scan{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:repeating-linear-gradient(0deg,currentColor 0 1px,transparent 1px 6px);
+  opacity:.09;
+  -webkit-mask-image:linear-gradient(160deg,#000 0%,transparent 70%);
+          mask-image:linear-gradient(160deg,#000 0%,transparent 70%);
+}
+
+/* ══ tDR APPARATUS ═══════════════════════════════════════════
+   Corporate and technical language at rave intensity: exposed
+   grid, registration targets, hazard chevrons, spec stamps,
+   deadpan small print. All CSS, no images. ═════════════════ */
+
+/* exposed column grid — the printer's guides left showing */
+.tex-grid{
+  position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.13;
+  background-image:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px calc(100% / 12));
+  background-size:calc(100% - (2 * var(--pad))) 100%;
+  background-position:var(--pad) 0;background-repeat:no-repeat;
+}
+
+/* registration targets, dropped at the panel corners */
+.regs{position:absolute;inset:0;z-index:1;pointer-events:none;color:var(--ink);opacity:.42}
+.regs span{
+  position:absolute;width:16px;height:16px;
+  background:
+    linear-gradient(currentColor,currentColor) center/1px 100% no-repeat,
+    linear-gradient(currentColor,currentColor) center/100% 1px no-repeat;
+}
+.regs span::after{
+  content:'';position:absolute;inset:3.5px;border:1px solid currentColor;border-radius:50%;
+}
+.regs .tl{top:calc(var(--chrome) + 14px);left:calc(var(--pad) - 26px)}
+.regs .tr{top:calc(var(--chrome) + 14px);right:calc(var(--pad) - 26px)}
+.regs .bl{bottom:16px;left:calc(var(--pad) - 26px)}
+.regs .br{bottom:16px;right:calc(var(--pad) - 26px)}
+
+/* hazard chevrons — flat, high contrast, no gradient softness */
+.chev{
+  height:12px;flex:none;
+  background:repeating-linear-gradient(115deg,
+    currentColor 0 9px, transparent 9px 20px);
+  opacity:.85;
+}
+
+/* a stamp: chamfered outline, tight-tracked, deadpan */
+.stamp{
+  display:inline-flex;align-items:center;gap:.7em;
+  font-family:var(--mono);font-weight:700;
+  font-size:clamp(8.5px,.86vw,10px);letter-spacing:.22em;text-transform:uppercase;
+  padding:7px 12px;color:var(--ink);
+  background:var(--rule);
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+.stamp > span{
+  display:inline-flex;align-items:center;gap:.7em;
+  background:var(--bg);padding:6px 11px;margin:-6px -11px;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+}
+.stamp em{font-style:normal;color:var(--dim)}
+.stamps{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:clamp(12px,1.8vh,20px)}
+
+/* deadpan small print */
+.smallprint{
+  margin:clamp(9px,1.3vh,14px) 0 0;
+  font-size:clamp(8.5px,.86vw,10px);line-height:1.8;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);max-width:78ch;
+}
+.smallprint b{font-weight:500;color:var(--ink);opacity:.7}
+
+/* ── PANEL 02 — the specification plate. The page's ONE list. ── */
+.plate-spec{margin-top:clamp(10px,1.6vh,18px)}
+.spec-head{
+  display:flex;align-items:center;gap:14px;
+  font-family:var(--mono);font-weight:700;
+  font-size:clamp(8.5px,.88vw,10px);letter-spacing:.3em;text-transform:uppercase;
+  color:var(--dim);padding-bottom:7px;border-bottom:1px solid var(--rule);
+}
+.spec-head .chev{width:clamp(40px,10vw,150px);margin-left:auto}
+.spec{list-style:none;margin:0;padding:0}
+.spec li{
+  display:flex;align-items:baseline;gap:clamp(8px,1.6vw,20px);
+  padding:clamp(5px,.85vh,9px) 0;border-bottom:1px solid var(--rule);
+  font-size:clamp(10px,1.06vw,12.5px);letter-spacing:.13em;text-transform:uppercase;
+}
+.spec .k{
+  font-family:var(--mono);font-weight:700;color:var(--ink);
+  flex:none;width:clamp(74px,10vw,132px);letter-spacing:.16em;
+}
+.spec .led{flex:1;min-width:14px;border-bottom:1px dotted var(--rule);transform:translateY(-3px)}
+.spec .v{color:var(--dim);text-align:right;max-width:62ch}
+.spec .v em{font-style:normal;color:var(--ink)}
+.spec .n{font-family:var(--pixel);font-size:10px;color:var(--dim);opacity:.6;flex:none;width:2.2em}
+
+/* ── FIGURE 01 — the mechanic, drawn. 2 rows of 8. ─────────── */
+/* chamfer lives on a wrapper with no absolutely-positioned children:
+   outer line layer, 1px-inset inner surface (clip-path can't take a border) */
+.frame{
+  --cut:14px;background:var(--rule);padding:1px;width:fit-content;max-width:100%;
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+.frame > .in{
+  background:var(--bg);
+  clip-path:polygon(calc(var(--cut) - 1px) 0,100% 0,100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,0 100%,0 calc(var(--cut) - 1px));
+  padding:clamp(11px,1.4vw,18px);
+}
+.fg-rows{display:flex;flex-direction:column;gap:clamp(3px,.45vw,6px)}
+.fg-row{display:flex;align-items:center;gap:clamp(5px,.8vw,10px)}
+.fg-row .rn{font-family:var(--pixel);font-size:10px;color:var(--dim);width:1.4em;flex:none}
+.fg-steps{display:flex;gap:clamp(3px,.4vw,6px)}
+.fg-cell{
+  --c:transparent;
+  width:clamp(20px,3.3vw,44px);height:clamp(20px,3.3vw,44px);flex:none;
+  background:var(--c);border:1px solid var(--rule);
+  clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--pixel);font-size:clamp(8px,1vw,12px);color:#0B0C0F;
+  transition:filter .12s linear;
+}
+.fg-cell.play{filter:brightness(1.42)}
+.fg-cell.off.play{background:var(--rule)}
+.fg-legend{
+  display:flex;flex-wrap:wrap;gap:clamp(9px,1.5vw,22px);
+  margin-top:clamp(10px,1.5vh,16px);
+  font-size:clamp(9px,.92vw,10.5px);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+}
+.fg-legend span{display:flex;align-items:center;gap:7px}
+.fg-legend b{width:9px;height:9px;display:block;flex:none;background:var(--k)}
+
+/* two-column panel: headline left, figure right */
+.split{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  gap:clamp(22px,4vw,64px);align-items:center;
+}
+.split.narrow{grid-template-columns:minmax(0,1.15fr) auto}
+
+/* ── PANEL 05 — the real product screen, embedded ─────────────
+   mockup-screens.css ships an UNSCOPED :root holding the app's
+   colour and font tokens. This <style> is parsed after that link,
+   so our :root wins the shared names (identical colour values, but
+   our font families). Re-pin the app's own tokens under .jolt-mock
+   so the embedded screen keeps its data-URI faces whatever the
+   link order — and so nothing leaks into the panels either way. */
+.jolt-mock{
+  --ground:#0B0C0F; --surface-1:#14161D; --surface-2:#1E222C; --line:#3A3F4B;
+  --text:#EDEFF3; --muted:#8B93A6; --accent:#7DFBFD; --lane-purple:#BF5AF2;
+  --display:'ChakraPetch-Bold','Chakra Petch',sans-serif;
+  --display-semi:'ChakraPetch-SemiBold','Chakra Petch',sans-serif;
+  --mono:'GeistMono-Regular','Geist Mono',ui-monospace,monospace;
+  --mono-med:'GeistMono-Medium','Geist Mono',ui-monospace,monospace;
+}
+.mk-hold{width:clamp(164px,15.6vw,224px);flex:none}
+.mk-hold .device{border-radius:26px;padding:11px}
+.mk-hold .viewport{border-radius:16px}
+
+/* ── PHOTOGRAPHIC PLATE (full bleed) ───────────────────────── */
+/* absolutely-positioned bed, not a grid: a grid item at height:100%
+   in a content-sized row falls back to the image's intrinsic height
+   and blows the panel out to ~760px. */
+.photoplate{position:relative;display:block;padding:0}
+/* the plates carry their own printed border — scale past it */
+.photoplate > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transform:scale(1.12)}
+.photoplate > .scrim{position:absolute;inset:0;z-index:1;background:var(--scrim,none)}
+.photoplate > .plate-in{
+  position:relative;z-index:3;min-height:var(--panelh);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--chrome) + clamp(18px,2.6vh,32px)) var(--pad) clamp(20px,2.8vh,34px);
+}
+
+/* ── CLOSE ─────────────────────────────────────────────────── */
+.wordmark{width:min(44vw,368px);height:auto;margin:clamp(4px,1vh,12px) 0 clamp(16px,2.6vh,30px)}
+.close-foot{
+  margin-top:clamp(22px,3.4vh,42px);padding-top:clamp(15px,2.2vh,25px);border-top:1px solid var(--rule);
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;
+  font-size:clamp(9px,.92vw,10.5px);letter-spacing:.2em;text-transform:uppercase;color:var(--dim);
+}
+.close-foot .sp{flex:1}
+.endorse{display:flex;align-items:center;gap:10px}
+.endorse img{filter:invert(1);opacity:.34}
+.endorse .lhmp{height:11px;width:auto}
+.endorse .dialmark{height:20px;width:auto;opacity:.5}
+
+/* ── SCROLL REVEAL — fails open (hidden state only under .reveal-on) ── */
+html.reveal-on .rv{opacity:0;transform:translateY(14px)}
+html.reveal-on .rv.in{opacity:1;transform:none;
+  transition:opacity .7s cubic-bezier(.2,.7,.3,1) var(--rd,0ms),transform .7s cubic-bezier(.2,.7,.3,1) var(--rd,0ms)}
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width:1000px){
+  .split,.split.narrow{grid-template-columns:1fr;gap:clamp(18px,3vh,30px)}
+  .mk-hold{width:clamp(160px,30vw,220px)}
+  .regs{display:none}
+}
+@media (max-width:900px){
+  .floorplan{display:none}
+  /* the exposed grid is a device, not a texture — fewer columns when narrow */
+  .tex-grid{background-image:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px calc(100% / 6));opacity:.10}
+  .spec li{flex-wrap:wrap}
+  .spec .led{display:none}
+  .spec .v{text-align:left;width:100%;padding-left:calc(2.2em + 8px)}
+}
+@media (max-width:560px){
+  .chrome .code{display:none}
+  .chrome a.demo{display:none}
+  .eyebrow i{display:none}
+  .eyebrow .tail{display:none}
+  .fg-row .rn{display:none}
+  .panel{justify-content:flex-start}
+  .wordmark{width:74vw}
+  .spec .k{width:100%}
+}
+@media (max-height:620px){ .panel{justify-content:flex-start} }
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  html.reveal-on .rv{opacity:1;transform:none}
+  .arrow .arr svg{transition:none}
+}
+</style>
+</head>
+<body data-tone="dark">
+
+<!-- the arrow, cut once -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="arrow" viewBox="0 0 44 18">
+    <path d="M1 9H41M32.5 1.5 41 9l-8.5 7.5" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="square"/>
+  </symbol>
+</defs></svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="chrome" id="chrome">
+  <a class="mark" href="#p01">
+    <img src="../images/logo.svg" alt="">
+    <b>JOLT<sup>&trade;</sup></b>
+  </a>
+  <span class="code">JLT&#8226;8V &nbsp;ISSUE&nbsp;02</span>
+  <span class="sp"></span>
+  <a class="demo" href="../onboarding2.html">Demo</a>
+  <a class="store" href="#appstore">App&nbsp;Store&nbsp;&#8599;</a>
+</header>
+
+<nav class="floorplan" aria-label="Panel index" id="floorplan"></nav>
+
+<main>
+
+<!-- 01 ─────────────────────────────────────────────── COVER -->
+<section class="panel t-ground" id="p01" data-tone="dark" data-label="Cover">
+  <svg class="tex tex-node" aria-hidden="true">
+    <defs>
+      <pattern id="node1" width="72" height="72" patternUnits="userSpaceOnUse">
+        <path d="M36 0V72M0 36H72" stroke="#3A3F4B" stroke-width=".5" opacity=".55"/>
+        <circle cx="36" cy="36" r="2" fill="#7DFBFD" opacity=".5"/>
+        <circle cx="0" cy="0" r="1.2" fill="#3A3F4B"/>
+        <circle cx="72" cy="72" r="1.2" fill="#3A3F4B"/>
+      </pattern>
+      <radialGradient id="nodefade1" cx="16%" cy="88%" r="90%">
+        <stop offset="0%" stop-color="#fff" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="nodemask1"><rect width="100%" height="100%" fill="url(#nodefade1)"/></mask>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#node1)" mask="url(#nodemask1)"/>
+  </svg>
+  <div class="regs" aria-hidden="true"><span class="tl"></span><span class="br"></span></div>
+
+  <p class="eyebrow"><b>01</b><i></i>Jolt Groovebox &nbsp;/&nbsp; iPhone + iPad
+    <span class="tail">MOD.&nbsp;JLT&#8226;8V</span></p>
+  <h1 class="d xl">Groovebox<br>simplicity,<br><span style="color:var(--cyan-quiet)">Tracker<br>flexibility.</span></h1>
+  <a class="arrow" href="#p02"><span class="arr"><svg><use href="#arrow"/></svg></span> Specification</a>
+</section>
+
+<!-- 02 ──────────────────────────── SPECIFICATION PLATE (eruption) -->
+<section class="panel t-s1" id="p02" data-tone="dark" data-label="Specification">
+  <div class="tex-grid" aria-hidden="true"></div>
+  <div class="regs" aria-hidden="true"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+
+  <p class="eyebrow"><b>02</b><i></i>Specification<span class="tail">SHEET&nbsp;1&nbsp;OF&nbsp;1</span></p>
+  <h2 class="d lg">It is a groovebox.</h2>
+
+  <div class="plate-spec">
+    <div class="spec-head"><span>Ref.</span><span>Item</span><span class="chev"></span><span>Configuration</span></div>
+    <ul class="spec">
+      <li><span class="n">A1</span><span class="k">Voices</span><span class="led"></span>
+        <span class="v"><em>Eight</em>, each with its own step sequencer</span></li>
+      <li><span class="n">A2</span><span class="k">Instruments</span><span class="led"></span>
+        <span class="v"><em>Classic Synth &#183; Macro Synth &#183; Sampler &#183; Drum Synth</em></span></li>
+      <li><span class="n">A3</span><span class="k">Pattern</span><span class="led"></span>
+        <span class="v">Up to <em>64 steps</em> &mdash; programmed, MIDI, or generative</span></li>
+      <li><span class="n">A4</span><span class="k">Song</span><span class="led"></span>
+        <span class="v">Patterns chained, with automation</span></li>
+      <li><span class="n">A5</span><span class="k">Effects</span><span class="led"></span>
+        <span class="v"><em>11 insert</em> &#183; <em>4 send</em> &#183; up to <em>5</em> global macros</span></li>
+      <li><span class="n">A6</span><span class="k">Platform</span><span class="led"></span>
+        <span class="v">iPhone portrait &#183; iPad landscape</span></li>
+    </ul>
+  </div>
+
+  <div class="stamps">
+    <span class="stamp"><span>JLT&#8226;8V <em>REV&nbsp;12</em></span></span>
+    <span class="stamp"><span>LHMP <em>&#9670;</em> STD&nbsp;04</span></span>
+    <span class="stamp"><span>ISSUE <em>02</em></span></span>
+    <span class="stamp"><span>&#9679; iOS ONLY</span></span>
+  </div>
+
+  <p class="smallprint">
+    <b>Notes.</b> Insert and send counts are stated separately and are not aggregated. Effect chains
+    are per instrument &mdash; any number, any order. Specification subject to change without notice.
+  </p>
+  <a class="arrow" href="#p03"><span class="arr"><svg><use href="#arrow"/></svg></span> The mechanic</a>
+</section>
+
+<!-- 03 ─────────────────────────────────────────── THE MECHANIC -->
+<section class="panel t-cyanq" id="p03" data-tone="dark" data-label="The mechanic">
+  <div class="tex-scan" aria-hidden="true"></div>
+  <p class="eyebrow"><b>03</b><i></i>The mechanic<span class="tail">FIG.&nbsp;01</span></p>
+  <div class="split">
+    <div>
+      <h2 class="d lg">Any voice.<br>Any instrument.<br>Any step.</h2>
+      <p class="note">Tracker semantics, groovebox interface. Multiple instruments mix into one pattern.</p>
+      <a class="arrow" href="#p04"><span class="arr"><svg><use href="#arrow"/></svg></span> Why it matters</a>
+    </div>
+    <div>
+      <div class="frame"><div class="in" id="rig"></div></div>
+      <div class="fg-legend" id="legend"></div>
+      <p class="fig">Fig. 01 &mdash; one voice, 16 steps as 2 rows of 8. Schematic; not to scale.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 ──────────────────────────────────────────── THE POINT -->
+<section class="panel t-acid" id="p04" data-tone="light" data-label="The point">
+  <div class="tex-halftone" aria-hidden="true"></div>
+  <p class="eyebrow"><b>04</b><i></i>The point</p>
+  <h2 class="d xl">A groovebox<br>you don't<br>outgrow.</h2>
+  <a class="arrow" href="#p05"><span class="arr"><svg><use href="#arrow"/></svg></span> The interface</a>
+</section>
+
+<!-- 05 ─────────────────────────────────────────── INTERFACE -->
+<section class="panel t-s2" id="p05" data-tone="dark" data-label="Interface">
+  <p class="eyebrow"><b>05</b><i></i>Interface<span class="tail">FIG.&nbsp;02</span></p>
+  <div class="split narrow">
+    <div>
+      <h2 class="d md">One voice at a time,<br>and that is deliberate.</h2>
+      <p class="note">An all-lanes overview was built, and removed &mdash; it stopped being readable
+        once songs got complex. On iPad the editor clusters merge onto one surface where iPhone
+        uses sub-tabs: <em>more controls resident, less menu-diving</em>.</p>
+      <a class="arrow" href="#p06"><span class="arr"><svg><use href="#arrow"/></svg></span> Performance</a>
+    </div>
+    <div class="mk-hold">
+      <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-editor">
+        <div class="bar top">
+          <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+          <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+          <span class="song-title" style="margin-left:4px">Pattern</span>
+          <span class="spacer"></span>
+          <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+          <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+        </div>
+        <div class="edit-body">
+            <div class="subnav">
+              <span class="name">Pattern</span>
+              <span class="icons">
+                <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+                <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+                <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+              </span>
+            </div>
+            <div class="pagebar">
+              <div class="pageseq">
+                <span class="pg label">Page</span>
+                <span class="pg num on">1</span>
+                <span class="pg num playing">2</span>
+                <span class="pg num">3</span>
+                <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/></svg></span>
+              </div>
+              <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+            </div>
+            <div class="steps" id="stepgrid"></div>
+            <div class="instr-strip">
+              <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+              <div class="chips">
+                <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+                <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+                <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+                <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+              </div>
+            </div>
+            <div class="tabcard">
+              <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+              <div class="panel">
+                <div class="dial-row">
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+                </div>
+                <div class="dial-row">
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Tune</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+                </div>
+              </div>
+              <div class="foot"><span class="on">Sound</span><span>Filter</span><span>F. Env</span><span>Noise</span><span>Amp</span></div>
+            </div>
+        </div>
+        <div class="bar bottom">
+          <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+          <span class="chip txt"><i>Solo</i></span>
+          <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+          <span class="spacer"></span>
+          <span class="chip txt"><i>VIZ</i></span>
+          <span class="chip txt"><i>FX</i></span>
+          <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+          <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+        </div>
+      </div></div></div>
+      <p class="fig">Fig. 02 &mdash; pattern editor, iPhone.<br>One lane, 2 rows of 8.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 ────────────────────────────── PERFORMANCE (eruption) -->
+<section class="panel t-orange" id="p06" data-tone="light" data-label="Performance">
+  <div class="tex-grid" aria-hidden="true"></div>
+  <div class="regs" aria-hidden="true"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+
+  <p class="eyebrow"><b>06</b><i></i>Performance<span class="tail">CLASS&nbsp;II &#8226; LIVE</span></p>
+  <div class="chev" style="margin-bottom:clamp(12px,1.8vh,22px)"></div>
+  <h2 class="d lg">Program it. Generate it.<br>Play it live.</h2>
+  <div class="chev" style="margin-top:clamp(12px,1.8vh,22px)"></div>
+
+  <div class="stamps">
+    <span class="stamp"><span>64 <em>STEPS MAX</em></span></span>
+    <span class="stamp"><span>MIDI <em>IN &#8226; OUT</em></span></span>
+    <span class="stamp"><span>LFO <em>&#9679;</em> PATTERN <em>&#9679;</em> SONG</span></span>
+  </div>
+  <p class="smallprint"><b>Conditions.</b> Live parameter control in performance mode. External MIDI
+    sequencing is light. Song automation runs bar to bar, or takes a real-time fader override.</p>
+  <a class="arrow" href="#p07"><span class="arr"><svg><use href="#arrow"/></svg></span> Hear it now</a>
+</section>
+
+<!-- 07 ──────────────────────────────────── PLATE / THE DEMO -->
+<section class="panel photoplate t-plate" id="p07" data-tone="dark" data-label="Demo"
+         style="--scrim:linear-gradient(96deg,rgba(11,12,15,.94) 0%,rgba(11,12,15,.80) 30%,rgba(11,12,15,.18) 62%,rgba(11,12,15,0) 86%),linear-gradient(180deg,rgba(11,12,15,.62) 0%,rgba(11,12,15,.22) 44%,rgba(11,12,15,.80) 100%)">
+  <img src="assets/plates/rave-dither__C-print.png" alt="">
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="plate-in">
+    <p class="eyebrow"><b>07</b><i></i>Demo<span class="tail">PLT&nbsp;/&nbsp;C&#183;PRINT</span></p>
+    <h2 class="d lg">It already runs<br>in this browser.</h2>
+    <p class="note">A slice of the engine &mdash; the real DSP, compiled to WebAssembly, behind a simple
+      sequencer. It is not the app.</p>
+    <a class="arrow big" href="../onboarding2.html"><span class="arr"><svg><use href="#arrow"/></svg></span> Play the demo</a>
+  </div>
+</section>
+
+<!-- 08 ────────────────────────────────────────────── GET IT -->
+<section class="panel t-ground" id="p08" data-tone="dark" data-label="Get it">
+  <div class="tex-scan" aria-hidden="true"></div>
+  <p class="eyebrow"><b>08</b><i></i>Get it<span class="tail">END&nbsp;OF&nbsp;SHEET</span></p>
+  <img class="wordmark" src="assets/marks/jolt-wordmark.svg" alt="JOLT" width="272" height="82">
+  <div class="arrows">
+    <a class="arrow big" href="#appstore" style="color:var(--cyan)"><span class="arr"><svg><use href="#arrow"/></svg></span> Download on the App&nbsp;Store</a>
+    <a class="arrow" href="../onboarding2.html"><span class="arr"><svg><use href="#arrow"/></svg></span> Play the demo</a>
+  </div>
+  <div class="close-foot">
+    <span>iPhone &amp; iPad</span>
+    <span>Groovebox simplicity, Tracker flexibility</span>
+    <span class="sp"></span>
+    <span class="endorse">
+      <img class="dialmark" src="assets/marks/lhmp-dial-jolt.svg" alt="">
+      <span>An</span>
+      <img class="lhmp" src="assets/marks/lhmp-wordmark-chamfer.svg" alt="LHMP">
+      <span>instrument</span>
+    </span>
+    <span>&copy;&nbsp;2026</span>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  var panels = [].slice.call(document.querySelectorAll('main > .panel'));
+
+  /* ── Floorplan index, built from the panels themselves ───── */
+  var fp = document.getElementById('floorplan');
+  panels.forEach(function(p,i){
+    var a = document.createElement('a');
+    a.href = '#' + p.id;
+    a.setAttribute('aria-label', p.getAttribute('data-label') || p.id);
+    a.innerHTML = '<span>' + String(i+1).padStart(2,'0') + '</span><i></i>';
+    fp.appendChild(a);
+  });
+  var links = [].slice.call(fp.querySelectorAll('a'));
+
+  /* ── Fig. 01 — the mechanic, drawn to the real editor geometry.
+     One voice's lane, 16 steps as 2 rows of 8, exactly as the
+     pattern editor lays it out. Colours are InstrumentColors.fixed;
+     every row carries more than one instrument — that is the point. */
+  var KIT = {
+    K:{name:'Kick',  c:'#7DFBFD'},
+    S:{name:'Snare', c:'#CFFB52'},
+    H:{name:'Hat',   c:'#FF9500'},
+    C:{name:'Chord', c:'#EA3EE7'}
+  };
+  var ROWS = ['K.H.S.HK','K.HCSH.K'];
+
+  var rig = document.getElementById('rig');
+  var cells = [];
+  if (rig){
+    var wrap = document.createElement('div'); wrap.className = 'fg-rows';
+    ROWS.forEach(function(spec,ri){
+      var row = document.createElement('div'); row.className = 'fg-row';
+      var rn = document.createElement('span'); rn.className = 'rn';
+      rn.textContent = ri ? '9' : '1';
+      row.appendChild(rn);
+      var steps = document.createElement('div'); steps.className = 'fg-steps';
+      spec.split('').forEach(function(ch){
+        var c = document.createElement('span');
+        c.className = 'fg-cell';
+        if (KIT[ch]){ c.style.setProperty('--c', KIT[ch].c); c.textContent = ch; }
+        else { c.className += ' off'; }
+        steps.appendChild(c); cells.push(c);
+      });
+      row.appendChild(steps); wrap.appendChild(row);
+    });
+    rig.appendChild(wrap);
+    var lg = document.getElementById('legend');
+    ['K','S','H','C'].forEach(function(k){
+      var s = document.createElement('span');
+      s.innerHTML = '<b style="--k:' + KIT[k].c + '"></b>' + KIT[k].name;
+      lg.appendChild(s);
+    });
+  }
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var step = 0, timer = null;
+  function tick(){
+    var prev = (step + 15) % 16;
+    if (cells[prev]) cells[prev].classList.remove('play');
+    if (cells[step]) cells[step].classList.add('play');
+    step = (step + 1) % 16;
+  }
+  function runPlayhead(on){
+    if (reduce || !cells.length) return;
+    if (on && !timer) timer = setInterval(tick, 230);
+    else if (!on && timer){
+      clearInterval(timer); timer = null;
+      cells.forEach(function(c){ c.classList.remove('play'); });
+    }
+  }
+
+  /* ── Chrome tone — the fixed chrome inverts over light fields ── */
+  function activate(p){
+    if (!p) return;
+    var tone = p.getAttribute('data-tone') || 'dark';
+    document.body.setAttribute('data-tone', tone);
+    var ink = tone === 'light' ? '#0B0C0F' : '#EDEFF3';
+    var chrome = document.getElementById('chrome');
+    chrome.style.color = ink;
+    chrome.style.setProperty('--logofx', tone === 'light' ? 'invert(1)' : 'none');
+    fp.style.color = ink;
+    links.forEach(function(a){
+      a.setAttribute('aria-current', a.getAttribute('href') === '#' + p.id ? 'true' : 'false');
+    });
+    runPlayhead(p.id === 'p03');
+  }
+
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting && e.intersectionRatio > 0.5) activate(e.target); });
+    }, {threshold:[0.51]});
+    panels.forEach(function(p){ io.observe(p); });
+  }
+  activate(panels[0]);
+
+  /* ── Scroll reveal — fails open ─────────────────────────────
+     The hidden state lives under html.reveal-on, added here, so a
+     no-JS or no-IntersectionObserver render is simply visible. */
+  if ('IntersectionObserver' in window && !reduce){
+    var doc = document.documentElement;
+    doc.classList.add('reveal-on');
+
+    var targets = [];
+    panels.forEach(function(p){
+      var host = p.querySelector('.plate-in') || p;
+      [].slice.call(host.children).forEach(function(el,i){
+        if (el.tagName === 'IMG' || el.tagName === 'SVG') return;
+        if (el.classList.contains('scrim') || el.classList.contains('regs')) return;
+        if (el.classList.contains('tex-scan') || el.classList.contains('tex-halftone')
+            || el.classList.contains('tex-grid')) return;
+        el.classList.add('rv');
+        el.style.setProperty('--rd', (i * 80) + 'ms');
+        targets.push(el);
+      });
+    });
+
+    var rio = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add('in'); rio.unobserve(e.target); }
+      });
+    }, {rootMargin:'0px 0px -8% 0px', threshold:0.01});
+    targets.forEach(function(t){ rio.observe(t); });
+
+    /* first-screen sweep — layout can settle after the observer is built */
+    function sweep(){
+      var h = window.innerHeight || 800;
+      targets.forEach(function(t){
+        if (t.classList.contains('in')) return;
+        var r = t.getBoundingClientRect();
+        if (r.top < h && r.bottom > 0){ t.classList.add('in'); rio.unobserve(t); }
+      });
+    }
+    requestAnimationFrame(sweep);
+    window.addEventListener('load', sweep);
+    [200,700,1500].forEach(function(t){ setTimeout(sweep, t); });
+    /* hard failsafe: never leave the page blank */
+    setTimeout(function(){
+      var any = document.querySelector('.rv.in');
+      if (!any) doc.classList.remove('reveal-on');
+    }, 2500);
+  }
+})();
+</script>
+
+<!-- populates the embedded pattern editor (step grid) and scales the frame -->
+<script src="../mockup-screens.js"></script>
+
+</body>
+</html>

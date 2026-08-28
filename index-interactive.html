@@ -1,0 +1,2015 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Jolt Groovebox | Interactive Demo</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+  /* ── Hero override ──────────────────────────────────────────── */
+  .hero {
+      min-height: 100svh;
+      padding: 5rem 2.5rem 3rem;
+      background:
+          linear-gradient(to bottom, rgba(13,13,15,0.3) 0%, rgba(28,28,28,0.92) 70%, var(--bg) 100%),
+          url('images/jolt-hero.jpg') center bottom / cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+  }
+  .hero::before { z-index: 0; }
+  .hero > * { position: relative; z-index: 1; }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 4rem); letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .hero-sub {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-label);
+      margin-bottom: 2rem;
+  }
+  .hero-seq-wrap {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+  }
+  .hero-seq-wrap canvas.seq { width: 100%; display: block; }
+
+  /* ── Voice rows (inline, no box) ────────────────────────────── */
+  .voice-rows { margin-top: 2.5rem; }
+
+  .drow {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 1.25rem;
+  }
+  .drow.ctrl { align-items: center; }
+
+  .dlabel {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      width: 52px;
+      flex-shrink: 0;
+      padding-top: 8px;
+  }
+  .drow-kick .dlabel  { color: #CFFB52; }
+  .drow-hat  .dlabel  { color: #7DFBFD; }
+  .drow-snare .dlabel { color: #FFBA36; }
+
+  .seq-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+  }
+  .seq-wrap canvas { width: 100%; display: block; }
+  canvas.seq { cursor: pointer; touch-action: none; }
+
+  /* ── Dials ──────────────────────────────────────────────────── */
+  .dial-row  { display: flex; flex-wrap: wrap; gap: 14px; padding-top: 4px; }
+  .dial-ctrl { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  canvas.dial { cursor: ns-resize; touch-action: none; display: block; }
+  .dial-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-label);
+      white-space: nowrap;
+  }
+
+  /* ── Ctrl rows (no sequencer canvas) ───────────────────────── */
+  .ctrl-group { margin-top: 2.5rem; }
+  .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+  }
+  .ctrl-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-label);
+      width: 52px;
+      flex-shrink: 0;
+  }
+  .ctrl-label.kick  { color: #CFFB52; }
+  .ctrl-label.hat   { color: #7DFBFD; }
+  .ctrl-label.snare { color: #FFBA36; }
+
+  /* ── Transport ──────────────────────────────────────────────── */
+  .transport-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      background: var(--panel);
+      padding: 10px 14px;
+  }
+  .t-label {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-label);
+  }
+  .t-sep { width: 1px; height: 14px; background: #3a3a3a; flex-shrink: 0; }
+
+  /* ── Buttons ────────────────────────────────────────────────── */
+  .dbtn {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: #252525;
+      color: var(--text-label);
+      border: 1px solid #383838;
+      padding: 0 13px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.1s, border-color 0.1s, background 0.1s;
+  }
+  .dbtn:hover { color: var(--text); border-color: #555; background: #2e2e2e; }
+  .dbtn.active { color: #111; background: var(--accent); border-color: var(--accent); }
+
+  /* ── BPM / Swing inputs ─────────────────────────────────────── */
+  input.dbpm {
+      width: 44px; height: 26px;
+      background: transparent; color: var(--text-label);
+      border: 1px solid #383838; padding: 0 4px;
+      font-family: var(--mono); font-size: 0.6rem;
+      letter-spacing: 0.1em; text-align: center;
+  }
+  input.dbpm:focus { outline: none; border-color: var(--accent); color: var(--text); }
+
+  input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      height: 2px; background: #3a3a3a;
+      border-radius: 1px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--text-label); cursor: pointer;
+  }
+  #swing-in { width: 80px; }
+
+  /* ── Mute button in hero ─────────────────────────────────────── */
+  #mute-btn { width: 34px; padding: 0; margin-bottom: 8px; }
+  #mute-btn.active { color: #111; background: var(--accent); border-color: var(--accent); }
+
+  /* ── FM voice colors ────────────────────────────────────────── */
+  .drow-bass .dlabel { color: #BF5AF2; }
+  .drow-lead .dlabel { color: #FF2D8C; }
+  .drow-smpl .dlabel { color: #9B59FF; }
+  #smpl-wave { display: block; width: 100%; border-radius: 3px; }
+
+  /* ── Note picker ─────────────────────────────────────────────── */
+  .note-ctrl {
+      display: flex; align-items: center; gap: 4px;
+      border: 1px solid #383838; padding: 0 6px; height: 30px;
+      align-self: center;
+  }
+  .note-btn {
+      background: none; border: none; color: var(--text-label);
+      font-family: var(--mono); font-size: 0.9rem;
+      cursor: pointer; padding: 0 2px; line-height: 1;
+      transition: color 0.1s;
+  }
+  .note-btn:hover { color: var(--text); }
+  .note-name {
+      font-family: var(--mono); font-size: 0.62rem;
+      letter-spacing: 0.12em; color: var(--text);
+      min-width: 24px; text-align: center;
+  }
+
+  /* ── Seq hint text ───────────────────────────────────────────── */
+  .seq-note {
+      color: var(--text-label);
+      font-size: 0.78rem;
+      margin-top: 0.25rem;
+      opacity: 0.65;
+  }
+
+  /* ── Bar automation (bass 4-note cycle) ─────────────────────── */
+  .bar-auto-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-top: 4px;
+  }
+  .bar-auto-label {
+      font-family: var(--mono);
+      font-size: 0.60rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-label);
+      white-space: nowrap;
+  }
+  .bar-note-sel {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      background: #1a1a1a;
+      color: var(--text-label);
+      border: 1px solid #383838;
+      padding: 0 4px;
+      height: 26px;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      transition: color .1s, border-color .1s;
+  }
+  .bar-note-sel:hover { color: var(--text); border-color: #555; }
+  .bar-note-sel.active { color: #BF5AF2; border-color: #BF5AF2; }
+
+  /* ── Lane mute buttons ──────────────────────────────────────────── */
+  .lane-head {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+  }
+  .lane-mute {
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: #202020;
+      color: #555;
+      border: 1px solid #383838;
+      width: 40px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.1s, border-color 0.1s, background 0.1s;
+  }
+  .lane-mute:hover { color: var(--text-label); border-color: #555; background: #2a2a2a; }
+  .lane-mute.muted { color: #111; background: #F87171; border-color: #F87171; }
+
+  /* ── Swarm note grid ─────────────────────────────────────────── */
+  canvas.swarm-grid { cursor: pointer; touch-action: none; }
+
+  /* ── Jam main layout ─────────────────────────────────────────── */
+  .jam-main {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      width: 100%;
+  }
+  .jam-lanes { flex: 1; min-width: 0; }
+
+  /* ── Macro vertical slider ───────────────────────────────────── */
+  .jam-macro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      padding-top: 4px;
+  }
+  .jam-macro .t-label { writing-mode: horizontal-tb; }
+  .jam-macro input[type=range] {
+      writing-mode: vertical-lr;
+      direction: rtl;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 6px;
+      height: 150px;
+      background: #3a3a3a;
+      border-radius: 3px;
+      outline: none;
+      cursor: ns-resize;
+      padding: 0;
+  }
+  .jam-macro input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--text-label); cursor: pointer;
+  }
+
+  /* ── Instrument panel ────────────────────────────────────────── */
+  .jam-panel {
+      flex-shrink: 0;
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+      background: var(--panel);
+      border-top: 2px solid var(--accent);
+  }
+  .panel-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+  }
+  .ptab {
+      font-family: var(--mono);
+      font-size: 0.60rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: #252525;
+      color: var(--text-label);
+      border: 1px solid #383838;
+      padding: 0 10px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      transition: color .1s, border-color .1s, background .1s;
+  }
+  .ptab:hover { color: var(--text); border-color: #555; background: #2e2e2e; }
+  .ptab.active { color: #111; background: var(--accent); border-color: var(--accent); }
+  .panel-tabs { justify-content: center; }
+  .panel-inst { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .panel-inst.pi-hidden { display: none; }
+  .panel-inst .dial-row { justify-content: center; gap: 10px; }
+  .panel-inst .dial-label { font-size: 0.65rem; letter-spacing: 0.10em; }
+  .panel-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 2px; justify-content: center; }
+
+  /* ── Instrument panel toggle (mobile only) ───────────────────── */
+  #panel-toggle { display: none; margin-left: auto; }
+
+  @media (max-width: 699px) {
+    #panel-toggle { display: inline-flex; }
+
+    .jam-main { position: relative; }
+
+    .jam-panel {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: min(220px, 88%);
+      z-index: 20;
+      max-height: 100%;
+      overflow-y: auto;
+      display: none;
+    }
+    .jam-panel.panel-open { display: flex; }
+  }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="nav-logo"><img src="images/logo.svg" /></div>
+    <ul class="nav-menu">
+      <li><a href="/">Home</a></li>
+      <li><a href="/privacy">Privacy Policy</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero">
+    <h1>Jolt Groovebox</h1>
+    <p class="hero-sub">Drum synth &amp; step sequencer &mdash; live in your browser</p>
+    <div class="hero-seq-wrap">
+      <button class="dbtn" id="mute-btn" title="Unmute">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+      </button>
+      <canvas class="seq" id="seq-0-hero"></canvas>
+    </div>
+  </div>
+</header>
+
+
+<section id="sec-pocket">
+  <h2>Pocket beats, massive sound</h2>
+  <p>Jolt was designed from the ground up to be the mobile beat station that you keep coming back to.</p>
+  <p>8 voices, each with their own step sequencer, per-section/per-sequence automation, per-instrument LFOs.</p>
+
+  <div class="voice-rows">
+    <div class="drow drow-kick">
+      <span class="dlabel">Kick</span>
+      <div class="seq-wrap"><canvas class="seq" id="seq-0-pocket"></canvas></div>
+    </div>
+    <div class="drow drow-hat">
+      <span class="dlabel">Hat</span>
+      <div class="seq-wrap"><canvas class="seq" id="seq-1-pocket"></canvas></div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-synths">
+  <h2>Samples or synths, you choose</h2>
+  <p>Each voice can play any built-in instrument per step. Mix multiple instruments into a single pattern.</p>
+
+  <div class="two-column">
+    <div><h3>Classic Synth</h3><p>Wavetable synth with 4 modes: spread, 2-op FM, paraphony, in-scale chords.</p></div>
+    <div><h3>Macro Synth</h3><p>16 sub-synths based on a classic Eurorack module.</p></div>
+    <div><h3>Sampler</h3><p>Pitched or slicing, old-skool repitching, per-step reversing, mic recording, mp3/wav loading.</p></div>
+    <div><h3>Drum Synth</h3><p>Simple x0x-style percussion, for hi-hats, snares, or heavy kicks.</p></div>
+  </div>
+
+  <div class="voice-rows">
+    <div class="drow drow-kick">
+      <span class="dlabel">Kick</span>
+      <div class="seq-wrap"><canvas class="seq" id="seq-0-synths"></canvas></div>
+    </div>
+    <div class="drow drow-hat">
+      <span class="dlabel">Hat</span>
+      <div class="seq-wrap"><canvas class="seq" id="seq-1-synths"></canvas></div>
+    </div>
+    <div class="drow drow-snare">
+      <span class="dlabel">Snare</span>
+      <div class="seq-wrap"><canvas class="seq" id="seq-2-synths"></canvas></div>
+    </div>
+    <div class="drow drow-smpl">
+      <span class="dlabel">Smpl</span>
+      <div class="seq-wrap">
+        <canvas class="seq" id="seq-smpl-synths"></canvas>
+        <canvas id="smpl-wave-synths"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-fx">
+  <h2>Effect Chain</h2>
+  <p>Any instrument can have any number of effects in any order.</p>
+
+  <div class="two-column">
+    <div><h3>Overdrive</h3><p>Crushing distortion for leads or drums.</p></div>
+    <div><h3>Filter</h3><p>4-stage ladder or resonant SVF (LP/HP/BP), with mod envelope.</p></div>
+    <div><h3>Chorus</h3><p>Shimmering pads, bubbling basses.</p></div>
+    <div><h3>Saturator</h3><p>Warmth or heavy saturation.</p></div>
+    <div><h3>Phaser</h3><p>Movement for pads or bass.</p></div>
+    <div><h3>Bitcrush / Erode</h3><p>Old-school bit-depth reduction and grainy lo-fi textures.</p></div>
+  </div>
+
+</section>
+
+
+<section id="sec-send">
+  <h2>Send effects</h2>
+  <p>Each instrument can be sent to global FX at any level.</p>
+
+  <div class="two-column">
+    <div><h3>Reverb</h3><p>Classic plate, short to long tails.</p></div>
+    <div><h3>Delay</h3><p>Synced with ping-pong &amp; feedback.</p></div>
+    <div><h3>Multi-tap</h3><p>8-tap rhythmic delay.</p></div>
+    <div><h3>Sidechain</h3><p>Kick-based sidechain for pumping or space.</p></div>
+  </div>
+
+</section>
+
+
+<section id="sec-macro">
+  <h2>Global Effect Macros</h2>
+  <p>Up to 5 macro controls for one-touch build-ups &amp; breakdowns.</p>
+
+  <ul class="features">
+    <li>Reverb</li><li>Delay</li><li>Phaser</li>
+    <li>Beat repeat</li><li>LP filter</li><li>HP filter</li>
+  </ul>
+
+</section>
+
+
+<section id="sec-auto">
+  <h2>Modulate and automate everything</h2>
+  <p>All instrument and global FX parameters can be automated with multi-source modulation.</p>
+
+  <h3>Per-instrument LFO</h3>
+  <p>Sine, ramp, random, freely assignable.</p>
+
+  <h3>Pattern automation lane</h3>
+  <p>Draw synced automation tied to instruments.</p>
+
+  <h3>Song automation lane</h3>
+  <p>Bar-to-bar automation or real-time fader overrides.</p>
+
+  <div class="voice-rows">
+    <div class="drow drow-hat">
+      <span class="dlabel">Hat</span>
+      <div class="seq-wrap">
+        <canvas class="seq" id="seq-1-auto"></canvas>
+        <canvas id="hat-lane" style="cursor:crosshair"></canvas>
+        <p class="seq-note">Draw to set hat open/closed per step</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="sec-jam">
+  <h2>Explore, sequence, jam</h2>
+  <p>Build patterns up to 64 steps: programmed, MIDI input, or generative. Chain patterns into songs.</p>
+
+  <div class="voice-rows">
+    <div class="transport-row">
+      <button class="dbtn" id="play-btn" title="Play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+      <div class="t-sep"></div>
+      <span class="t-label">BPM</span>
+      <input class="dbpm" type="number" id="bpm-in" value="120" min="40" max="300">
+      <div class="t-sep"></div>
+      <span class="t-label">Swing</span>
+      <input type="range" id="swing-in" min="0" max="25" value="0">
+      <button class="dbtn" id="panel-toggle">Inst</button>
+    </div>
+
+    <div class="jam-main">
+
+      <!-- Macro vertical slider -->
+      <div class="jam-macro">
+        <span class="t-label">Space</span>
+        <input type="range" id="macro" orient="vertical" min="0" max="100" value="0">
+      </div>
+
+      <!-- Sequencer lanes -->
+      <div class="jam-lanes">
+        <div class="drow drow-kick">
+          <div class="dlabel lane-head">Kick<button class="lane-mute" data-lane="kick">mute</button></div>
+          <div class="seq-wrap"><canvas class="seq" id="seq-0-jam"></canvas></div>
+        </div>
+        <div class="drow drow-hat">
+          <div class="dlabel lane-head">Hat<button class="lane-mute" data-lane="hat">mute</button></div>
+          <div class="seq-wrap"><canvas class="seq" id="seq-1-jam"></canvas></div>
+        </div>
+        <div class="drow drow-snare">
+          <div class="dlabel lane-head">Snare<button class="lane-mute" data-lane="snare">mute</button></div>
+          <div class="seq-wrap"><canvas class="seq" id="seq-2-jam"></canvas></div>
+        </div>
+        <div class="drow drow-bass">
+          <div class="dlabel lane-head">Bass<button class="lane-mute" data-lane="bass">mute</button></div>
+          <div class="seq-wrap">
+            <canvas class="seq fm-seq" id="seq-fm-0-jam"></canvas>
+            <div class="bar-auto-row">
+              <span class="bar-auto-label">Bars</span>
+              <select class="bar-note-sel" data-bar="0"></select>
+              <select class="bar-note-sel" data-bar="1"></select>
+              <select class="bar-note-sel" data-bar="2"></select>
+              <select class="bar-note-sel" data-bar="3"></select>
+            </div>
+          </div>
+        </div>
+        <div class="drow drow-lead">
+          <div class="dlabel lane-head">Lead<button class="lane-mute" data-lane="lead">mute</button></div>
+          <div class="seq-wrap">
+            <canvas class="swarm-grid" id="seq-swarm-jam"></canvas>
+          </div>
+        </div>
+        <div class="drow drow-smpl">
+          <div class="dlabel lane-head">Smpl<button class="lane-mute" data-lane="smpl">mute</button></div>
+          <div class="seq-wrap">
+            <canvas class="seq" id="seq-smpl-jam"></canvas>
+            <canvas id="smpl-wave"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instrument panel -->
+      <div class="jam-panel">
+        <div class="panel-tabs">
+          <button class="ptab active" data-pi="kick">Kick</button>
+          <button class="ptab" data-pi="hat">Hat</button>
+          <button class="ptab" data-pi="snare">Snare</button>
+          <button class="ptab" data-pi="bass">Bass</button>
+          <button class="ptab" data-pi="lead">Lead</button>
+          <button class="ptab" data-pi="smpl">Smpl</button>
+          <button class="ptab" data-pi="fx">FX</button>
+        </div>
+
+        <div class="panel-inst" id="pi-kick">
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-kick-body"></canvas><div class="dial-label">Body</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-kick-click"></canvas><div class="dial-label">Click</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-kick-drive"></canvas><div class="dial-label">Drive</div></div>
+          </div>
+          <div class="panel-row">
+            <button class="dbtn" id="kick-drive-toggle">Drive off</button>
+          </div>
+        </div>
+
+        <div class="panel-inst pi-hidden" id="pi-hat">
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-hat-open"></canvas><div class="dial-label">Open</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-hat-tone"></canvas><div class="dial-label">Tone</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-hat-filter"></canvas><div class="dial-label">Filter</div></div>
+          </div>
+        </div>
+
+        <div class="panel-inst pi-hidden" id="pi-snare">
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-snare-body"></canvas><div class="dial-label">Body</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-snare-crack"></canvas><div class="dial-label">Crack</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-snare-send"></canvas><div class="dial-label">Send</div></div>
+          </div>
+        </div>
+
+        <div class="panel-inst pi-hidden" id="pi-bass">
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-fm0-decay"></canvas><div class="dial-label">Decay</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-fm0-filter"></canvas><div class="dial-label">Filter</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-fm0-drive"></canvas><div class="dial-label">Drive</div></div>
+          </div>
+        </div>
+
+        <div class="panel-inst pi-hidden" id="pi-lead">
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-spread"></canvas><div class="dial-label">Spread</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-drift"></canvas><div class="dial-label">Drift</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-decay"></canvas><div class="dial-label">Decay</div></div>
+          </div>
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-filter"></canvas><div class="dial-label">Filter</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-send"></canvas><div class="dial-label">Send</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-delay"></canvas><div class="dial-label">Dly</div></div>
+            <div class="dial-ctrl"><canvas class="dial" id="d-sw-envamt"></canvas><div class="dial-label">Env→F</div></div>
+          </div>
+        </div>
+
+        <div class="panel-inst pi-hidden" id="pi-smpl">
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-smpl-vol"></canvas><div class="dial-label">Vol</div></div>
+          </div>
+          <div class="panel-row">
+            <button class="dbtn" id="smpl-load-btn">Load sample</button>
+            <input type="file" id="smpl-file-input" accept="audio/*" style="display:none">
+            <span id="smpl-filename" style="font-size:11px;opacity:0.6;margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px"></span>
+          </div>
+        </div>
+
+        <div class="panel-inst pi-hidden" id="pi-fx">
+          <div class="dial-row">
+            <div class="dial-ctrl"><canvas class="dial" id="d-rv-tail"></canvas><div class="dial-label">Reverb tail</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <p>Copyright &copy; 2026 EdJ / Jolt Groovebox</p>
+  <p>"Noise Resonant Synth Percussion.Sustained.Vari Octaves" by newlocknew -- <a href="https://freesound.org/s/858313/">https://freesound.org/s/858313/</a> -- License: Creative Commons 0</p>
+</footer>
+
+<script>
+'use strict';
+
+const NV = 3, NS = 16, LS = 128;
+const GAP = 2, GROUP_EXTRA = 2;
+
+const P = {
+    SubGain:0, SubDecay:1, TransientGain:2, TransientDecay:3,
+    NoiseGain:4, NoiseDecay:5, NoiseLowPass:6, NoiseHighPass:7,
+    NoiseResonance:8, OverdriveAmt:9, ReverbSend:10,
+};
+const NUM_PARAMS = 11;
+
+// Snare: bumped TransientGain, NoiseGain, NoiseLowPass for more presence
+const DEF_BASE = [
+    [1.0,  0.35, 1.0,  0.08, 0.25, 0.06, 0.50, 0.20, 0.30, 0.0, 0.0],  // kick
+    [0.0,  0.2,  0.0,  0.05, 0.9,  0.08, 0.88, 0.65, 0.65, 0.0, 0.0],  // hat
+    [0.45, 0.18, 0.35, 0.05, 1.0,  0.22, 0.78, 0.35, 0.52, 0.0, 0.0],  // snare
+];
+
+const CLR = [
+    { on:'#CFFB52', off:'#242424', play:'#E8FCA0', playOff:'#333' },
+    { on:'#7DFBFD', off:'#242424', play:'#B8FEFF', playOff:'#333' },
+    { on:'#FFBA36', off:'#242424', play:'#FFD98A', playOff:'#333' },
+];
+
+const VOICE_CANVASES = [
+    ['seq-0-hero', 'seq-0-pocket', 'seq-0-synths', 'seq-0-jam'],
+    ['seq-1-pocket', 'seq-1-synths', 'seq-1-auto', 'seq-1-jam'],
+    ['seq-2-synths', 'seq-2-jam'],
+];
+
+const canvasInfo = {};
+let currentStep = -1;
+let bpm = 120;
+
+function reverbTail(n) { return 0.9 + Math.pow(n, 6) * (0.9999 - 0.9); }
+const rvLP = 20 * Math.pow(1200, 0.7) / 48000;
+const rvPD = 0.5;
+
+const steps = [
+    [true,false,false,false,true,false,false,false,true,false,false,false,true,false,false,false],
+    new Array(NS).fill(false),
+    new Array(NS).fill(false),
+];
+const HAT_VEL = [0.25, 0.5, 1.0, 0.5];
+const stepVel = [
+    new Array(NS).fill(0.75),
+    Array.from({ length: NS }, (_, i) => HAT_VEL[i % 4]),
+    new Array(NS).fill(0.75),
+];
+const hatLane = new Uint8Array(LS).fill(128);
+
+// ── Sampler state ──────────────────────────────────────────────────────────────
+const SAMPLER_SLICE_FRACS = [0.0, 0.333, 0.667];
+const SMPL_CLR = [
+    { on:'#9B59FF', play:'#C4A0FF', off:'#242424', playOff:'#333' },
+    { on:'#FF3B30', play:'#FF9490', off:'#242424', playOff:'#333' },
+    { on:'#32E5C8', play:'#8EF2E1', off:'#242424', playOff:'#333' },
+];
+const SMPL_CANVAS_ID  = 'seq-smpl-jam';
+const SMPL_CANVASES   = ['seq-smpl-jam', 'seq-smpl-synths'];
+const SMPL_WAVE_IDS   = ['smpl-wave',    'smpl-wave-synths'];
+const samplerSteps = new Array(NS).fill(-1); // -1=off, 0/1/2=slice index
+
+// Waveform display state
+const SMPL_WAVE_H = 48;
+const SMPL_WAVE_POINTS = 1024;
+const samplerSliceOffsets = [0, 0, 0];
+let samplerWaveform = null; // Float32Array, SMPL_WAVE_POINTS peak values
+let samplerTotalLen = 0;
+let samplerStartOffset = 0;
+let samplerStartTime = 0;
+let samplerIsPlaying = false;
+let samplerRafId = null;
+let samplerSelectedSlice = 0;
+let _decodedSampleL = null; // Float32Array at 48 kHz, populated before audio starts
+let _decodedSampleR = null;
+
+// ── Audio ──────────────────────────────────────────────────────────────────────
+
+let actx = null, wNode = null, muteGain = null;
+let isMuted = false, engineStopped = true;
+
+const mutedLanes = { kick: false, hat: false, snare: false, bass: false, lead: false, smpl: false };
+const VOICE_LANE  = ['kick', 'hat', 'snare'];
+
+const SVG_MUTED = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
+const SVG_SOUND = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+const SVG_PLAY  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+const SVG_PAUSE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+
+function updatePlayBtn() {
+    const btn = document.getElementById('play-btn');
+    btn.innerHTML = engineStopped ? SVG_PLAY : SVG_PAUSE;
+    btn.title     = engineStopped ? 'Play' : 'Pause';
+}
+
+function updateMuteBtn() {
+    const btn = document.getElementById('mute-btn');
+    btn.innerHTML = isMuted ? SVG_MUTED : SVG_SOUND;
+    btn.title     = isMuted ? 'Unmute' : 'Mute';
+    btn.classList.toggle('active', !isMuted);
+}
+
+async function initAudio() {
+    if (actx) { await actx.resume(); return; }
+    actx = new AudioContext({ sampleRate: 48000 });
+    muteGain = actx.createGain();
+    muteGain.gain.value = isMuted ? 0 : 1;
+    muteGain.connect(actx.destination);
+    await actx.resume();
+    await actx.audioWorklet.addModule('kick-worklet-bundle.js');
+    const wasmBuf = await fetch('kick_engine.wasm').then(r => {
+        if (!r.ok) throw new Error('kick_engine.wasm not found — run build.sh');
+        return r.arrayBuffer();
+    });
+    wNode = new AudioWorkletNode(actx, 'kick-processor', {
+        outputChannelCount: [2], numberOfOutputs: 1,
+    });
+    wNode.port.onmessage = ({ data }) => {
+        if (data.type === 'step') {
+            if (data.step === NS - 1) {
+                currentBarNote = (currentBarNote + 1) % 4;
+                applyBarNote();
+            }
+            currentStep = data.step;
+            drawAllSeq();
+            drawAllFmSeq();
+            drawHatLane();
+        } else if (data.type === 'sampler_start') {
+            samplerStartOffset = data.offset;
+            samplerStartTime = performance.now();
+            samplerIsPlaying = true;
+            if (!samplerRafId) samplerRafId = requestAnimationFrame(animateSamplerWave);
+        } else if (data.type === 'sampler_stop') {
+            samplerIsPlaying = false;
+        }
+    };
+    wNode.connect(muteGain);
+    wNode.port.postMessage({ type: 'init', sr: actx.sampleRate, wasmBuf }, [wasmBuf]);
+    syncAll();
+    loadSampler();
+}
+
+function send(msg) { if (wNode) wNode.port.postMessage(msg); }
+function lerp(t, a, b) { return a + t * (b - a); }
+
+function sendStep(v, s) {
+    send({ type: 'set_step', v, step: s, active: steps[v][s] && !mutedLanes[VOICE_LANE[v]], vel: stepVel[v][s] });
+}
+
+function syncAll() {
+    send({ type: 'set_bpm', bpm });
+    sendReverb();
+    for (let v = 0; v < NV; v++) {
+        for (let s = 0; s < NS; s++) sendStep(v, s);
+        for (let p = 0; p < NUM_PARAMS; p++)
+            send({ type: 'set_base', v, param: p, value: DEF_BASE[v][p] });
+    }
+    sendKickSynth(); sendHatSynth(); sendSnareSynth(); sendHatFilter();
+    send({ type: 'set_base', v: 2, param: P.ReverbSend, value: dialScaled('d-snare-send') });
+    sendLane();
+    syncFmAll();
+    syncSampler();
+    ['sec-pocket', 'sec-synths'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top < window.innerHeight * 0.8) activateSection(id);
+    });
+    send({ type: 'play' });
+    engineStopped = false;
+    updatePlayBtn();
+}
+
+// ── Synth senders ─────────────────────────────────────────────────────────────
+
+const dialValues = {};
+const dialLimits = {};
+
+function dialScaled(id) {
+    const v = dialValues[id] ?? 0;
+    const lim = dialLimits[id];
+    return lim ? lim.min + v * (lim.max - lim.min) : v;
+}
+
+function sendKickSynth() {
+    send({ type: 'set_base', v: 0, param: P.SubDecay,      value: dialScaled('d-kick-body')  });
+    send({ type: 'set_base', v: 0, param: P.TransientGain, value: dialScaled('d-kick-click') });
+}
+function sendHatSynth() {
+    send({ type: 'set_base', v: 1, param: P.NoiseDecay,    value: dialScaled('d-hat-open') });
+    send({ type: 'set_base', v: 1, param: P.NoiseHighPass, value: dialScaled('d-hat-tone') });
+}
+function sendSnareSynth() {
+    send({ type: 'set_base', v: 2, param: P.SubGain,    value: dialScaled('d-snare-body')  });
+    send({ type: 'set_base', v: 2, param: P.NoiseDecay, value: dialScaled('d-snare-crack') });
+}
+function sendKickDrive() {
+    send({ type: 'set_base', v: 0, param: P.OverdriveAmt, value: dialScaled('d-kick-drive') });
+}
+function sendHatFilter() {
+    send({ type: 'set_base', v: 1, param: P.NoiseLowPass, value: dialScaled('d-hat-filter') });
+}
+function sendLane()   { send({ type: 'set_lane', v: 1, buf: hatLane.buffer.slice(0) }); }
+function sendReverb() {
+    send({ type: 'set_reverb', decay: reverbTail(dialValues['d-rv-tail'] ?? 0.80), lowPass: rvLP, preDelay: rvPD, ret: 1.0 });
+}
+
+// ── Progressive reveal ────────────────────────────────────────────────────────
+
+const sectionActivated = {};
+function activateSection(id) {
+    if (sectionActivated[id]) return;
+    sectionActivated[id] = true;
+    if (id === 'sec-pocket') {
+        for (let s = 0; s < NS; s += 2) {
+            steps[1][s] = true;
+            sendStep(1, s);
+        }
+        drawSeq(1);
+    } else if (id === 'sec-synths') {
+        [4, 12].forEach(s => {
+            steps[2][s] = true;
+            sendStep(2, s);
+        });
+        drawSeq(2);
+    }
+}
+['sec-pocket', 'sec-synths'].forEach(id => {
+    new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) activateSection(e.target.id); });
+    }, { threshold: 0.25 }).observe(document.getElementById(id));
+});
+
+// ── Sequencer layout & draw ───────────────────────────────────────────────────
+
+function seqMode() { return window.innerWidth >= 600 ? '1x16' : '2x8'; }
+
+function colX(col, cell, mode) {
+    if (mode === '1x16') return col * (cell + GAP) + (col >= 8 ? GROUP_EXTRA : 0);
+    return col * (cell + GAP) + (col >= 4 ? GROUP_EXTRA : 0);
+}
+
+function doSeqLayout(v, id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const w = canvas.offsetWidth;
+    if (!w) { requestAnimationFrame(() => doSeqLayout(v, id)); return; }
+    const dpr  = window.devicePixelRatio || 1;
+    const mode = seqMode();
+    let cell, h;
+    if (mode === '1x16') {
+        cell = Math.max(8, (w - 15 * GAP - GROUP_EXTRA) / 16);
+        h = cell;
+    } else {
+        cell = Math.max(8, (w - 7 * GAP - GROUP_EXTRA) / 8);
+        h = 2 * cell + GAP;
+    }
+    canvas.style.height = h + 'px';
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvasInfo[id] = { cell, seqW: w, seqH: h, mode };
+    drawSeqOnCanvas(v, id);
+}
+
+function chamferRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.lineTo(x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.lineTo(x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.lineTo(x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.closePath();
+}
+
+function drawSeqOnCanvas(v, id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const info = canvasInfo[id];
+    if (!info) return;
+    const { cell, seqW: W, seqH: H, mode } = info;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const ch = cell * 0.18;
+    const clr = CLR[v];
+    for (let s = 0; s < NS; s++) {
+        let col, row, x, y;
+        if (mode === '1x16') {
+            col = s; row = 0; x = colX(s, cell, mode); y = 0;
+        } else {
+            col = s % 8; row = s >> 3; x = colX(col, cell, mode); y = row * (cell + GAP);
+        }
+        const isOn = steps[v][s], isPlay = s === currentStep;
+        ctx.fillStyle = (isOn && isPlay) ? clr.play
+                      : isOn             ? clr.on
+                      : isPlay           ? clr.playOff
+                      :                    clr.off;
+        chamferRect(ctx, x, y, cell, cell, ch);
+        ctx.fill();
+    }
+}
+
+function drawSeq(v)  { VOICE_CANVASES[v].forEach(id => drawSeqOnCanvas(v, id)); }
+function drawAllSeq() { for (let v = 0; v < NV; v++) drawSeq(v); drawSamplerSeq(); }
+
+function initSeqCanvas(v, id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    function hitStep(e) {
+        const info = canvasInfo[id];
+        if (!info) return -1;
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+        const { cell, mode } = info;
+        if (mode === '1x16') {
+            for (let col = 0; col < 16; col++) {
+                const x = colX(col, cell, mode);
+                if (cx >= x && cx < x + cell) return col;
+            }
+        } else {
+            const row = cy < cell + GAP / 2 ? 0 : 1;
+            for (let col = 0; col < 8; col++) {
+                const x = colX(col, cell, mode);
+                if (cx >= x && cx < x + cell) return row * 8 + col;
+            }
+        }
+        return -1;
+    }
+
+    let dragOp = null;
+    canvas.addEventListener('pointerdown', e => {
+        const s = hitStep(e);
+        if (s < 0) return;
+        dragOp = steps[v][s] ? 'clear' : 'fill';
+        steps[v][s] = dragOp === 'fill';
+        sendStep(v, s);
+        drawSeq(v);
+        canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', e => {
+        if (!dragOp) return;
+        const s = hitStep(e);
+        if (s < 0) return;
+        const want = dragOp === 'fill';
+        if (steps[v][s] !== want) {
+            steps[v][s] = want;
+            sendStep(v, s);
+            drawSeq(v);
+        }
+    });
+    canvas.addEventListener('pointerup',     () => { dragOp = null; });
+    canvas.addEventListener('pointercancel', () => { dragOp = null; });
+    doSeqLayout(v, id);
+}
+
+// ── Hat automation lane ───────────────────────────────────────────────────────
+
+const LANE_H = 44;
+
+function doHatLaneLayout() {
+    const canvas = document.getElementById('hat-lane');
+    if (!canvas) return;
+    const w = canvas.offsetWidth;
+    if (!w) { requestAnimationFrame(doHatLaneLayout); return; }
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.height = LANE_H + 'px';
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(LANE_H * dpr);
+    drawHatLane();
+}
+
+function initHatLane() {
+    const canvas = document.getElementById('hat-lane');
+    if (!canvas) return;
+    let drag = false, lastI = -1, lastV = 128;
+    function posFrom(e) {
+        const r = canvas.getBoundingClientRect();
+        return {
+            i:   Math.max(0, Math.min(LS-1, Math.floor(((e.clientX-r.left)/r.width)*LS))),
+            val: Math.max(0, Math.min(255, Math.round((1-(e.clientY-r.top)/r.height)*255))),
+        };
+    }
+    function paint(p) {
+        if (lastI >= 0 && lastI !== p.i) {
+            const span = Math.abs(p.i - lastI);
+            for (let k = 0; k <= span; k++) {
+                const t = k / Math.max(span, 1);
+                hatLane[Math.round(lastI + t*(p.i-lastI))] = Math.round(lastV + t*(p.val-lastV));
+            }
+        } else {
+            hatLane[p.i] = p.val;
+        }
+        lastI = p.i; lastV = p.val;
+        sendLane(); drawHatLane();
+    }
+    canvas.addEventListener('mousedown', e => { drag=true; lastI=-1; paint(posFrom(e)); });
+    canvas.addEventListener('mousemove', e => { if(drag) paint(posFrom(e)); });
+    window.addEventListener('mouseup', () => { drag=false; });
+    doHatLaneLayout();
+}
+
+function drawHatLane() {
+    const canvas = document.getElementById('hat-lane');
+    if (!canvas || !canvas.offsetWidth) return;
+    const W = canvas.offsetWidth, H = LANE_H;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#1c1c1c';
+    ctx.fillRect(0, 0, W, H);
+    for (let s = 0; s < NS; s++) {
+        ctx.fillStyle = s === currentStep ? 'rgba(125,251,253,0.09)' : '#222';
+        ctx.fillRect((s/NS)*W, 0, W/NS, H);
+    }
+    ctx.fillStyle = '#7DFBFD';
+    const bw = W / LS;
+    for (let i = 0; i < LS; i++) {
+        const bh = (hatLane[i]/255)*H;
+        ctx.fillRect(i*bw, H-bh, bw+0.5, bh);
+    }
+}
+
+// ── Dial — top semicircle (∩ shape), matching Easter Dial.swift ──────────────
+// Geometry: cy near bottom of canvas so arc rises upward into canvas interior.
+// Background: ctx.arc(cx,cy,r, PI, 0,  false) — clockwise PI→2PI through top
+// Value fill: ctx.arc(cx,cy,r, PI, PI*(1+v), false) — fills left→top→right
+
+const DIAL_W  = 72;
+const DIAL_H  = 50;
+const DIAL_CX = 36;
+const DIAL_CY = 44;   // arc legs at y=44; top of arc at y=44-26=18
+const DIAL_R  = 26;
+const DIAL_LW = 9;
+
+function drawDial(canvas, value, color) {
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, DIAL_W, DIAL_H);
+    ctx.lineCap = 'round';
+    ctx.lineWidth = DIAL_LW;
+
+    // Background arc
+    ctx.beginPath();
+    ctx.arc(DIAL_CX, DIAL_CY, DIAL_R, Math.PI, 0, false);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.stroke();
+
+    // Value arc (fills left→top→right as value 0→1)
+    if (value > 0.005) {
+        ctx.beginPath();
+        ctx.arc(DIAL_CX, DIAL_CY, DIAL_R, Math.PI, Math.PI * (1 + value), false);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+    }
+
+    // Value text inside the arch (below the arc peak, above the legs)
+    ctx.fillStyle = value > 0.005 ? color : 'rgba(154,154,142,0.6)';
+    ctx.font = `${Math.round(DIAL_W * 0.2)}px 'GeistPixel Grid', monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(Math.max(1, Math.round(value * 100)), DIAL_CX, DIAL_CY - DIAL_R * 0.32);
+}
+
+function initDial(id, initVal, color, onChange) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width  = DIAL_W + 'px';
+    canvas.style.height = DIAL_H + 'px';
+    canvas.width  = Math.round(DIAL_W * dpr);
+    canvas.height = Math.round(DIAL_H * dpr);
+
+    let value = initVal;
+    let origY = null, origVal = null;
+
+    function set(v) {
+        value = Math.max(0, Math.min(1, v));
+        dialValues[id] = value;
+        drawDial(canvas, value, color);
+        onChange(value);
+    }
+
+    dialValues[id] = initVal;
+    drawDial(canvas, initVal, color);
+
+    canvas.addEventListener('pointerdown', e => {
+        origY = e.clientY; origVal = value;
+        canvas.setPointerCapture(e.pointerId);
+        e.preventDefault();
+    });
+    canvas.addEventListener('pointermove', e => {
+        if (origY === null) return;
+        let v = origVal + (origY - e.clientY) / 130;
+        if (v < 0.02) v = 0;
+        if (v > 0.98) v = 1;
+        set(v);
+        e.preventDefault();
+    });
+    canvas.addEventListener('pointerup',     () => { origY = null; });
+    canvas.addEventListener('pointercancel', () => { origY = null; });
+    canvas.addEventListener('dblclick',      () => set(initVal));
+}
+
+// ── Dial init ────────────────────────────────────────────────────────────────
+
+let kickDriveOn = false;
+
+// ── FX events ────────────────────────────────────────────────────────────────
+
+document.getElementById('smpl-load-btn').addEventListener('click', () => {
+    document.getElementById('smpl-file-input').click();
+});
+document.getElementById('smpl-file-input').addEventListener('change', function() {
+    if (this.files && this.files[0]) loadSampleFromFile(this.files[0]);
+    this.value = '';
+});
+
+document.getElementById('kick-drive-toggle').addEventListener('click', function() {
+    kickDriveOn = !kickDriveOn;
+    this.textContent = kickDriveOn ? 'Drive on' : 'Drive off';
+    this.classList.toggle('active', kickDriveOn);
+    if (kickDriveOn) sendKickDrive();
+    else send({ type: 'set_base', v: 0, param: P.OverdriveAmt, value: 0 });
+});
+
+// ── Lane mutes ────────────────────────────────────────────────────────────────
+
+function setLaneMute(lane, muted) {
+    mutedLanes[lane] = muted;
+    document.querySelector(`.lane-mute[data-lane="${lane}"]`).classList.toggle('muted', muted);
+    const vi = VOICE_LANE.indexOf(lane);
+    if (vi >= 0) {
+        for (let s = 0; s < NS; s++) sendStep(vi, s);
+    } else if (lane === 'bass') {
+        for (let s = 0; s < NS; s++) sendBassStep(s);
+    } else if (lane === 'lead') {
+        for (let s = 0; s < NS; s++) sendSwarmStep(s);
+    } else if (lane === 'smpl') {
+        for (let s = 0; s < NS; s++) sendSamplerStep(s);
+    }
+}
+
+document.querySelectorAll('.lane-mute').forEach(btn => {
+    btn.addEventListener('click', () => setLaneMute(btn.dataset.lane, !mutedLanes[btn.dataset.lane]));
+});
+
+// ── Macro ─────────────────────────────────────────────────────────────────────
+
+const macroEl = document.getElementById('macro');
+function sendMacro() { send({ type: 'set_macro', value: macroEl.value / 100 }); }
+macroEl.addEventListener('input', sendMacro);
+macroEl.addEventListener('pointerup',    () => { macroEl.value = 0; sendMacro(); });
+macroEl.addEventListener('pointerleave', () => { if (+macroEl.value > 0) { macroEl.value = 0; sendMacro(); } });
+
+// ── Transport ─────────────────────────────────────────────────────────────────
+
+document.getElementById('mute-btn').addEventListener('click', async () => {
+    await initAudio();
+    isMuted = !isMuted;
+    muteGain.gain.value = isMuted ? 0 : 1;
+    if (!isMuted && engineStopped) {
+        send({ type: 'play' }); engineStopped = false;
+        updatePlayBtn();
+    }
+    updateMuteBtn();
+});
+
+document.getElementById('play-btn').addEventListener('click', async () => {
+    const firstInit = !actx;
+    await initAudio();
+    if (!firstInit) {
+        if (engineStopped) {
+            send({ type: 'play' });
+            engineStopped = false;
+        } else {
+            send({ type: 'stop' });
+            currentStep = -1; drawAllSeq(); drawHatLane(); drawAllFmSeq();
+            engineStopped = true;
+        }
+    }
+    updatePlayBtn();
+});
+
+document.getElementById('bpm-in').addEventListener('change', function() {
+    bpm = Math.max(40, Math.min(300, +this.value || 120));
+    send({ type: 'set_bpm', bpm });
+});
+
+document.getElementById('swing-in').addEventListener('input', function() {
+    send({ type: 'set_swing', amount: this.value / 100 });
+});
+
+document.getElementById('panel-toggle').addEventListener('click', function() {
+    document.querySelector('.jam-panel').classList.toggle('panel-open');
+    this.classList.toggle('active');
+});
+
+// ── D minor scales ────────────────────────────────────────────────────────────
+
+// D2..D3 (bass); D5 down to D4 for swarm (row 0=top=high)
+const D_MINOR_BASS  = [26, 28, 29, 31, 33, 34, 36, 38];
+const D_MINOR_SWARM = [74, 72, 70, 69, 67, 65, 64, 62]; // D5→D4, top→bottom
+const SWARM_GRID_ROWS = D_MINOR_SWARM.length; // 8
+const SWARM_ROW_GAP = 1;
+
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+function noteName(midi) { return NOTE_NAMES[midi % 12] + (Math.floor(midi / 12) - 1); }
+
+// ── FM bass voice ─────────────────────────────────────────────────────────────
+
+const FM_P = { AMP_DECAY:0, LP_CUTOFF:1, DRIVE:2, GAIN:3 };
+const BASS_CLR = { on:'#BF5AF2', off:'#242424', play:'#D49CF7', playOff:'#333' };
+const BASS_CANVAS_ID = 'seq-fm-0-jam';
+
+const bassSteps = new Array(NS).fill(false);
+const bassNote  = new Array(NS).fill(38); // D2
+
+// Bar automation: 4 notes cycling per bar (updated at step 15 boundary)
+const bassBarNotes  = [26, 26, 26, 26]; // overwritten by initFromParams
+let   currentBarNote = 0;
+
+function sendBassStep(s) {
+    send({ type:'set_fm_step', voice:0, step:s, active:bassSteps[s] && !mutedLanes.bass, note:bassNote[s], vel:0.75 });
+}
+
+function updateBarNoteBtns() {
+    document.querySelectorAll('[data-bar]').forEach(sel => {
+        const bar = +sel.dataset.bar;
+        sel.value = bassBarNotes[bar];
+        sel.classList.toggle('active', bar === currentBarNote);
+    });
+}
+
+function applyBarNote() {
+    const note = bassBarNotes[currentBarNote];
+    for (let s = 0; s < NS; s++) { bassNote[s] = note; sendBassStep(s); }
+    updateBarNoteBtns();
+}
+
+function syncBassAll() {
+    applyBarNote();
+}
+
+// Populate bar note selects with D minor options, then wire change handler
+document.querySelectorAll('[data-bar]').forEach(sel => {
+    [...D_MINOR_BASS].reverse().forEach(midi => {
+        const opt = document.createElement('option');
+        opt.value = midi;
+        opt.textContent = noteName(midi);
+        sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => {
+        const bar = +sel.dataset.bar;
+        bassBarNotes[bar] = +sel.value;
+        if (bar === currentBarNote) applyBarNote();
+        else updateBarNoteBtns();
+    });
+});
+
+function drawBassSeqOnCanvas(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const info = canvasInfo[id];
+    if (!info) return;
+    const { cell, seqW: W, seqH: H, mode } = info;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const ch = cell * 0.18;
+    for (let s = 0; s < NS; s++) {
+        let x, y;
+        if (mode === '1x16') { x = colX(s, cell, mode); y = 0; }
+        else { x = colX(s % 8, cell, mode); y = (s >> 3) * (cell + GAP); }
+        const isOn = bassSteps[s], isPlay = s === currentStep;
+        ctx.fillStyle = (isOn && isPlay) ? BASS_CLR.play : isOn ? BASS_CLR.on : isPlay ? BASS_CLR.playOff : BASS_CLR.off;
+        chamferRect(ctx, x, y, cell, cell, ch);
+        ctx.fill();
+    }
+}
+function drawBassSeq() { drawBassSeqOnCanvas(BASS_CANVAS_ID); }
+
+function doBassSeqLayout(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const w = canvas.offsetWidth;
+    if (!w) { requestAnimationFrame(() => doBassSeqLayout(id)); return; }
+    const dpr  = window.devicePixelRatio || 1;
+    const mode = seqMode();
+    let cell, h;
+    if (mode === '1x16') { cell = Math.max(8, (w - 15*GAP - GROUP_EXTRA) / 16); h = cell; }
+    else                  { cell = Math.max(8, (w -  7*GAP - GROUP_EXTRA) / 8);  h = 2*cell + GAP; }
+    canvas.style.height = h + 'px';
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvasInfo[id] = { cell, seqW: w, seqH: h, mode };
+    drawBassSeqOnCanvas(id);
+}
+
+function initBassSeqCanvas(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    function hitStep(e) {
+        const info = canvasInfo[id];
+        if (!info) return -1;
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+        const { cell, mode } = info;
+        if (mode === '1x16') {
+            for (let c = 0; c < 16; c++) { const x = colX(c, cell, mode); if (cx >= x && cx < x+cell) return c; }
+        } else {
+            const row = cy < cell + GAP/2 ? 0 : 1;
+            for (let c = 0; c < 8; c++) { const x = colX(c, cell, mode); if (cx >= x && cx < x+cell) return row*8+c; }
+        }
+        return -1;
+    }
+
+    let dragOp = null;
+    canvas.addEventListener('pointerdown', e => {
+        const s = hitStep(e);
+        if (s < 0) return;
+        dragOp = bassSteps[s] ? 'clear' : 'fill';
+        bassSteps[s] = dragOp === 'fill';
+        sendBassStep(s);
+        drawBassSeq();
+        canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', e => {
+        if (!dragOp) return;
+        const s = hitStep(e);
+        if (s < 0) return;
+        const want = dragOp === 'fill';
+        if (bassSteps[s] !== want) {
+            bassSteps[s] = want;
+            sendBassStep(s);
+            drawBassSeq();
+        }
+    });
+    canvas.addEventListener('pointerup',     () => { dragOp = null; });
+    canvas.addEventListener('pointercancel', () => { dragOp = null; });
+    doBassSeqLayout(id);
+}
+
+// Bass dials: depth, decay, filter (ratio=1 fixed, no send)
+const BASS_DIAL_IDS   = ['d-fm0-decay', 'd-fm0-filter', 'd-fm0-drive'];
+const BASS_DIAL_PARAM = [FM_P.AMP_DECAY, FM_P.LP_CUTOFF, FM_P.DRIVE];
+
+// ── Swarm lead voice — 8×16 note grid ────────────────────────────────────────
+
+const SW_P = { SPREAD:0, DRIFT:1, DECAY:2, CUTOFF:3, REVERB:4, GAIN:5, DELAY:6, ENV_AMT:7 };
+const SWARM_CLR = { on:'#FF2D8C', off:'#1e1e1e', play:'#FF89C2', playOff:'#2a2a2a', root:'#2a1020' };
+const SWARM_CANVAS_ID = 'seq-swarm-jam';
+
+const swarmSteps = new Array(NS).fill(false);
+const swarmNote  = new Array(NS).fill(62); // D4
+
+function sendSwarmStep(s) {
+    send({ type:'set_swarm_step', step:s, active:swarmSteps[s] && !mutedLanes.lead, note:swarmNote[s], vel:0.75 });
+}
+function syncSwarmAll() { for (let s = 0; s < NS; s++) sendSwarmStep(s); }
+
+function drawSwarmGrid(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const info = canvasInfo[id];
+    if (!info) return;
+    const { cell, seqW: W, seqH: H, rowH } = info;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const ch = Math.min(rowH, cell) * 0.15;
+
+    for (let step = 0; step < NS; step++) {
+        const x = colX(step, cell, '1x16');
+        const isPlay = step === currentStep;
+        for (let row = 0; row < SWARM_GRID_ROWS; row++) {
+            const y = row * (rowH + SWARM_ROW_GAP);
+            const noteAtRow = D_MINOR_SWARM[row];
+            const isActive = swarmSteps[step] && swarmNote[step] === noteAtRow;
+            const isRoot = noteAtRow % 12 === 2; // D notes
+            let fill;
+            if (isActive && isPlay) fill = SWARM_CLR.play;
+            else if (isActive)      fill = SWARM_CLR.on;
+            else if (isPlay)        fill = SWARM_CLR.playOff;
+            else if (isRoot)        fill = SWARM_CLR.root;
+            else                    fill = SWARM_CLR.off;
+            chamferRect(ctx, x, y, cell, rowH, ch);
+            ctx.fillStyle = fill;
+            ctx.fill();
+        }
+    }
+}
+function drawSwarmSeq() { drawSwarmGrid(SWARM_CANVAS_ID); }
+
+function doSwarmSeqLayout(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const w = canvas.offsetWidth;
+    if (!w) { requestAnimationFrame(() => doSwarmSeqLayout(id)); return; }
+    const dpr = window.devicePixelRatio || 1;
+    // Always 1x16 so all 16 steps show as columns
+    const cell = Math.max(6, (w - 15*GAP - GROUP_EXTRA) / 16);
+    const rowH = Math.max(6, Math.floor(cell * 0.72));
+    const h = rowH * SWARM_GRID_ROWS + SWARM_ROW_GAP * (SWARM_GRID_ROWS - 1);
+    canvas.style.height = h + 'px';
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvasInfo[id] = { cell, seqW: w, seqH: h, mode: '1x16', rowH };
+    drawSwarmGrid(id);
+}
+
+function initSwarmSeqCanvas(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    function hitCell(e) {
+        const info = canvasInfo[id];
+        if (!info) return null;
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+        const { cell, rowH } = info;
+        let step = -1;
+        for (let c = 0; c < NS; c++) {
+            const x = colX(c, cell, '1x16');
+            if (cx >= x && cx < x + cell) { step = c; break; }
+        }
+        if (step < 0) return null;
+        const row = Math.floor(cy / (rowH + SWARM_ROW_GAP));
+        if (row < 0 || row >= SWARM_GRID_ROWS) return null;
+        return { step, row };
+    }
+
+    let dragOp = null;
+    canvas.addEventListener('pointerdown', e => {
+        const hit = hitCell(e);
+        if (!hit) return;
+        const { step, row } = hit;
+        const note = D_MINOR_SWARM[row];
+        if (swarmSteps[step] && swarmNote[step] === note) {
+            dragOp = 'clear';
+            swarmSteps[step] = false;
+        } else {
+            dragOp = 'fill';
+            swarmSteps[step] = true;
+            swarmNote[step] = note;
+        }
+        sendSwarmStep(step);
+        drawSwarmSeq();
+        canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', e => {
+        if (!dragOp) return;
+        const hit = hitCell(e);
+        if (!hit) return;
+        const { step, row } = hit;
+        if (dragOp === 'fill') {
+            const note = D_MINOR_SWARM[row];
+            if (!swarmSteps[step] || swarmNote[step] !== note) {
+                swarmSteps[step] = true;
+                swarmNote[step] = note;
+                sendSwarmStep(step);
+                drawSwarmSeq();
+            }
+        } else if (swarmSteps[step]) {
+            swarmSteps[step] = false;
+            sendSwarmStep(step);
+            drawSwarmSeq();
+        }
+    });
+    canvas.addEventListener('pointerup',     () => { dragOp = null; });
+    canvas.addEventListener('pointercancel', () => { dragOp = null; });
+    doSwarmSeqLayout(id);
+}
+
+// Swarm dials: spread, drift, decay, filter, send
+const SWARM_DIAL_IDS   = ['d-sw-spread', 'd-sw-drift', 'd-sw-decay', 'd-sw-filter', 'd-sw-send', 'd-sw-delay', 'd-sw-envamt'];
+const SWARM_DIAL_PARAM = [SW_P.SPREAD, SW_P.DRIFT, SW_P.DECAY, SW_P.CUTOFF, SW_P.REVERB, SW_P.DELAY, SW_P.ENV_AMT];
+
+function drawAllFmSeq() { drawBassSeq(); drawSwarmSeq(); }
+function syncFmAll() { syncBassAll(); syncSwarmAll(); }
+
+// ── Sampler lane ──────────────────────────────────────────────────────────────
+
+function sendSamplerStep(s) {
+    send({ type: 'sampler_set_step', step: s, slice: mutedLanes.smpl ? -1 : samplerSteps[s] });
+}
+function syncSampler() {
+    for (let s = 0; s < NS; s++) sendSamplerStep(s);
+    send({ type: 'sampler_gain', value: dialScaled('d-smpl-vol') || 0.7 });
+}
+
+function buildSamplerWaveform(audio) {
+    const len = audio.length;
+    const slices = SAMPLER_SLICE_FRACS.map(f => Math.floor(f * len));
+    const ch0 = audio.getChannelData(0);
+    const segLen = Math.max(1, Math.floor(len / SMPL_WAVE_POINTS));
+    const wfData = new Float32Array(SMPL_WAVE_POINTS);
+    for (let i = 0; i < SMPL_WAVE_POINTS; i++) {
+        let peak = 0;
+        const start = i * segLen;
+        const end = Math.min(start + segLen, len);
+        for (let j = start; j < end; j++) {
+            const a = Math.abs(ch0[j]);
+            if (a > peak) peak = a;
+        }
+        wfData[i] = peak;
+    }
+    samplerWaveform = wfData;
+    samplerTotalLen = len;
+    samplerSliceOffsets[0] = slices[0];
+    samplerSliceOffsets[1] = slices[1];
+    samplerSliceOffsets[2] = slices[2];
+    drawSamplerWave();
+}
+
+function applySamplerAudio(audio) {
+    _decodedSampleL = audio.getChannelData(0).slice();
+    _decodedSampleR = audio.numberOfChannels > 1 ? audio.getChannelData(1).slice() : null;
+    buildSamplerWaveform(audio);
+}
+
+function sendSamplerToWorklet() {
+    const slices = [...samplerSliceOffsets];
+    const left = _decodedSampleL.slice().buffer;
+    const msg = { type: 'sampler_load', left, slices };
+    const transfer = [left];
+    if (_decodedSampleR) {
+        const right = _decodedSampleR.slice().buffer;
+        msg.right = right;
+        transfer.push(right);
+    }
+    wNode.port.postMessage(msg, transfer);
+}
+
+// Runs on page load — no AudioContext needed
+async function loadSamplerDisplay() {
+    try {
+        const resp = await fetch('rawaudiofiles/858313__newlocknew__noise-resonant-synth-percussionsustained.wav');
+        if (!resp.ok) return;
+        const buf = await resp.arrayBuffer();
+        const tmpCtx = new OfflineAudioContext(1, 1, 48000);
+        const audio = await tmpCtx.decodeAudioData(buf);
+        applySamplerAudio(audio);
+    } catch(e) {
+        console.warn('Sampler display load failed:', e);
+    }
+}
+
+// Runs when audio starts — sends pre-decoded buffers to worklet
+async function loadSampler() {
+    try {
+        if (!_decodedSampleL) {
+            // Display load hasn't finished yet; decode via the live AudioContext
+            const resp = await fetch('rawaudiofiles/858313__newlocknew__noise-resonant-synth-percussionsustained.wav');
+            if (!resp.ok) throw new Error('WAV not found');
+            const buf = await resp.arrayBuffer();
+            const audio = await actx.decodeAudioData(buf);
+            applySamplerAudio(audio);
+        }
+        sendSamplerToWorklet();
+    } catch(e) {
+        console.warn('Sampler load failed:', e);
+    }
+}
+
+async function loadSampleFromFile(file) {
+    try {
+        const buf = await file.arrayBuffer();
+        if (actx) {
+            const audio = await actx.decodeAudioData(buf);
+            applySamplerAudio(audio);
+            if (wNode) sendSamplerToWorklet();
+        } else {
+            const tmpCtx = new OfflineAudioContext(1, 1, 48000);
+            const audio = await tmpCtx.decodeAudioData(buf);
+            applySamplerAudio(audio);
+        }
+        const el = document.getElementById('smpl-filename');
+        if (el) el.textContent = file.name;
+    } catch(e) {
+        console.warn('Sample file load failed:', e);
+    }
+}
+
+function drawSamplerSeqOnCanvas(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const info = canvasInfo[id];
+    if (!info) return;
+    const { cell, seqW: W, seqH: H, mode } = info;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const ch = cell * 0.18;
+    for (let s = 0; s < NS; s++) {
+        let x, y;
+        if (mode === '1x16') { x = colX(s, cell, mode); y = 0; }
+        else { x = colX(s % 8, cell, mode); y = (s >> 3) * (cell + GAP); }
+        const slice = samplerSteps[s];
+        const isPlay = s === currentStep;
+        let fill;
+        if (slice >= 0) fill = isPlay ? SMPL_CLR[slice].play : SMPL_CLR[slice].on;
+        else            fill = isPlay ? '#333' : '#242424';
+        chamferRect(ctx, x, y, cell, cell, ch);
+        ctx.fillStyle = fill;
+        // Dim steps that are on but not the selected slice, so active slice stands out
+        ctx.globalAlpha = (slice >= 0 && slice !== samplerSelectedSlice) ? 0.4 : 1.0;
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
+}
+function drawSamplerSeq() { SMPL_CANVASES.forEach(id => drawSamplerSeqOnCanvas(id)); }
+
+function doSamplerSeqLayout(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const w = canvas.offsetWidth;
+    if (!w) { requestAnimationFrame(() => doSamplerSeqLayout(id)); return; }
+    const dpr  = window.devicePixelRatio || 1;
+    const mode = seqMode();
+    let cell, h;
+    if (mode === '1x16') { cell = Math.max(8, (w - 15*GAP - GROUP_EXTRA) / 16); h = cell; }
+    else                  { cell = Math.max(8, (w -  7*GAP - GROUP_EXTRA) / 8);  h = 2*cell + GAP; }
+    canvas.style.height = h + 'px';
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvasInfo[id] = { cell, seqW: w, seqH: h, mode };
+    drawSamplerSeqOnCanvas(id);
+}
+
+function drawSamplerWave(id = 'smpl-wave') {
+    if (id === 'smpl-wave') { SMPL_WAVE_IDS.forEach(wid => { if (wid !== 'smpl-wave') drawSamplerWave(wid); }); }
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const W = canvas.offsetWidth;
+    const H = SMPL_WAVE_H;
+    if (!W) return;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, W, H);
+
+    if (samplerWaveform) {
+        // Selected region highlight
+        if (samplerTotalLen > 0) {
+            const sel = samplerSelectedSlice;
+            const rStart = samplerSliceOffsets[sel];
+            const rEnd = sel < 2 ? samplerSliceOffsets[sel + 1] : samplerTotalLen;
+            const rx = (rStart / samplerTotalLen) * W;
+            const rw = ((rEnd - rStart) / samplerTotalLen) * W;
+            ctx.fillStyle = 'rgba(255,255,255,0.07)';
+            ctx.fillRect(rx, 0, rw, H);
+        }
+
+        const n = samplerWaveform.length;
+        ctx.fillStyle = '#7B3FDD';
+        for (let i = 0; i < W; i++) {
+            const idx = Math.floor((i / W) * n);
+            const bh = Math.max(1, samplerWaveform[idx] * H * 0.9);
+            ctx.fillRect(i, (H - bh) * 0.5, 1, bh);
+        }
+
+        // Slice markers — selected one is full-brightness, others dimmed
+        const sliceColors = ['#9B59FF', '#FF3B30', '#32E5C8'];
+        for (let si = 0; si < 3; si++) {
+            if (samplerTotalLen <= 0) break;
+            const x = Math.round((samplerSliceOffsets[si] / samplerTotalLen) * W);
+            ctx.fillStyle = sliceColors[si];
+            ctx.globalAlpha = si === samplerSelectedSlice ? 1.0 : 0.35;
+            ctx.fillRect(x, 0, si === samplerSelectedSlice ? 2 : 1, H);
+        }
+        ctx.globalAlpha = 1.0;
+
+        // Playback position line
+        if (samplerIsPlaying && samplerTotalLen > 0) {
+            const pos = samplerStartOffset + (performance.now() - samplerStartTime) * 0.001 * 48000;
+            if (pos >= 0 && pos < samplerTotalLen) {
+                const x = Math.round((pos / samplerTotalLen) * W);
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                ctx.fillRect(x, 0, 2, H);
+            }
+        }
+    }
+}
+
+function animateSamplerWave() {
+    drawSamplerWave();
+    if (samplerIsPlaying) {
+        samplerRafId = requestAnimationFrame(animateSamplerWave);
+    } else {
+        samplerRafId = null;
+        drawSamplerWave(); // final frame without position line
+    }
+}
+
+function initSamplerWaveCanvas(id = 'smpl-wave') {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    // Drag-to-move slice markers only on the primary interactive canvas
+    if (id === 'smpl-wave') {
+        canvas.style.cursor = 'pointer';
+        const DRAG_HIT_PX = 8;
+        let draggingSlice = -1;
+
+        function markerUnderCursor(clientX) {
+            if (!samplerTotalLen) return -1;
+            const rect = canvas.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const W = rect.width;
+            for (let si = 1; si <= 2; si++) {
+                const mx = (samplerSliceOffsets[si] / samplerTotalLen) * W;
+                if (Math.abs(x - mx) <= DRAG_HIT_PX) return si;
+            }
+            return -1;
+        }
+
+        canvas.addEventListener('pointermove', e => {
+            if (!samplerTotalLen) return;
+            if (draggingSlice < 0) {
+                canvas.style.cursor = markerUnderCursor(e.clientX) >= 0 ? 'col-resize' : 'pointer';
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const pos = Math.floor(Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * samplerTotalLen);
+            if (draggingSlice === 1) {
+                samplerSliceOffsets[1] = Math.max(samplerSliceOffsets[0] + 1, Math.min(pos, samplerSliceOffsets[2] - 1));
+            } else {
+                samplerSliceOffsets[2] = Math.max(samplerSliceOffsets[1] + 1, Math.min(pos, samplerTotalLen - 1));
+            }
+            drawSamplerWave();
+        });
+
+        canvas.addEventListener('pointerdown', e => {
+            if (!samplerTotalLen) return;
+            const si = markerUnderCursor(e.clientX);
+            if (si >= 0) {
+                draggingSlice = si;
+                canvas.setPointerCapture(e.pointerId);
+                canvas.style.cursor = 'col-resize';
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width * samplerTotalLen;
+            let slice = 0;
+            if (pos >= samplerSliceOffsets[2]) slice = 2;
+            else if (pos >= samplerSliceOffsets[1]) slice = 1;
+            samplerSelectedSlice = slice;
+            drawSamplerWave();
+            drawSamplerSeq();
+        });
+
+        canvas.addEventListener('pointerup', () => {
+            if (draggingSlice >= 0) {
+                draggingSlice = -1;
+                canvas.style.cursor = 'pointer';
+                if (wNode) send({ type: 'sampler_set_slices', slices: [...samplerSliceOffsets] });
+            }
+        });
+    }
+
+    function layout() {
+        const w = canvas.offsetWidth;
+        if (!w) { requestAnimationFrame(layout); return; }
+        const dpr = window.devicePixelRatio || 1;
+        canvas.style.height = SMPL_WAVE_H + 'px';
+        canvas.width  = Math.round(w * dpr);
+        canvas.height = Math.round(SMPL_WAVE_H * dpr);
+        drawSamplerWave(id);
+    }
+    layout();
+}
+
+function initSamplerSeqCanvas(id) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    function hitStep(e) {
+        const info = canvasInfo[id];
+        if (!info) return -1;
+        const rect = canvas.getBoundingClientRect();
+        const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+        const { cell, mode } = info;
+        if (mode === '1x16') {
+            for (let c = 0; c < 16; c++) { const x = colX(c, cell, mode); if (cx >= x && cx < x+cell) return c; }
+        } else {
+            const row = cy < cell + GAP/2 ? 0 : 1;
+            for (let c = 0; c < 8; c++) { const x = colX(c, cell, mode); if (cx >= x && cx < x+cell) return row*8+c; }
+        }
+        return -1;
+    }
+
+    canvas.addEventListener('pointerdown', e => {
+        const s = hitStep(e);
+        if (s < 0) return;
+        // Toggle: if already on selected slice → off, otherwise → selected slice
+        samplerSteps[s] = samplerSteps[s] === samplerSelectedSlice ? -1 : samplerSelectedSlice;
+        sendSamplerStep(s);
+        drawSamplerSeq();
+        canvas.setPointerCapture(e.pointerId);
+    });
+    doSamplerSeqLayout(id);
+}
+
+// ── Parameters ────────────────────────────────────────────────────────────────
+
+async function initFromParams() {
+    const DEFAULTS = {
+        bpm: 120,
+        dials: {
+            'd-kick-body':   { value: 0.30, min: 0.12, max: 0.90 },
+            'd-kick-click':  { value: 0.85, min: 0.00, max: 1.00 },
+            'd-kick-drive':  { value: 0.00, min: 0.00, max: 0.70 },
+            'd-hat-open':    { value: 0.18, min: 0.02, max: 0.35 },
+            'd-hat-tone':    { value: 0.65, min: 0.45, max: 0.80 },
+            'd-hat-filter':  { value: 0.77, min: 0.55, max: 0.98 },
+            'd-snare-body':  { value: 0.50, min: 0.05, max: 0.85 },
+            'd-snare-crack': { value: 0.40, min: 0.08, max: 0.42 },
+            'd-snare-send':  { value: 0.00 },
+            'd-rv-tail':     { value: 0.80 },
+            'd-fm0-decay':   { value: 0.35 },
+            'd-fm0-filter':  { value: 0.45 },
+            'd-fm0-drive':   { value: 0.00, min: 0.00, max: 0.70 },
+            'd-sw-spread':   { value: 0.45 },
+            'd-sw-drift':    { value: 0.35 },
+            'd-sw-decay':    { value: 0.25 },
+            'd-sw-filter':   { value: 0.55 },
+            'd-sw-send':     { value: 0.00 },
+            'd-sw-delay':    { value: 0.00 },
+            'd-sw-envamt':   { value: 0.00 },
+            'd-smpl-vol':    { value: 0.70 },
+        },
+        bass: { barNotes: [0,1,2,3].map(() => D_MINOR_BASS[Math.floor(Math.random() * D_MINOR_BASS.length)]) },
+        hat:  { stepVelocities: [0.25, 0.5, 1.0, 0.5] },
+    };
+
+    let p = DEFAULTS;
+    try { p = await fetch('params.json').then(r => r.json()); } catch {}
+
+    // Merge loaded dials over defaults, normalise entries to objects
+    const norm = e => (typeof e === 'object' && e !== null) ? e : { value: e };
+    const dialDefs = {};
+    for (const [id, def] of Object.entries(DEFAULTS.dials)) {
+        const loaded = p.dials?.[id];
+        dialDefs[id] = loaded !== undefined ? { ...norm(def), ...norm(loaded) } : norm(def);
+    }
+    const d = id => dialDefs[id]?.value ?? 0;
+
+    // Populate dialLimits for dialScaled()
+    for (const [id, entry] of Object.entries(dialDefs)) {
+        if (entry.min !== undefined || entry.max !== undefined)
+            dialLimits[id] = { min: entry.min ?? 0, max: entry.max ?? 1 };
+    }
+
+    bpm = p.bpm ?? DEFAULTS.bpm;
+    document.getElementById('bpm-in').value = bpm;
+
+    const hv = p.hat?.stepVelocities ?? DEFAULTS.hat.stepVelocities;
+    for (let i = 0; i < NS; i++) stepVel[1][i] = hv[i % hv.length];
+
+    (p.bass?.barNotes ?? DEFAULTS.bass.barNotes).forEach((n, i) => { bassBarNotes[i] = n; });
+
+    initDial('d-kick-body',   d('d-kick-body'),   '#CFFB52', () => sendKickSynth());
+    initDial('d-kick-click',  d('d-kick-click'),  '#CFFB52', () => sendKickSynth());
+    initDial('d-hat-open',    d('d-hat-open'),    '#7DFBFD', () => sendHatSynth());
+    initDial('d-hat-tone',    d('d-hat-tone'),    '#7DFBFD', () => sendHatSynth());
+    initDial('d-snare-body',  d('d-snare-body'),  '#FFBA36', () => sendSnareSynth());
+    initDial('d-snare-crack', d('d-snare-crack'), '#FFBA36', () => sendSnareSynth());
+    initDial('d-kick-drive',  d('d-kick-drive'),  '#CFFB52', () => { if (kickDriveOn) sendKickDrive(); });
+    initDial('d-hat-filter',  d('d-hat-filter'),  '#7DFBFD', () => sendHatFilter());
+    initDial('d-snare-send',  d('d-snare-send'),  '#FFBA36', () => { send({ type: 'set_base', v: 2, param: P.ReverbSend, value: dialScaled('d-snare-send') }); });
+    initDial('d-rv-tail',     d('d-rv-tail'),     '#A9B1BC', () => sendReverb());
+
+    BASS_DIAL_IDS.forEach((id, di) => {
+        initDial(id, d(id), BASS_CLR.on, () => {
+            send({ type:'set_fm_param', voice:0, param:BASS_DIAL_PARAM[di], value:dialScaled(id) });
+        });
+    });
+
+    SWARM_DIAL_IDS.forEach((id, di) => {
+        initDial(id, d(id), SWARM_CLR.on, () => {
+            send({ type:'set_swarm_param', param:SWARM_DIAL_PARAM[di], value:dialScaled(id) });
+        });
+    });
+
+    initDial('d-smpl-vol', d('d-smpl-vol'), '#9B59FF', () => {
+        send({ type: 'sampler_gain', value: dialScaled('d-smpl-vol') });
+    });
+
+    updateBarNoteBtns();
+}
+
+// ── Resize ────────────────────────────────────────────────────────────────────
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        VOICE_CANVASES.forEach((ids, v) => ids.forEach(id => doSeqLayout(v, id)));
+        doBassSeqLayout(BASS_CANVAS_ID);
+        doSwarmSeqLayout(SWARM_CANVAS_ID);
+        SMPL_CANVASES.forEach(id => doSamplerSeqLayout(id));
+        SMPL_WAVE_IDS.forEach(id => initSamplerWaveCanvas(id));
+        doHatLaneLayout();
+    }, 120);
+});
+
+// ── Instrument panel tabs ─────────────────────────────────────────────────────
+
+document.querySelectorAll('.ptab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel-inst').forEach(p => p.classList.add('pi-hidden'));
+        tab.classList.add('active');
+        document.getElementById('pi-' + tab.dataset.pi).classList.remove('pi-hidden');
+    });
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+VOICE_CANVASES.forEach((ids, v) => ids.forEach(id => initSeqCanvas(v, id)));
+initBassSeqCanvas(BASS_CANVAS_ID);
+initSwarmSeqCanvas(SWARM_CANVAS_ID);
+SMPL_CANVASES.forEach(id => initSamplerSeqCanvas(id));
+SMPL_WAVE_IDS.forEach(id => initSamplerWaveCanvas(id));
+loadSamplerDisplay();
+initHatLane();
+initFromParams();
+updateMuteBtn();
+updatePlayBtn();
+</script>
+</body>
+</html>

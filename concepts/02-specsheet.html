@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt Groovebox — Tracker flexibility, none of the hex</title>
+
+<!-- Real app screens: tokens, fonts and icons lifted from the app. Scoped under .jolt-mock. -->
+<link rel="stylesheet" href="../mockup-screens.css">
+
+<style>
+/* ─────────────────────────────────────────────────────────────
+   JOLT GROOVEBOX / LANDING CONCEPT 02 — "SPEC SHEET"  (v2)
+   The specification is the page. One list on the page and the
+   spec sheet is it; everything around it stays lean.
+   ───────────────────────────────────────────────────────────── */
+
+@font-face{font-family:'Geist Mono';src:url(../geist/GeistMono/webfonts/GeistMono-Regular.woff2) format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Geist Mono';src:url(../geist/GeistMono/webfonts/GeistMono-Medium.woff2) format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Geist Mono';src:url(../geist/GeistMono/webfonts/GeistMono-Bold.woff2) format('woff2');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra Petch';src:url(../fonts/ChakraPetch-Bold.ttf) format('truetype');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra Petch';src:url(../fonts/ChakraPetch-SemiBold.ttf) format('truetype');font-weight:600;font-style:normal;font-display:swap}
+
+:root{
+  --ground:#0B0C0F; --s1:#14161D; --s2:#1E222C; --line:#3A3F4B;
+  --text:#EDEFF3;   --muted:#8B93A6;
+  --cyan:#7DFBFD;   --orange:#FF6A00; --acid:#E8FF00;
+
+  --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:'Chakra Petch',system-ui,sans-serif;
+
+  --hair:rgba(58,63,75,.5);
+  --gut:clamp(20px,4vw,44px);
+  --pad:clamp(5rem,10vw,9rem);
+}
+
+/* Re-assert the app's own tokens inside the mockup, so the page's
+   :root cannot bleed into the screens. */
+.jolt-mock{
+  --ground:#0B0C0F; --surface-1:#14161D; --surface-2:#1E222C; --line:#3A3F4B;
+  --text:#EDEFF3; --muted:#8B93A6; --accent:#7DFBFD;
+  --mono:'GeistMono-Regular','Geist Mono',ui-monospace,monospace;
+  --mono-med:'GeistMono-Medium','Geist Mono',ui-monospace,monospace;
+}
+
+*{box-sizing:border-box}
+html{background:var(--ground);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ground);color:var(--text);
+  font-family:var(--mono);font-weight:400;font-size:14px;line-height:1.65;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img,svg{display:block}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gut)}
+
+/* ── Chamfer primitives ───────────────────────────────────────
+   clip-path can't take a border, so an outer element in --line
+   carries a 1px-inset inner in the surface colour. */
+.cham{
+  --cut:12px;--fill:var(--s1);--edge:var(--line);
+  background:var(--edge);padding:1px;
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+.cham>.in{
+  clip-path:polygon(calc(var(--cut) - 1px) 0,100% 0,100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,0 100%,0 calc(var(--cut) - 1px));
+  background:var(--fill);height:100%;width:100%;
+}
+.cham.q{clip-path:polygon(var(--cut) 0,calc(100% - var(--cut)) 0,100% var(--cut),100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,var(--cut) 100%,0 calc(100% - var(--cut)),0 var(--cut))}
+.cham.q>.in{clip-path:polygon(calc(var(--cut) - 1px) 0,calc(100% - var(--cut) + 1px) 0,100% calc(var(--cut) - 1px),100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,calc(var(--cut) - 1px) 100%,0 calc(100% - var(--cut) + 1px),0 calc(var(--cut) - 1px))}
+
+/* ── Type utilities ─────────────────────────────────────────── */
+.kick{font-family:var(--mono);font-weight:500;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.kick.on{color:var(--cyan)}
+.idx{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.1em;line-height:1;color:var(--line)}
+h1,h2,h3{font-family:var(--disp);font-weight:700;text-transform:uppercase;margin:0;letter-spacing:.005em}
+
+/* ── Nav ────────────────────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:60;background:rgba(11,12,15,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--hair)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:60px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand .wm{height:15px;width:auto}
+.brand .nm{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.nav .plate{margin-left:auto;display:flex;gap:24px;align-items:center}
+.nav .plate .kick{white-space:nowrap}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.btn{--cut:10px;display:inline-flex;text-decoration:none}
+.btn>.in{
+  display:inline-flex;align-items:center;gap:10px;padding:0 18px;height:38px;
+  font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--text);white-space:nowrap;
+}
+.btn:hover{--edge:var(--cyan)}
+.btn:hover>.in{color:var(--cyan)}
+.btn.pri{--edge:var(--cyan);--fill:var(--cyan)}
+.btn.pri>.in{color:#04070A;font-weight:700}
+.btn.pri:hover{--fill:#B4FDFE;--edge:#B4FDFE}
+.btn.pri:hover>.in{color:#04070A}
+.btn.lg>.in{height:46px;padding:0 26px;font-size:12px}
+.acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.hero{padding:clamp(56px,7vw,96px) 0 0;position:relative;overflow:hidden}
+.hero::before{
+  content:'';position:absolute;left:50%;top:-220px;width:1200px;height:720px;transform:translateX(-50%);
+  background:radial-gradient(ellipse at center,rgba(125,251,253,.07),transparent 66%);pointer-events:none;
+}
+.hero .wrap{position:relative}
+h1{font-size:clamp(34px,6.4vw,80px);line-height:.96;margin:22px 0 0;max-width:16ch}
+h1 .dim{color:var(--muted)}
+.deck{margin:30px 0 0;color:var(--muted);font-size:clamp(13px,1.2vw,15.5px);letter-spacing:.01em;max-width:64ch}
+.deck b{color:var(--text);font-weight:500}
+.hero .acts{margin:34px 0 0}
+
+/* ── Fig. 01 — the real screen, annotated ───────────────────── */
+.fig{margin:0;padding:clamp(48px,6vw,86px) 0 var(--pad)}
+.figrail{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  border-bottom:1px solid var(--hair);padding-bottom:9px;margin-bottom:clamp(20px,2.4vw,30px)}
+.figframe{--cut:22px;--fill:#04060A;max-width:1080px;margin:0 auto;
+  box-shadow:0 46px 130px -40px rgba(0,0,0,.95),0 0 210px -70px rgba(125,251,253,.45)}
+.figframe>.in{display:block;padding:13px}
+
+/* neutralise the mockup's own bezel — this page frames it in a chamfer instead */
+.jolt-mock.device{background:transparent;border:0;border-radius:0;padding:0;box-shadow:none;width:auto}
+.jolt-mock .viewport{border-radius:0;overflow:visible;position:relative;margin:0 auto}
+
+.mk{
+  position:absolute;z-index:5;width:21px;height:21px;margin:-10px 0 0 -10px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--cyan);color:#04070A;font-family:var(--mono);font-weight:700;font-size:11px;line-height:1;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+  box-shadow:0 0 0 3px rgba(4,6,10,.92),0 0 18px rgba(125,251,253,.55);
+}
+.legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;
+  margin:clamp(26px,3vw,38px) auto 0;padding:0;border-top:1px solid var(--line);max-width:1080px}
+.legend li{list-style:none;padding:16px 22px 2px 0;border-right:1px solid var(--hair)}
+.legend li:last-child{border-right:0}
+.legend li:not(:first-child){padding-left:22px}
+.legend .n{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--cyan);display:block;margin-bottom:9px;letter-spacing:.1em}
+.legend p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.66}
+.legend p b{color:var(--text);font-weight:500}
+
+/* ── Note ───────────────────────────────────────────────────── */
+.note{border-top:1px solid var(--line);padding:var(--pad) 0}
+.note .wrap{display:grid;grid-template-columns:210px minmax(0,1fr);gap:clamp(22px,4vw,64px)}
+.note p{margin:0;font-size:clamp(15px,1.55vw,19px);line-height:1.66;color:var(--muted);max-width:62ch}
+.note p b{color:var(--text);font-weight:500}
+.note p+p{margin-top:1.5em;font-size:clamp(13px,1.2vw,15px);line-height:1.72}
+.side{display:flex;flex-direction:column;gap:8px;padding-top:6px}
+
+/* ── Spec sheet — the one list on the page ──────────────────── */
+.spec{border-top:1px solid var(--line);padding:var(--pad) 0}
+.spechead{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:clamp(28px,3.5vw,46px)}
+.spechead h2{font-size:clamp(22px,3vw,34px);line-height:1}
+.specgrid{display:grid;grid-template-columns:1fr 1.62fr 1.16fr .96fr;gap:0}
+.sc{padding:0 clamp(16px,2vw,30px);border-left:1px solid var(--line)}
+.sc:first-child{padding-left:0;border-left:0}
+.sc:last-child{padding-right:0}
+
+.ghead{display:flex;align-items:flex-end;gap:10px;min-height:52px;padding-bottom:11px;border-bottom:1px solid var(--text);margin-bottom:2px}
+.ghead .idx{color:var(--cyan)}
+.ghead h3{font-size:14px;letter-spacing:.05em;line-height:1.2}
+.ghead .ref{margin-left:auto;font-size:9.5px;letter-spacing:.16em;color:var(--line);text-transform:uppercase;font-weight:500;white-space:nowrap}
+
+.grp{margin:26px 0 2px;display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;border-bottom:1px solid var(--hair);padding-bottom:8px}
+.grp .t{font-weight:700;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text);white-space:nowrap}
+.grp .c{margin-left:auto;font-size:9.5px;letter-spacing:.14em;color:var(--muted);text-align:right}
+
+.r{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--hair)}
+.r:last-child{border-bottom:0}
+.r .k{font-size:11.5px;font-weight:500;letter-spacing:.075em;text-transform:uppercase;color:var(--text);line-height:1.4}
+.r .v{font-size:11.5px;font-weight:500;color:var(--cyan);letter-spacing:.06em;text-align:right;white-space:nowrap}
+.r .v.q{color:var(--muted)}
+.r .d{grid-column:1/-1;margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.6}
+.r.hi{background:linear-gradient(90deg,rgba(125,251,253,.075),transparent 80%);margin:0 -10px;padding:9px 10px}
+.r.hi .k{color:var(--cyan)}
+.inv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px}
+.inv.one{grid-template-columns:1fr}
+.fxnote{margin:14px 0 0;font-size:10.5px;line-height:1.68;color:var(--muted)}
+.fxnote b{font-weight:700;color:var(--cyan);margin-right:4px}
+
+.endcard{margin-top:30px;--cut:14px;--fill:var(--s1)}
+.endcard>.in{padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.endcard p{margin:0;font-size:11px;line-height:1.62;color:var(--muted)}
+
+/* ── Demo ───────────────────────────────────────────────────── */
+.demo{border-top:1px solid var(--line);padding:var(--pad) 0}
+.demo .wrap{display:grid;grid-template-columns:210px minmax(0,1fr);gap:clamp(22px,4vw,64px)}
+.demo h2{font-size:clamp(21px,2.6vw,32px);line-height:1.04;margin:0 0 18px}
+.demo p{margin:0 0 26px;color:var(--muted);font-size:clamp(13px,1.2vw,15px);max-width:60ch}
+.demo p b{color:var(--text);font-weight:500}
+
+/* ── Final CTA ──────────────────────────────────────────────── */
+.cta{border-top:1px solid var(--line);padding:clamp(3.5rem,6vw,5.5rem) 0}
+.cta .wrap{display:flex;flex-wrap:wrap;gap:26px 44px;align-items:center;justify-content:space-between}
+.cta h2{font-size:clamp(20px,2.4vw,30px);line-height:1.05;max-width:22ch}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+footer{border-top:1px solid var(--line);padding:26px 0 46px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 30px;align-items:center}
+footer .kick{color:var(--line)}
+footer a.kick:hover{color:var(--cyan)}
+.endorse{display:flex;align-items:center;gap:9px}
+.endorse img.dial{height:17px;width:auto;opacity:.6;filter:invert(1)}
+.endorse img.wm{height:9px;width:auto;filter:invert(1);opacity:.45}
+footer .r2{margin-left:auto;display:flex;gap:24px;flex-wrap:wrap}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width:1180px){
+  .specgrid{grid-template-columns:1fr 1.5fr;row-gap:46px}
+  .sc:nth-child(3){padding-left:0;border-left:0}
+  .sc:nth-child(2){padding-right:0}
+  .legend{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .legend li:nth-child(2n){border-right:0}
+}
+@media (max-width:900px){
+  .note .wrap,.demo .wrap{grid-template-columns:1fr;gap:20px}
+  .mk{width:18px;height:18px;font-size:10px;margin:-9px 0 0 -9px}
+}
+@media (max-width:680px){
+  .specgrid{grid-template-columns:1fr;row-gap:40px}
+  .sc{padding:0;border-left:0}
+  .inv{grid-template-columns:1fr}
+  .legend{grid-template-columns:1fr}
+  .legend li{border-right:0;border-bottom:1px solid var(--hair);padding-left:0!important;padding-bottom:14px}
+  .legend li:last-child{border-bottom:0}
+  h1{font-size:34px}
+  .nav .plate .kick{display:none}
+  .mk{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <img class="wm" src="assets/marks/jolt-wordmark.svg" alt="Jolt" width="50" height="15">
+      <span class="nm">Groovebox</span>
+    </a>
+    <div class="plate">
+      <span class="kick">iOS &nbsp;/&nbsp; iPhone + iPad</span>
+      <a class="cham btn" href="#appstore"><span class="in">App&nbsp;Store</span></a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ 01 · HERO ═════════════════════════════════════════════ -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <p class="kick on" style="margin:0">iOS Groovebox</p>
+    <h1>Tracker flexibility.<br><span class="dim">None of the hex.</span></h1>
+    <p class="deck"><b>Groovebox simplicity, tracker flexibility.</b> Eight voices, each with its own step sequencer. Any voice plays any instrument on any step — the step carries the instrument, not the lane.</p>
+    <div class="acts">
+      <a class="cham btn pri lg" href="#appstore"><span class="in">Download on the App Store</span></a>
+      <a class="cham btn lg" href="../onboarding2.html"><span class="in">Play the browser demo</span></a>
+    </div>
+
+    <!-- ══ 02 · FIG. 01 — the real pattern editor, annotated ══ -->
+    <figure class="fig">
+      <div class="figrail">
+        <span class="kick">Fig. 01 — Pattern editor, iPad</span>
+        <span class="kick">Real interface · staged content</span>
+      </div>
+
+      <div class="cham q figframe"><div class="in">
+        <div class="jolt-mock device"><div class="viewport"><div class="screen pad" id="scr-editor-pad">
+          <div class="bar top">
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+            <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+            <span class="song-title" style="margin-left:4px">Pattern</span>
+            <span class="spacer"></span>
+            <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+            <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+          </div>
+          <div class="edit-body edit-cols">
+            <div class="ecol-l">
+              <div class="subnav">
+                <span class="name">Pattern</span>
+                <span class="icons">
+                  <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+                </span>
+              </div>
+              <div class="pagebar">
+                <div class="pageseq">
+                  <span class="pg label">Page</span>
+                  <span class="pg num on">1</span>
+                  <span class="pg num playing">2</span>
+                  <span class="pg num">3</span>
+                  <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/></svg></span>
+                </div>
+                <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+              </div>
+              <div class="steps big" id="stepgrid-pad"></div>
+              <div class="instr-strip">
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+                <div class="chips">
+                  <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+                  <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+                  <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+                  <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                  <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                  <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="ecol-r">
+              <div class="tabcard">
+                <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+                <div class="panel">
+                  <div class="cluster"><div class="ch">Sound</div>
+                    <div class="dial-row">
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+                    </div>
+                  </div>
+                  <div class="cluster"><div class="ch">Filter</div>
+                    <div class="dial-row">
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.55"></span><span class="val">55</span></span><span class="cap">Cutoff</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.3"></span><span class="val">30</span></span><span class="cap">Resonance</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.4"></span><span class="val">40</span></span><span class="cap">Env Amt</span></div>
+                    </div>
+                  </div>
+                  <div class="cluster"><div class="ch">F. Env</div>
+                    <div class="dial-row">
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.1"></span><span class="val">10</span></span><span class="cap">Attack</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.7"></span><span class="val">70</span></span><span class="cap">Sustain</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.35"></span><span class="val">35</span></span><span class="cap">Release</span></div>
+                    </div>
+                  </div>
+                  <div class="cluster"><div class="ch">Noise</div>
+                    <div class="dial-row">
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.2"></span><span class="val">20</span></span><span class="cap">Level</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.6"></span><span class="val">60</span></span><span class="cap">Color</span></div>
+                    </div>
+                  </div>
+                  <div class="cluster"><div class="ch">Amp</div>
+                    <div class="dial-row">
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.05"></span><span class="val">5</span></span><span class="cap">Attack</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Decay</span></div>
+                      <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bar bottom">
+            <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+            <span class="chip txt"><i>Solo</i></span>
+            <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+            <span class="spacer"></span>
+            <span class="chip txt"><i>VIZ</i></span>
+            <span class="chip txt"><i>FX</i></span>
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+          </div>
+        </div></div></div>
+      </div></div>
+
+      <ol class="legend">
+        <li><span class="n">1</span><p><b>Pages.</b> Sixteen steps to a page, four pages here. A pattern runs to sixty-four steps — programmed, played in over MIDI, or generated.</p></li>
+        <li><span class="n">2</span><p><b>One voice's lane.</b> Sixteen steps as two rows of eight. Every lit step carries its own instrument, in that instrument's colour — kick, hat, snare and chord inside one bar, on one voice. Steps also hold ratchet counts and slice letters.</p></li>
+        <li><span class="n">3</span><p><b>Instrument palette.</b> Pick the instrument, then write steps with it. The lane is a voice, not an instrument.</p></li>
+        <li><span class="n">4</span><p><b>Editor panel.</b> On iPad the sound clusters merge onto one surface. On iPhone the same controls sit behind sub-tabs.</p></li>
+      </ol>
+    </figure>
+  </div>
+</header>
+
+<!-- ══ 03 · NOTE ═════════════════════════════════════════════ -->
+<section class="note">
+  <div class="wrap">
+    <div class="side">
+      <span class="kick on">Note 01</span>
+      <span class="kick">Design intent</span>
+    </div>
+    <div>
+      <p>Grooveboxes lock an instrument to a track. Trackers don't — and that is the single most useful thing a tracker does. <b>Jolt keeps the tracker's per-step instrument assignment and throws away the column of hex.</b></p>
+      <p>The other half is knowing when to stop. An all-at-once view of every voice was built, then removed: past a certain song complexity nobody could follow what was happening. Legibility over density, both times.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 · SPECIFICATIONS — the one list on this page ════════ -->
+<section class="spec" id="spec">
+  <div class="wrap">
+    <div class="spechead">
+      <h2>Specifications</h2>
+      <span class="kick">Jolt Groovebox &nbsp;/&nbsp; iOS</span>
+    </div>
+
+    <div class="specgrid">
+
+      <!-- 01 SEQUENCER -->
+      <div class="sc">
+        <div class="ghead"><span class="idx">01</span><h3>Sequencer</h3><span class="ref">SEQ</span></div>
+
+        <div class="r"><span class="k">Voices</span><span class="v">8</span></div>
+        <div class="r"><span class="k">Step sequencers</span><span class="v">8</span>
+          <p class="d">One per voice, independent.</p></div>
+        <div class="r"><span class="k">Pattern length</span><span class="v">≤ 64 steps</span></div>
+        <div class="r hi"><span class="k">Per-step instrument</span><span class="v">Yes</span>
+          <p class="d">Any voice plays any instrument on any step. Multiple instruments mix into a single pattern.</p></div>
+        <div class="r"><span class="k">Step entry</span><span class="v q">3 methods</span>
+          <p class="d">Programmed · MIDI input · generative.</p></div>
+        <div class="r"><span class="k">Song mode</span><span class="v q">Chained</span>
+          <p class="d">Patterns chain into songs, with automation.</p></div>
+        <div class="r"><span class="k">Performance mode</span><span class="v q">Live</span>
+          <p class="d">Live parameter control while the song runs.</p></div>
+        <div class="r"><span class="k">External MIDI seq.</span><span class="v q">Light</span></div>
+      </div>
+
+      <!-- 02 INSTRUMENTS & EFFECTS -->
+      <div class="sc">
+        <div class="ghead"><span class="idx">02</span><h3>Instruments &amp; Effects</h3><span class="ref">INS · FX</span></div>
+
+        <div class="grp"><span class="t">Instruments</span><span class="c">4 engines</span></div>
+        <div class="inv one">
+          <div class="r"><span class="k">Classic Synth</span><span class="v">Wavetable</span>
+            <p class="d">4 modes — spread, 2-op FM, paraphony, in-scale chords.</p></div>
+          <div class="r"><span class="k">Macro Synth</span><span class="v">16 sub-synths</span>
+            <p class="d">Built on the architecture of a classic Eurorack module.</p></div>
+          <div class="r"><span class="k">Sampler</span><span class="v">Pitched / slicing</span>
+            <p class="d">Old-skool repitching, per-step reversing, mic recording, mp3 and wav loading.</p></div>
+          <div class="r"><span class="k">Drum Synth</span><span class="v">x0x-style</span>
+            <p class="d">Hats, snares, heavy kicks.</p></div>
+        </div>
+
+        <div class="grp"><span class="t">Insert effects</span><span class="c">any instrument · any number · any order</span></div>
+        <div class="inv">
+          <div class="r"><span class="k">Overdrive</span><span class="v q">01</span></div>
+          <div class="r"><span class="k">Saturator</span><span class="v q">02</span></div>
+          <div class="r"><span class="k">Chorus</span><span class="v q">03</span></div>
+          <div class="r"><span class="k">Filter</span><span class="v q">04</span></div>
+          <div class="r"><span class="k">Band / EQ</span><span class="v q">05</span></div>
+          <div class="r"><span class="k">Erode</span><span class="v q">06</span></div>
+          <div class="r"><span class="k">Bitcrush</span><span class="v q">07</span></div>
+          <div class="r"><span class="k">Sample rate red.</span><span class="v q">08</span></div>
+          <div class="r"><span class="k">Phaser</span><span class="v q">09</span></div>
+          <div class="r"><span class="k">Gater</span><span class="v q">10</span></div>
+          <div class="r"><span class="k">Stereo pan</span><span class="v q">11</span></div>
+        </div>
+        <p class="fxnote">
+          <b>04</b> 4-stage ladder, or resonant SVF (LP / HP / BP), with mod envelope. &nbsp;
+          <b>10</b> 16-step, synced.
+        </p>
+      </div>
+
+      <!-- 03 MODULATION & ROUTING -->
+      <div class="sc">
+        <div class="ghead"><span class="idx">03</span><h3>Modulation</h3><span class="ref">MOD · SEND</span></div>
+
+        <div class="r"><span class="k">LFO</span><span class="v">Per instrument</span>
+          <p class="d">Sine, ramp, random. Freely assignable.</p></div>
+        <div class="r"><span class="k">Pattern automation</span><span class="v">Lane</span></div>
+        <div class="r"><span class="k">Song automation</span><span class="v">Lane</span>
+          <p class="d">Bar-to-bar, or real-time fader override.</p></div>
+
+        <div class="grp"><span class="t">Send buses</span><span class="c">4</span></div>
+        <div class="r"><span class="k">Reverb</span><span class="v q">Plate</span></div>
+        <div class="r"><span class="k">Delay</span><span class="v q">Ping-pong</span>
+          <p class="d">Synced, with feedback.</p></div>
+        <div class="r"><span class="k">Multi-tap</span><span class="v q">8 taps</span></div>
+        <div class="r"><span class="k">Sidechain</span><span class="v q">Kick-keyed</span></div>
+
+        <div class="grp"><span class="t">Global macros</span><span class="c">up to 5</span></div>
+        <div class="r"><span class="k">Reverb</span><span class="v q">M</span></div>
+        <div class="r"><span class="k">Delay</span><span class="v q">M</span></div>
+        <div class="r"><span class="k">Phaser</span><span class="v q">M</span></div>
+        <div class="r"><span class="k">Beat repeat</span><span class="v q">M</span></div>
+        <div class="r"><span class="k">DJ filter — LP</span><span class="v q">Resonant</span></div>
+        <div class="r"><span class="k">DJ filter — HP</span><span class="v q">Resonant</span></div>
+      </div>
+
+      <!-- 04 PLATFORM -->
+      <div class="sc">
+        <div class="ghead"><span class="idx">04</span><h3>Platform</h3><span class="ref">SYS</span></div>
+
+        <div class="r"><span class="k">Devices</span><span class="v">iPhone · iPad</span>
+          <p class="d">iPhone portrait. iPad landscape.</p></div>
+        <div class="r hi"><span class="k">iPad layout</span><span class="v">Merged</span>
+          <p class="d">Editor clusters on one surface, three note lanes instead of one, all four composer segments visible. More controls resident, less menu-diving.</p></div>
+        <div class="r"><span class="k">MIDI in</span><span class="v q">Note entry</span></div>
+        <div class="r"><span class="k">MIDI out</span><span class="v q">Light seq.</span></div>
+        <div class="r"><span class="k">Audio in</span><span class="v q">Mic → sampler</span></div>
+        <div class="r"><span class="k">File import</span><span class="v q">mp3 · wav</span></div>
+        <div class="r"><span class="k">Demo</span><span class="v"><a href="../onboarding2.html" style="color:var(--cyan)">Browser →</a></span></div>
+
+        <div class="cham q endcard">
+          <div class="in">
+            <span class="kick on">End of sheet</span>
+            <p>Everything listed above ships in the app.</p>
+            <a class="cham btn pri" href="#appstore"><span class="in">App Store</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 · DEMO ═════════════════════════════════════════════ -->
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="side">
+      <span class="kick on">Note 02</span>
+      <span class="kick">Browser demo</span>
+    </div>
+    <div>
+      <h2>A slice of the engine</h2>
+      <p>The app's real DSP, compiled to WebAssembly and put behind a simple sequencer in your browser. It is <b>not the app</b> — it is the sound, and a step under your finger. Nothing to install.</p>
+      <div class="acts">
+        <a class="cham btn lg" href="../onboarding2.html"><span class="in">Open the browser demo</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FINAL CTA ═════════════════════════════════════════════ -->
+<section class="cta" id="appstore">
+  <div class="wrap">
+    <h2>A groovebox you don't outgrow</h2>
+    <div class="acts">
+      <span class="kick">iPhone &nbsp;·&nbsp; iPad</span>
+      <a class="cham btn pri lg" href="#appstore"><span class="in">Download on the App Store</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="endorse">
+      <img class="dial" src="assets/marks/lhmp-dial-jolt.svg" alt="" width="17" height="17">
+      <span class="kick">By</span>
+      <img class="wm" src="assets/marks/lhmp-wordmark-chamfer.svg" alt="LHMP" width="30" height="9">
+    </span>
+    <span class="kick">Jolt Groovebox · iOS</span>
+    <span class="r2">
+      <a class="kick" href="#spec">Specifications</a>
+      <a class="kick" href="../onboarding2.html">Demo</a>
+      <a class="kick" href="../privacy.html">Privacy</a>
+      <a class="kick" href="#appstore">App Store</a>
+    </span>
+  </div>
+</footer>
+
+<script src="../mockup-screens.js"></script>
+<script>
+/* Fig.01 callouts — anchored to real elements in the embedded screen so the
+   numbers stay on their features at any scale. No network requests. */
+(function(){
+  var SCREEN = document.getElementById('scr-editor-pad');
+  if(!SCREEN) return;
+  var vp = SCREEN.closest('.viewport');
+  var marks = [
+    {n:1, sel:'.pageseq',           ax:1,   ay:0.5, dx:26,  dy:0},
+    {n:2, sel:'.steps.big',         ax:0,   ay:0,   dx:-4,  dy:-4},
+    {n:3, sel:'.instr-strip .chips',ax:1,   ay:0.5, dx:22,  dy:0},
+    {n:4, sel:'.ecol-r .tabcard',   ax:0,   ay:0,   dx:-2,  dy:-2}
+  ];
+  var els = marks.map(function(m){
+    var s = document.createElement('span');
+    s.className = 'mk'; s.textContent = m.n; s.setAttribute('aria-hidden','true');
+    vp.appendChild(s); return s;
+  });
+  function place(){
+    var vr = vp.getBoundingClientRect();
+    marks.forEach(function(m,i){
+      var t = SCREEN.querySelector(m.sel);
+      if(!t){ els[i].style.display='none'; return; }
+      var r = t.getBoundingClientRect();
+      els[i].style.left = (r.left - vr.left + r.width  * m.ax + m.dx) + 'px';
+      els[i].style.top  = (r.top  - vr.top  + r.height * m.ay + m.dy) + 'px';
+    });
+  }
+  place();
+  addEventListener('resize', place);
+  addEventListener('load', place);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+})();
+</script>
+</body>
+</html>

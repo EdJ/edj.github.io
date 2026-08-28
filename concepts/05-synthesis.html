@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt Groovebox — Groovebox simplicity, Tracker flexibility</title>
+<meta name="description" content="Jolt is an iOS groovebox. 8 voices, 4 instrument engines, 64-step patterns. Any voice plays any instrument on any step.">
+<link rel="stylesheet" href="../mockup-screens.css">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   FONTS
+   ───────────────────────────────────────────────────────────── */
+@font-face{font-family:'Geist Mono';src:url('../geist/GeistMono/webfonts/GeistMono-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Geist Mono';src:url('../geist/GeistMono/webfonts/GeistMono-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Geist Mono';src:url('../geist/GeistMono/webfonts/GeistMono-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra Petch';src:url('../fonts/ChakraPetch-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra Petch';src:url('../fonts/ChakraPetch-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Geist Pixel';src:url('../geist/GeistPixel/webfonts/GeistPixel-Grid.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+
+/* ─────────────────────────────────────────────────────────────
+   TOKENS
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --ground:#0B0C0F;
+  --s1:#14161D;
+  --s2:#1E222C;
+  --line:#3A3F4B;
+  --text:#EDEFF3;
+  --muted:#8B93A6;
+  --cyan:#7DFBFD;      /* state and accent only */
+  --orange:#FF6A00;    /* subordinate */
+  --acid:#E8FF00;      /* rare, high impact */
+
+  /* InstrumentColors.fixed — the app's own instrument palette */
+  --i-kick:#7DFBFD;  --i-snare:#CFFB52;  --i-hat:#FF9500;  --i-chord:#EA3EE7;
+
+  --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:'Chakra Petch','Geist Mono',sans-serif;
+  --pix:'Geist Pixel','Geist Mono',monospace;
+
+  --maxw:1180px;
+
+  --ic-kick: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAAThJREFUeAHtlkESgzAMA2mH/3+5nd7MHoIhcYBKPcXjxjYbKbAs/pmACSgTeBU8/KegZiw5dOZ3rKy4NgDFU4/PPMJP9PyImnFG1o+537qrny1AnGqxvALO+IeePFOjR2jsz1qH5pFXgAFQP2pxxi/0XGbPTI6cj72b89oCxKUWyytgveDE6dmmR6vnk1eAAVRL7O71Z9wBe57fy5cytAVK8T6guBXwgEMqHdEKKMX7gOLyCpjxHcBv/Uvf+xSlvAIMgJJQizN3wN08zDuEZ8Z5md/EtsAGh2Agr4DMHUBd0GP0JPPcfzRmfe7v6ievAAOgntTiM/6hJ1mD+dFM9/ox3+xvCzTxCCTlFZDxCz2d2RO1w/0xl1n39mvul1eAAWQ06P+YgAmYgAmYgAmYgAmYgAmYwL8R+AJfQBVoFXghTgAAAABJRU5ErkJggg==);
+  --ic-snare: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAATdJREFUeAHtV0ESAjEMWh3//2X1upxMgm0a8NaxJYRAq9fljxWwAsoKPBLNv+FMBgMgSssSn2ep9IDDFmDAEEstMPJbymCCPbWeI5CYwKgj8g5g3AHoCGpGv+BsvBtfeQdYgJsfBBf/uANQxmiGo/uxXmjtCITkGrhZ3gEDZ+qWrIAVCCjA+B2A73agPGVrqQf5V8ACUEx4MEgmP5j5DAZTshIfR4A5ihOx5B3wS35LGdvgihBfeQdYgA0WbVXSDmg1jg1k7IANorcq+UqwCb2zCfzoEeQTOu8IhOQauFneAZk7AP8/lDJIMFWJj7wDLADBgkdDZO4AbBgziN+3XjsCrcezgJy8AzL5xXc/g8GcbYmPvAMsANOLJ2Ix8osZXK1DqQdHYPW4utWTd0C3gZiPFbACaxX4AOnfFGZrsd+3AAAAAElFTkSuQmCC);
+  --ic-hihat: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAAQBJREFUeAHtlUEOgzAQAyni/19uxQ0QigFhirPTU0skxzv2lmHgAwEIQAACEIBAVQKfPwz+FXc+6mkUZro/BkD3EYsBaYAA1P0xDeg+YjHglXeueo+LK+3Hp2ZiBex5vPyC8g04si9q549oLHvwKr3yDQDAspsVv087Q2939OyO70haHyl/zXlYAWs2AeLlG6D2Z85wu0MBua4sNmcs3wAArMpS8EdzP0w81H/Ko55YAVPKMbI0ICYqk1EaYAIbI0sDYqIyGaUBJrAxsjQgJiqTURpgAhsjSwNiojIZpQEmsDGyNCAmKpNRGmACGyNbvgExSWEUAhCAAAQgAIHbCfwAHEIJXyBvFwIAAAAASUVORK5CYII=);
+  --ic-chord: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAAS1JREFUeAHtl0EOgzAMBGnV/3+5vY+CYjcmUbLbW4gBM8wa9br8MwETUCbw2uDhv+ixtOc3Li63NAC5V44HLs0Trv3v8tHMsylHgETU1vIGrJgBzDilY0+s5z7PT63lDTCAlC8HFpfm6YYPM3xTFj5c2rMjEOZ+aKG8AaV5CkrSmwnsifXcD962XSZvgAG0xdA5+lnwqKUZHu3fERgluPv58gasmAH8rlOiqTNC3gADoH9q6xl562U+y7y0Z0cgi/+0enkDSvMUtKM3E9gT67kfvG27TN4AA2iLoXN0xX+B0gyPvipHYJTg7ufLG7BiBvC7Tommzgh5AwyA/qmtZ+Stl/ks89KeHYEs/tPq5Q0ozVPQjt5MmNqTvAEGENTWZSZgAiZgAiZgAiZwHIEfSqcOanFO1aYAAAAASUVORK5CYII=);
+}
+
+*{box-sizing:border-box}
+html{background:var(--ground);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ground);color:var(--text);
+  font-family:var(--mono);font-size:14px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ── chamfer helpers: corners cut, never rounded ───────────── */
+.ch6 {clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.ch10{clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.ch14{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.ch20{clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px)}
+
+/* ── grain ─────────────────────────────────────────────────── */
+.grain{position:relative}
+.grain::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;opacity:.2;
+}
+
+/* ── layout ────────────────────────────────────────────────── */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ── type ──────────────────────────────────────────────────── */
+.kicker{font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin:0}
+.kicker b{color:var(--cyan);font-weight:500}
+h1{
+  font-family:var(--disp);font-weight:700;
+  font-size:clamp(34px,6.1vw,74px);line-height:.98;letter-spacing:-.005em;
+  margin:18px 0 0;text-wrap:balance;
+}
+h1 .b{display:block;color:var(--muted)}
+h2{font-family:var(--disp);font-weight:700;font-size:clamp(24px,3.2vw,40px);line-height:1.04;margin:0;letter-spacing:.005em}
+h3{font-family:var(--disp);font-weight:600;font-size:17px;margin:0;letter-spacing:.02em}
+p{margin:0}
+.lede{font-size:clamp(14px,1.35vw,16px);line-height:1.72;color:var(--muted);max-width:66ch}
+.lede b{color:var(--text);font-weight:500}
+
+/* ── figure captions (documentation, not marketing) ────────── */
+.fig{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text);opacity:.4;margin:10px 0 0;display:flex;gap:10px;align-items:baseline;
+}
+.fig .n{flex:none;font-weight:500}
+.fig .t{flex:1;min-width:0}
+
+/* ── buttons ───────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;flex:none;
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.13em;
+  text-transform:uppercase;background:var(--text);transition:transform .12s ease;
+}
+.btn > span{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;background:var(--text);color:var(--ground)}
+.btn:hover{transform:translate(0,-1px)}
+.btn.ghost{background:var(--acid)}
+.btn.ghost > span{background:var(--ground);color:var(--acid);margin:1px;padding:12px 19px}
+.btn.ghost:hover > span{background:var(--acid);color:var(--ground)}
+.btn.wire{background:var(--line)}
+.btn.wire > span{background:var(--ground);color:var(--text);margin:1px;padding:12px 19px}
+.btn.wire:hover > span{background:var(--s2)}
+.btn .ar{opacity:.65;font-style:normal}
+
+/* ─────────────────────────────────────────────────────────────
+   NAV
+   ───────────────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:40;background:rgba(11,12,15,.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(58,63,75,.5)}
+.navin{max-width:var(--maxw);margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .wm{height:15px;width:auto;display:block}
+.brand .st{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--line);padding-left:12px}
+.navlinks{margin-left:auto;display:flex;align-items:center;gap:26px}
+.navlinks a{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);transition:color .15s}
+.navlinks a:hover{color:var(--text)}
+.navcta{display:flex;gap:8px}
+.navcta .btn > span{padding:9px 15px;font-size:10.5px}
+.navcta .btn.ghost > span{padding:8px 14px}
+@media(max-width:780px){.navlinks .hidem{display:none}}
+@media(max-width:540px){.navcta .demoonly{display:none}.brand .st{display:none}}
+
+/* ─────────────────────────────────────────────────────────────
+   HERO
+   ───────────────────────────────────────────────────────────── */
+.hero{position:relative;padding:clamp(42px,5vw,66px) 0 0;overflow:hidden}
+.hero::before{
+  content:'';position:absolute;inset:-20% -10% auto -10%;height:min(620px,58vw);
+  background:radial-gradient(58% 70% at 50% 0%,rgba(125,251,253,.085),transparent 70%);pointer-events:none;
+}
+.heroin{position:relative;z-index:2}
+.herotop{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px 48px;align-items:end}
+@media(max-width:900px){.herotop{grid-template-columns:1fr;align-items:start}}
+
+.quant{margin-top:22px;font-size:clamp(14px,1.35vw,16.5px);line-height:1.72;color:var(--muted);max-width:60ch}
+.quant b{color:var(--text);font-weight:500}
+.quant .num{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;align-items:center}
+
+/* ─────────────────────────────────────────────────────────────
+   FIG 01 — the lane IS the feature grid
+   ───────────────────────────────────────────────────────────── */
+.rigwrap{margin-top:clamp(26px,3.2vw,40px);position:relative}
+.rigbar{display:flex;align-items:center;gap:14px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:0 0 10px;flex-wrap:wrap}
+.rigbar .dot{width:6px;height:6px;background:var(--cyan);flex:none;animation:blink 1.6s steps(2) infinite}
+@keyframes blink{0%,50%{opacity:1}50.01%,100%{opacity:.25}}
+.rigbar .sp{flex:1}
+.rigbar .legend{display:flex;gap:14px;flex-wrap:wrap}
+.rigbar .lg{display:inline-flex;align-items:center;gap:6px}
+.rigbar .lg i{width:8px;height:8px;display:block;flex:none}
+
+.rig{background:var(--line);padding:1px}
+.rigin{background:var(--s1);padding:11px}
+
+.laneg{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+
+/* one step of the lane */
+.stp{
+  position:relative;background:transparent;border:0;padding:0;margin:0;
+  height:clamp(46px,5vw,72px);cursor:pointer;outline:none;display:block;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+.stp::before{
+  content:'';position:absolute;inset:0;background:#1B1F28;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+  transition:background .09s linear;
+}
+.stp.q::before{background:#262C38}
+.stp.on::before{background:var(--c)}
+.stp .no{
+  position:absolute;left:8px;top:6px;z-index:2;font-size:9px;font-weight:500;letter-spacing:.06em;
+  color:var(--muted);opacity:.55;font-variant-numeric:tabular-nums;
+}
+.stp.on .no{color:var(--ground);opacity:.5}
+.stp .gl{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:clamp(20px,2.2vw,30px);height:clamp(20px,2.2vw,30px);
+  background:var(--ground);opacity:0;transition:opacity .09s linear;
+  -webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat;
+}
+.stp.on .gl{opacity:1}
+.stp .rt{position:absolute;left:0;right:0;bottom:7px;z-index:2;display:flex;gap:3px;justify-content:center}
+.stp .rt b{width:3px;height:3px;background:var(--ground);display:block}
+.stp:not(.on) .rt{display:none}
+.stp.play::after{
+  content:'';position:absolute;inset:0;z-index:3;pointer-events:none;
+  box-shadow:inset 0 0 0 2px var(--text);
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+.stp:hover::before{filter:brightness(1.45)}
+.stp:focus-visible{box-shadow:0 0 0 2px var(--cyan)}
+
+/* claim pads — four enlarged cells in the same grid */
+.claim{
+  grid-column:span 2;position:relative;background:var(--s2);overflow:hidden;
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+  padding:14px 16px 14px;display:flex;flex-direction:column;justify-content:flex-end;
+  min-height:clamp(100px,8.6vw,124px);transition:background .15s ease;
+}
+@media(max-width:900px){.claim{grid-column:span 4}}
+@media(max-width:600px){.claim{grid-column:span 8;min-height:0}}
+.claim .ix{position:absolute;top:12px;left:17px;z-index:1;font-size:9px;letter-spacing:.16em;color:var(--muted);opacity:.65}
+.claim .hd{font-family:var(--disp);font-weight:700;font-size:clamp(17px,1.75vw,23px);line-height:1;margin:0 0 7px;position:relative;z-index:1;color:var(--k)}
+.claim .sb{font-size:clamp(11px,1.02vw,12.5px);line-height:1.45;color:var(--muted);position:relative;z-index:1;margin:0}
+.claim .sb .n{color:var(--k);font-weight:500}
+.claim::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--k);opacity:.9;z-index:1}
+.claim:hover{background:#262b36}
+
+.readout{
+  display:flex;align-items:center;margin-top:10px;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);border-top:1px solid rgba(58,63,75,.6);
+  padding-top:10px;flex-wrap:wrap;gap:6px;
+}
+.readout .k{opacity:.6;margin-right:8px}
+.readout .v{color:var(--cyan)}
+.readout .hint{margin-left:auto;opacity:.55}
+
+/* ─────────────────────────────────────────────────────────────
+   SECTIONS
+   ───────────────────────────────────────────────────────────── */
+section{padding:clamp(5rem,10vw,9rem) 0 0}
+.shead{display:flex;align-items:baseline;gap:18px;margin-bottom:26px}
+.shead .idx{font-family:var(--pix);font-size:13px;color:var(--cyan);opacity:.85;letter-spacing:.06em;flex:none;line-height:1}
+.shead .lbl{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);flex:none}
+.shead .ln{flex:1;height:1px;background:var(--line);opacity:.5}
+
+.split{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(28px,4vw,60px);align-items:start}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+
+/* ── product screen mount ──────────────────────────────────── */
+.screenrow{display:grid;grid-template-columns:420px minmax(0,1fr);gap:clamp(28px,4vw,58px);align-items:center;margin-top:clamp(28px,3.4vw,42px)}
+@media(max-width:820px){.screenrow{grid-template-columns:minmax(0,1fr);justify-items:start}.mockcol{width:100%;max-width:420px}}
+.mockcol{width:420px;max-width:100%}
+/* the embed is cropped to the step region: the per-step instrument is the point */
+.mockcol .viewport{position:relative;height:374px!important}
+.mockcol .cropfade{position:absolute;left:0;right:0;bottom:0;height:78px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(11,12,15,0) 0%,rgba(11,12,15,.72) 52%,#05060a 100%)}
+.note{border-left:2px solid var(--line);padding-left:22px;max-width:46ch}
+.note .nt{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:.02em;margin:0 0 12px}
+.note p{font-size:14.5px;line-height:1.72;color:var(--muted)}
+
+/* ─────────────────────────────────────────────────────────────
+   ENGINES
+   ───────────────────────────────────────────────────────────── */
+.engines{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);margin-top:clamp(26px,3.2vw,40px)}
+@media(max-width:980px){.engines{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.engines{grid-template-columns:1fr}}
+.eng{background:var(--s1);padding:16px 16px 18px;position:relative}
+.eng::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;background:var(--k)}
+.eng .no{font-size:9px;letter-spacing:.18em;color:var(--muted);opacity:.6}
+.eng h3{margin:9px 0 5px}
+.eng .sub{font-size:11px;color:var(--muted);line-height:1.55;min-height:3.4em}
+.knobs{display:flex;gap:14px;margin-top:12px}
+.knob{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.krg{
+  width:100%;max-width:46px;aspect-ratio:1;border-radius:50%;
+  background:conic-gradient(from 225deg,var(--k) 0 calc(var(--v)*270deg),rgba(58,63,75,.85) calc(var(--v)*270deg) 270deg,transparent 270deg);
+  -webkit-mask:radial-gradient(circle closest-side,transparent 62%,#000 63%);
+  mask:radial-gradient(circle closest-side,transparent 62%,#000 63%);
+}
+.knob .dl{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);opacity:.8}
+
+/* ─────────────────────────────────────────────────────────────
+   SIGNAL PATH FIGURE
+   ───────────────────────────────────────────────────────────── */
+.flow{margin-top:clamp(26px,3.2vw,40px);background:var(--line);padding:1px}
+.flowin{background:var(--s1);padding:clamp(18px,2.1vw,26px)}
+.chain{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.node{
+  flex:1 1 0;min-width:150px;background:var(--s2);padding:14px 15px 15px;position:relative;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+}
+.node::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--k,var(--line))}
+.node .nn{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:.7}
+.node .nv{font-family:var(--disp);font-weight:700;font-size:clamp(15px,1.5vw,19px);line-height:1.1;margin-top:7px;letter-spacing:.01em}
+.node .nd{font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:6px}
+.arw{flex:none;display:flex;align-items:center;color:var(--line);font-size:15px}
+@media(max-width:900px){.arw{display:none}.node{flex:1 1 44%}}
+
+.modbus{display:flex;align-items:center;gap:12px;margin-top:16px;padding-top:15px;border-top:1px dashed rgba(58,63,75,.85);flex-wrap:wrap}
+.modbus .ml{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:.7;flex:none}
+.modbus .mt{
+  font-size:10.5px;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line);padding:5px 10px;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+}
+.modbus .mt b{color:var(--text);font-weight:500}
+
+/* ─────────────────────────────────────────────────────────────
+   PLATE — the one eruption
+   ───────────────────────────────────────────────────────────── */
+.plate{position:relative;margin-top:clamp(5rem,10vw,9rem);overflow:hidden;background:var(--ground)}
+.plate img{
+  width:100%;height:clamp(230px,19vw,280px);object-fit:cover;object-position:center 45%;
+  opacity:.58;filter:saturate(.7) contrast(1.06);transform:scale(1.1);transform-origin:center;
+}
+.plate .veil{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(90deg,rgba(11,12,15,.92) 0%,rgba(11,12,15,.55) 46%,rgba(11,12,15,0) 78%),
+    linear-gradient(180deg,rgba(11,12,15,.8) 0%,rgba(11,12,15,.18) 42%,rgba(11,12,15,.9) 100%);
+}
+.plate .over{position:absolute;inset:0;display:flex;align-items:flex-end}
+.plate .over .wrap{width:100%;padding-bottom:clamp(22px,3vw,40px)}
+.plate h2{max-width:20ch;text-wrap:balance}
+.plate .pl{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan);margin:0 0 12px}
+.plate .pd{margin-top:14px;font-size:12.5px;color:var(--muted);max-width:56ch;line-height:1.65}
+
+/* ─────────────────────────────────────────────────────────────
+   DEMO BAND
+   ───────────────────────────────────────────────────────────── */
+.demo{margin-top:clamp(5rem,10vw,9rem)}
+.demoslab{background:var(--acid);padding:1px}
+.demoin{
+  background:var(--s1);padding:clamp(24px,3vw,38px);
+  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);
+  gap:clamp(24px,3vw,48px);align-items:center;
+}
+@media(max-width:860px){.demoin{grid-template-columns:1fr}}
+.demoin h2 .a{color:var(--acid)}
+.demoart{max-width:360px;margin-left:auto;width:100%}
+.demoart .kbd{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.demoart .kbd b{
+  aspect-ratio:1;background:var(--s2);display:block;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+}
+.demoart .kbd b.a{background:#2C313D}
+.demoart .kbd b.h{background:var(--acid)}
+
+/* ─────────────────────────────────────────────────────────────
+   END CTA + FOOTER
+   ───────────────────────────────────────────────────────────── */
+.endcta{margin-top:clamp(5rem,10vw,9rem)}
+.endin{background:var(--line);padding:1px}
+.endbox{
+  background:var(--s1);padding:clamp(28px,3.6vw,46px) clamp(24px,4vw,50px);
+  display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:space-between;position:relative;
+}
+.endbox h2{max-width:17ch}
+
+footer{margin-top:48px;border-top:1px solid var(--line)}
+.footin{max-width:var(--maxw);margin:0 auto;padding:20px 24px 38px;display:flex;flex-wrap:wrap;gap:16px 26px;align-items:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.footin .sp{flex:1}
+.footin a:hover{color:var(--text)}
+.endorse{display:flex;align-items:center;gap:10px;font-size:9.5px;letter-spacing:.18em;color:var(--muted)}
+.endorse svg{display:block;flex:none;color:var(--muted)}
+.endorse .lm{width:58px;height:auto}
+.endorse .dl{width:17px;height:17px;opacity:.85}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="navin">
+    <a class="brand" href="#top" aria-label="Jolt Groovebox">
+      <img class="wm" src="assets/marks/jolt-wordmark.svg" alt="Jolt">
+      <span class="st">Groovebox</span>
+    </a>
+    <div class="navlinks">
+      <a class="hidem" href="#mechanic">Mechanic</a>
+      <a class="hidem" href="#instruments">Instruments</a>
+      <a class="hidem" href="#demo">Demo</a>
+      <div class="navcta">
+        <a class="btn ghost demoonly" href="../onboarding2.html"><span>Play demo</span></a>
+        <a class="btn" href="#appstore"><span>App&nbsp;Store</span></a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<header class="hero grain" id="top">
+  <div class="wrap heroin">
+    <div class="herotop">
+      <div>
+        <p class="kicker"><b>iOS</b> / iPhone + iPad / JLT-4G</p>
+        <h1>Groovebox simplicity,<span class="b">Tracker flexibility</span></h1>
+      </div>
+      <div>
+        <p class="quant">
+          <span class="num">8</span> voices, each with its own step sequencer.
+          <span class="num">4</span> instrument engines. Patterns up to <span class="num">64</span> steps.
+          <b>Any voice plays any instrument on any step</b> — tracker semantics, on a grid you hit with your thumbs.
+        </p>
+        <div class="cta">
+          <a class="btn" href="#appstore"><span>Download on the App Store <em class="ar">→</em></span></a>
+          <a class="btn ghost" href="../onboarding2.html"><span>Play it in the browser <em class="ar">→</em></span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIG 01 — one voice's lane, 16 steps as 2 rows of 8 -->
+    <div class="rigwrap">
+      <div class="rigbar">
+        <span class="dot"></span>
+        <span>Voice 03 / Pattern A1 / 16 steps</span>
+        <span class="sp"></span>
+        <span class="legend">
+          <span class="lg"><i style="background:var(--i-kick)"></i>Kick</span>
+          <span class="lg"><i style="background:var(--i-snare)"></i>Snare</span>
+          <span class="lg"><i style="background:var(--i-hat)"></i>Hat</span>
+          <span class="lg"><i style="background:var(--i-chord)"></i>Chord</span>
+        </span>
+      </div>
+
+      <div class="rig ch20">
+        <div class="rigin ch20">
+          <div class="laneg" id="laneg">
+
+            <div class="claim ch14" style="--k:var(--i-kick)">
+              <span class="ix">01 / MECHANIC</span>
+              <p class="hd">Free-form.</p>
+              <p class="sb">Any instrument, on any of <span class="n">64</span> steps.</p>
+            </div>
+
+            <div class="claim ch14" style="--k:var(--i-snare)">
+              <span class="ix">02 / VOICES</span>
+              <p class="hd">Multitimbral.</p>
+              <p class="sb"><span class="n">8</span> voices, <span class="n">8</span> step sequencers.</p>
+            </div>
+
+            <div class="claim ch14" style="--k:var(--i-hat)">
+              <span class="ix">03 / SIGNAL</span>
+              <p class="hd">Processed.</p>
+              <p class="sb"><span class="n">11</span> inserts, <span class="n">4</span> sends, any order.</p>
+            </div>
+
+            <div class="claim ch14" style="--k:var(--i-chord)">
+              <span class="ix">04 / MOTION</span>
+              <p class="hd">Automated.</p>
+              <p class="sb"><span class="n">3</span> modulation layers, any parameter.</p>
+            </div>
+
+          </div>
+
+          <div class="readout">
+            <span class="k">Step</span><span class="v" id="ro">—</span>
+            <span class="hint">Click a step to reassign its instrument</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="fig"><span class="n">FIG 01</span><span class="t">One voice&rsquo;s lane &mdash; sixteen steps as two rows of eight, the way the app draws it. Every step stores its own instrument. Four cells enlarged.</span></p>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════ 01 MECHANIC ══════════════════════ -->
+<section id="mechanic">
+  <div class="wrap">
+    <div class="shead"><span class="idx">01</span><span class="lbl">The mechanic</span><span class="ln"></span></div>
+    <div class="split">
+      <h2>One instrument per step, not one per track.</h2>
+      <p class="lede">
+        Most grooveboxes bind an instrument to a track and leave it there. Jolt stores it on the
+        step &mdash; a kick on step 1, a repitched sample on step 7, a wavetable chord on step 11,
+        all on one lane. The first pattern takes a minute. The ceiling is somewhere past where
+        most people stop looking.
+      </p>
+    </div>
+
+    <div class="screenrow">
+      <div class="mockcol">
+        <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-editor">
+          <div class="bar top">
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+            <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+            <span class="song-title" style="margin-left:4px">Pattern</span>
+            <span class="spacer"></span>
+            <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+            <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+          </div>
+          <div class="edit-body">
+              <div class="subnav">
+                <span class="name">Pattern</span>
+                <span class="icons">
+                  <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+                </span>
+              </div>
+              <div class="pagebar">
+                <div class="pageseq">
+                  <span class="pg label">Page</span>
+                  <span class="pg num on">1</span>
+                  <span class="pg num playing">2</span>
+                  <span class="pg num">3</span>
+                  <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/></svg></span>
+                </div>
+                <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+              </div>
+              <div class="steps" id="stepgrid"></div>
+              <div class="instr-strip">
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+                <div class="chips">
+                  <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+                  <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+                  <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+                  <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                  <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                  <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+                </div>
+              </div>
+              <div class="tabcard">
+                <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+                <div class="panel">
+                  <div class="dial-row">
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+                  </div>
+                  <div class="dial-row">
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Tune</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+                  </div>
+                </div>
+                <div class="foot"><span class="on">Sound</span><span>Filter</span><span>F. Env</span><span>Noise</span><span>Amp</span></div>
+              </div>
+          </div>
+          <div class="bar bottom">
+            <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+            <span class="chip txt"><i>Solo</i></span>
+            <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+            <span class="spacer"></span>
+            <span class="chip txt"><i>VIZ</i></span>
+            <span class="chip txt"><i>FX</i></span>
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+          </div>
+        </div><span class="cropfade"></span></div></div>
+        <p class="fig"><span class="n">FIG 02</span><span class="t">Pattern editor, iPhone, cropped to the step region. Two rows of eight, four pages. Each step carries its own instrument icon in its own colour; ratchets and slice letters ride on the step.</span></p>
+      </div>
+
+      <div>
+        <div class="note">
+          <p class="nt">Why one lane, and not eight.</p>
+          <p>
+            An all-at-once view of every voice was built, and then removed. Once songs got
+            complex it stopped being followable. The editor shows one lane, sixteen steps at a
+            time, with the instrument palette underneath. Legibility won.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ 02 INSTRUMENTS ══════════════════════ -->
+<section id="instruments">
+  <div class="wrap">
+    <div class="shead"><span class="idx">02</span><span class="lbl">Instrument engines</span><span class="ln"></span></div>
+    <div class="split">
+      <h2>Four engines.<br>Any of them, any step.</h2>
+      <p class="lede">
+        A kit is not something you commit to at the start. Every engine carries its own insert
+        chain, its own LFO and its own send levels.
+      </p>
+    </div>
+
+    <div class="engines">
+      <div class="eng" style="--k:var(--i-chord)">
+        <div class="no">ENG 01</div>
+        <h3>Classic Synth</h3>
+        <p class="sub">Wavetable oscillator with four modes: spread, 2-op FM, paraphony and in-scale chords.</p>
+        <div class="knobs">
+          <div class="knob"><div class="krg" style="--v:.62"></div><span class="dl">Wave</span></div>
+          <div class="knob"><div class="krg" style="--v:.34"></div><span class="dl">Spread</span></div>
+          <div class="knob"><div class="krg" style="--v:.78"></div><span class="dl">Decay</span></div>
+        </div>
+      </div>
+      <div class="eng" style="--k:var(--i-kick)">
+        <div class="no">ENG 02</div>
+        <h3>Macro Synth</h3>
+        <p class="sub">Sixteen sub-synths based on a classic Eurorack module.</p>
+        <div class="knobs">
+          <div class="knob"><div class="krg" style="--v:.45"></div><span class="dl">Model</span></div>
+          <div class="knob"><div class="krg" style="--v:.7"></div><span class="dl">Timbre</span></div>
+          <div class="knob"><div class="krg" style="--v:.28"></div><span class="dl">Colour</span></div>
+        </div>
+      </div>
+      <div class="eng" style="--k:var(--i-hat)">
+        <div class="no">ENG 03</div>
+        <h3>Sampler</h3>
+        <p class="sub">Pitched or slicing. Old-skool repitching, per-step reversing, mic recording, mp3 and wav.</p>
+        <div class="knobs">
+          <div class="knob"><div class="krg" style="--v:.55"></div><span class="dl">Start</span></div>
+          <div class="knob"><div class="krg" style="--v:.82"></div><span class="dl">Pitch</span></div>
+          <div class="knob"><div class="krg" style="--v:.4"></div><span class="dl">Slice</span></div>
+        </div>
+      </div>
+      <div class="eng" style="--k:var(--i-snare)">
+        <div class="no">ENG 04</div>
+        <h3>Drum Synth</h3>
+        <p class="sub">x0x-style percussion synthesis for hi-hats, snares and heavy kicks.</p>
+        <div class="knobs">
+          <div class="knob"><div class="krg" style="--v:.72"></div><span class="dl">Tune</span></div>
+          <div class="knob"><div class="krg" style="--v:.5"></div><span class="dl">Snap</span></div>
+          <div class="knob"><div class="krg" style="--v:.36"></div><span class="dl">Decay</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="fig"><span class="n">FIG 03</span><span class="t">Engine panels &mdash; three parameters shown of each. All of them are automatable.</span></p>
+  </div>
+</section>
+
+<!-- ══════════════════════ 03 SIGNAL PATH ══════════════════════ -->
+<section id="signal">
+  <div class="wrap">
+    <div class="shead"><span class="idx">03</span><span class="lbl">Signal path</span><span class="ln"></span></div>
+    <div class="split">
+      <h2>Any effect, any number, any order.</h2>
+      <p class="lede">
+        Eleven insert effects sit per instrument, chained however you build them &mdash; ladder
+        filter, gater and bitcrush among them. Four sends run underneath. Three layers of
+        modulation reach all of it.
+      </p>
+    </div>
+
+    <div class="flow">
+      <div class="flowin">
+        <div class="chain">
+          <div class="node" style="--k:var(--line)">
+            <div class="nn">Source</div>
+            <div class="nv">Instrument</div>
+            <div class="nd">Per step, per voice.</div>
+          </div>
+          <div class="arw">&rarr;</div>
+          <div class="node" style="--k:var(--i-hat)">
+            <div class="nn">Insert chain</div>
+            <div class="nv">11 available</div>
+            <div class="nd">Any number, any order.</div>
+          </div>
+          <div class="arw">&rarr;</div>
+          <div class="node" style="--k:var(--i-kick)">
+            <div class="nn">Sends</div>
+            <div class="nv">4 buses</div>
+            <div class="nd">Reverb, delay, multi-tap, sidechain.</div>
+          </div>
+          <div class="arw">&rarr;</div>
+          <div class="node" style="--k:var(--i-snare)">
+            <div class="nn">Global macros</div>
+            <div class="nv">Up to 5</div>
+            <div class="nd">One-touch build-ups.</div>
+          </div>
+        </div>
+        <div class="modbus">
+          <span class="ml">Modulation &mdash; 3 layers</span>
+          <span class="mt"><b>LFO</b> &middot; per instrument</span>
+          <span class="mt"><b>Pattern lane</b> &middot; synced</span>
+          <span class="mt"><b>Song lane</b> &middot; bar-to-bar or fader</span>
+        </div>
+      </div>
+    </div>
+    <p class="fig"><span class="n">FIG 04</span><span class="t">Signal path. Modulation is drawn dashed because it crosses the chain rather than sitting in it.</span></p>
+  </div>
+</section>
+
+<!-- ══════════════════════ PLATE — PERFORMANCE ══════════════════════ -->
+<div class="plate grain">
+  <img src="assets/plates/rave-dither__A-riso.png" alt="">
+  <div class="veil"></div>
+  <div class="over">
+    <div class="wrap">
+      <p class="pl">Plate 01 / Performance mode</p>
+      <h2>It is also meant to be played at people.</h2>
+      <p class="pd">
+        Live parameter control while the sequencer runs, and up to five global macros over the
+        whole mix. Beat repeat and the two resonant DJ filters are among what you can put on them.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ DEMO BAND ══════════════════════ -->
+<div class="wrap demo" id="demo">
+  <div class="demoslab ch20">
+    <div class="demoin ch20 grain">
+      <div>
+        <p class="kicker" style="color:var(--acid)">Browser demo</p>
+        <h2 style="margin-top:16px">Hear it before<br>the <span class="a">App Store</span>.</h2>
+        <p class="lede" style="margin-top:18px;max-width:52ch">
+          A slice of the engine runs on this page: the real DSP, compiled to WebAssembly, behind
+          a simple sequencer. It is not the app &mdash; it is the part of it that makes the noise.
+        </p>
+        <div class="cta">
+          <a class="btn ghost" href="../onboarding2.html"><span>Open the browser demo <em class="ar">→</em></span></a>
+          <a class="btn wire" href="#appstore"><span>Get the app <em class="ar">→</em></span></a>
+        </div>
+      </div>
+      <div class="demoart">
+        <div class="kbd" id="kbd"></div>
+        <p class="fig"><span class="n">FIG 05</span><span class="t">Demo sequencer &mdash; one lane, sixteen steps, one browser tab.</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ END CTA ══════════════════════ -->
+<div class="wrap endcta" id="appstore">
+  <div class="endin ch20">
+    <div class="endbox ch20 grain">
+      <div>
+        <p class="kicker">Jolt Groovebox / iOS / JLT-4G</p>
+        <h2 style="margin-top:16px">Groovebox simplicity, Tracker flexibility.</h2>
+        <p class="lede" style="margin-top:16px;max-width:48ch">
+          Fun in a minute. Deep enough that the minute never turns out to be the ceiling.
+        </p>
+      </div>
+      <div class="cta" style="margin:0">
+        <a class="btn" href="#appstore"><span>Download on the App Store <em class="ar">→</em></span></a>
+        <a class="btn ghost" href="../onboarding2.html"><span>Play the demo <em class="ar">→</em></span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footin">
+    <span>Jolt Groovebox / iPhone + iPad</span>
+    <span class="sp"></span>
+    <a href="../onboarding2.html">Browser demo</a>
+    <a href="../privacy.html">Privacy</a>
+    <span class="endorse">
+      <svg class="dl" viewBox="0 0 100 100" aria-hidden="true" fill="none">
+        <path d="M23.13,76.87 A38,38 0 1 1 76.87,76.87" stroke="currentColor" stroke-width="3"/>
+        <path d="M23.13,76.87 A38,38 0 0 1 69.00,17.10" stroke="currentColor" stroke-width="11"/>
+        <polygon points="66,12 72,12 74,14 74,20 72,22 66,22 64,20 64,14" fill="currentColor"/>
+        <path d="M65.00,24.02 A30,30 0 0 0 28.79,28.79" stroke="currentColor" stroke-width="4.5"/>
+        <circle cx="28.79" cy="28.79" r="2.8" fill="currentColor"/>
+        <path d="M61.50,30.08 A23,23 0 0 1 72.91,47.99" stroke="currentColor" stroke-width="4"/>
+        <circle cx="72.91" cy="47.99" r="2.4" fill="currentColor"/>
+        <path d="M58.25,35.71 A16.5,16.5 0 0 0 43.03,35.05" stroke="currentColor" stroke-width="3.5"/>
+        <circle cx="43.03" cy="35.05" r="2.2" fill="currentColor"/>
+        <line x1="44" y1="50" x2="56" y2="50" stroke="currentColor" stroke-width="3"/>
+        <line x1="50" y1="44" x2="50" y2="56" stroke="currentColor" stroke-width="3"/>
+      </svg>
+      <span>An instrument by</span>
+      <svg class="lm" viewBox="0 0 1398.9 424.0" fill="currentColor" fill-rule="evenodd" role="img" aria-label="LHMP">
+        <path d="M0.0,394.0 L30.0,424.0 L270.0,424.0 L300.0,394.0 L300.0,354.0 L270.0,324.0 L100,324.0 L100.0,30.0 L70.0,0.0 L30.0,0.0 L0.0,30.0Z"/>
+        <path d="M366.3,394.0 L396.3,424.0 L436.3,424.0 L466.3,394.0 L466.3,262.0 L566.3,262.0 L566.3,394.0 L596.3,424.0 L636.3,424.0 L666.3,394.0 L666.3,30.0 L636.3,0.0 L596.3,0.0 L566.3,30.0 L566.3,162.0 L466.3,162.0 L466.3,30.0 L436.3,0.0 L396.3,0.0 L366.3,30.0Z"/>
+        <path d="M762.6,424.0 L732.6,394.0 L732.6,30.0 L762.6,0.0 L802.6,0.0 L847.17,26.22 L882.6,90.0 L918.03,26.22 L962.6,0.0 L1002.6,0.0 L1032.6,30.0 L1032.6,394.0 L1002.6,424.0 L962.6,424.0 L932.6,394.0 L932.6,100.0 L897.17,163.78 L868.03,163.78 L832.6,100.0 L832.6,394.0 L802.6,424.0Z"/>
+        <path d="M1098.9,394.0 L1128.9,424.0 L1168.9,424.0 L1198.9,394.0 L1198.9,260.0 L1368.9,260.0 L1398.9,230.0 L1398.9,30.0 L1368.9,0.0 L1128.9,0.0 L1098.9,30.0ZM1227.7,160.0 L1198.9,131.2 L1198.9,128.8 L1227.7,100.0 L1270.1,100.0 L1298.9,128.8 L1298.9,131.2 L1270.1,160.0Z"/>
+      </svg>
+    </span>
+  </div>
+</footer>
+
+<script src="../mockup-screens.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* Instrument palette — InstrumentColors.fixed */
+  var INS = [
+    {k:null,    c:null,               n:'EMPTY'},
+    {k:'kick',  c:'var(--i-kick)',    n:'KICK'},
+    {k:'snare', c:'var(--i-snare)',   n:'SNARE'},
+    {k:'hihat', c:'var(--i-hat)',     n:'HAT'},
+    {k:'chord', c:'var(--i-chord)',   n:'CHORD'}
+  ];
+
+  /* One voice's lane: 16 steps. [instrument index, ratchet count] */
+  var LANE = [
+    [1,0],[0,0],[3,3],[0,0], [2,0],[0,0],[3,0],[4,0],
+    [1,0],[0,0],[3,0],[1,0], [2,0],[3,2],[4,0],[0,0]
+  ];
+
+  var grid = document.getElementById('laneg');
+  var ro   = document.getElementById('ro');
+  var first = grid.firstElementChild;
+  var cells = [];
+
+  function pad2(n){ return (n<10?'0':'')+n; }
+
+  function paint(b){
+    var d = INS[+b.dataset.i];
+    if(d.k){
+      b.classList.add('on');
+      b.style.setProperty('--c', d.c);
+      b.querySelector('.gl').style.setProperty('--ic','var(--ic-'+d.k+')');
+    }else{
+      b.classList.remove('on');
+      b.style.removeProperty('--c');
+    }
+    b.setAttribute('aria-label','Step '+b.dataset.s+': '+d.n);
+  }
+
+  function say(b){
+    ro.textContent = pad2(b.dataset.s)+' / 16  —  '+INS[+b.dataset.i].n;
+  }
+
+  for(var s=0; s<16; s++){
+    var b = document.createElement('button');
+    b.type='button';
+    b.className = 'stp' + (s%4===0 ? ' q' : '');
+    b.dataset.s = s+1;
+    b.dataset.i = LANE[s][0];
+
+    var no = document.createElement('span'); no.className='no'; no.textContent = pad2(s+1);
+    var gl = document.createElement('span'); gl.className='gl';
+    b.appendChild(no); b.appendChild(gl);
+
+    if(LANE[s][1]){
+      var rt = document.createElement('span'); rt.className='rt';
+      for(var r=0;r<LANE[s][1];r++){ rt.appendChild(document.createElement('b')); }
+      b.appendChild(rt);
+    }
+
+    paint(b);
+    (function(el){
+      el.addEventListener('mouseenter', function(){ say(el); });
+      el.addEventListener('focus',      function(){ say(el); });
+      el.addEventListener('click',      function(){
+        el.dataset.i = (+el.dataset.i + 1) % INS.length;
+        paint(el); say(el);
+      });
+    })(b);
+
+    grid.insertBefore(b, first);
+    cells.push(b);
+  }
+
+  /* transport — 16th notes at 120bpm */
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce){
+    var p = 0;
+    setInterval(function(){
+      cells[p].classList.remove('play');
+      p = (p+1) % 16;
+      cells[p].classList.add('play');
+    }, 125);
+  }
+  cells[0].classList.add('play');
+  ro.textContent = '01 / 16  —  ' + INS[LANE[0][0]].n;
+
+  /* demo pad art — one lane, 16 steps */
+  var kbd = document.getElementById('kbd');
+  var HOT = [0,4,8,12], ACT = [2,6,10,11,14];
+  for(var k=0; k<16; k++){
+    var q = document.createElement('b');
+    if(HOT.indexOf(k)>-1) q.className='h';
+    else if(ACT.indexOf(k)>-1) q.className='a';
+    kbd.appendChild(q);
+  }
+})();
+</script>
+</body>
+</html>

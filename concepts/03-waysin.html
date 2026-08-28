@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt Groovebox — Groovebox simplicity, Tracker flexibility</title>
+<meta name="description" content="Jolt is a groovebox for iPhone and iPad. Eight voices, and a step owns its instrument. Pick a way in.">
+
+<!-- Real app mockup screens. Loaded FIRST so this page's own tokens win the cascade;
+     the app-scoped font tokens are restored under .jolt-mock below. -->
+<link rel="stylesheet" href="../mockup-screens.css">
+
+<style>
+/* ───────────────────────── Fonts ───────────────────────── */
+@font-face{font-family:'GeistMono';src:url(../geist/GeistMono/webfonts/GeistMono-Regular.woff2) format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'GeistMono';src:url(../geist/GeistMono/webfonts/GeistMono-Medium.woff2) format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'GeistMono';src:url(../geist/GeistMono/webfonts/GeistMono-Bold.woff2) format('woff2');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'ChakraPetch';src:url(../fonts/ChakraPetch-SemiBold.ttf) format('truetype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'ChakraPetch';src:url(../fonts/ChakraPetch-Bold.ttf) format('truetype');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'GeistPixel';src:url(../geist/GeistPixel/webfonts/GeistPixel-Grid.woff2) format('woff2');font-weight:400;font-style:normal;font-display:swap}
+
+/* ───────────────────────── Tokens ───────────────────────── */
+:root{
+  --ground:#0B0C0F;
+  --s1:#14161D;
+  --s2:#1E222C;
+  --line:#3A3F4B;
+  --text:#EDEFF3;
+  --muted:#8B93A6;
+  --cyan:#7DFBFD;
+  --orange:#FF6A00;
+  --acid:#E8FF00;
+
+  --display:'ChakraPetch','Chakra Petch',system-ui,sans-serif;
+  --mono:'GeistMono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --pixel:'GeistPixel','GeistMono',ui-monospace,monospace;
+
+  /* InstrumentColors.fixed — the app's own instrument colours. */
+  --i-kick:#7DFBFD; --i-snare:#CFFB52; --i-hat:#FF9500; --i-chord:#EA3EE7;
+  --i-waves:#32E5C8;
+  --wc:var(--cyan); /* "way in" colour — set per tab */
+
+  --gutter:24px;
+  --max:1140px;
+}
+
+/* Restore the app's embedded font tokens inside mockup screens only, so this
+   page's :root override doesn't reach into them. */
+.jolt-mock,.jolt-mock *{
+  --display:'ChakraPetch-Bold','Chakra Petch',sans-serif;
+  --display-semi:'ChakraPetch-SemiBold','Chakra Petch',sans-serif;
+  --mono:'GeistMono-Regular','Geist Mono',ui-monospace,monospace;
+  --mono-med:'GeistMono-Medium','Geist Mono',ui-monospace,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ground);-webkit-text-size-adjust:100%;overflow-x:clip}
+body{
+  margin:0;background:var(--ground);color:var(--text);
+  font-family:var(--mono);font-weight:400;font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+::selection{background:var(--cyan);color:var(--ground)}
+
+/* padding-left/right only — a shorthand here would cancel the section rhythm */
+.wrap{max-width:var(--max);margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter)}
+
+/* ───────────────────────── Chamfer primitives ───────────────────────── */
+.cham{
+  --cut:16px;
+  background:var(--line);
+  padding:1px;
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+.cham > .cin{
+  min-width:0;
+  clip-path:polygon(calc(var(--cut) - 1px) 0,100% 0,100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,0 100%,0 calc(var(--cut) - 1px));
+  background:var(--s1);
+  height:100%;
+}
+
+/* ───────────────────────── Type helpers ───────────────────────── */
+.eyebrow{
+  font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--muted);margin:0;
+}
+.eyebrow.hot{color:var(--cyan)}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.005em}
+
+/* ───────────────────────── Nav ───────────────────────── */
+.topnav{
+  position:sticky;top:0;z-index:60;
+  background:rgba(11,12,15,.86);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topnav .inner{display:flex;align-items:center;gap:20px;height:60px}
+.topnav .mark{display:flex;align-items:center;gap:12px;text-decoration:none}
+.topnav .mark img.mk-glyph{width:26px;opacity:.9}
+.topnav .mark img.mk-word{height:17px;width:auto}
+.topnav .sp{flex:1}
+.topnav a.txt{
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  text-decoration:none;font-weight:500;
+}
+.topnav a.txt:hover{color:var(--text)}
+@media (max-width:640px){.topnav a.txt.hide-s{display:none}}
+
+/* ───────────────────────── Buttons ───────────────────────── */
+.btn{
+  --cut:10px;display:inline-block;text-decoration:none;background:var(--text);padding:1px;
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+.btn > span{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  clip-path:polygon(calc(var(--cut) - 1px) 0,100% 0,100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,0 100%,0 calc(var(--cut) - 1px));
+  background:var(--text);color:var(--ground);
+  font-weight:700;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;
+  padding:14px 22px;
+}
+.btn:hover > span{background:var(--cyan)}
+.btn.ghost{background:var(--line)}
+.btn.ghost > span{background:var(--ground);color:var(--text)}
+.btn.ghost:hover{background:var(--cyan)}
+.btn.ghost:hover > span{background:var(--ground);color:var(--cyan)}
+.ctarow{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+/* ───────────────────────── Hero ───────────────────────── */
+.hero{padding-top:clamp(52px,7vw,88px);padding-bottom:clamp(36px,4vw,46px)}
+.hero .kick{margin-bottom:26px}
+.hero h1{
+  font-size:clamp(32px,6vw,64px);line-height:1.02;text-transform:uppercase;
+  margin:0 0 22px;max-width:16ch;
+}
+.hero h1 .thin{font-weight:600;color:var(--muted)}
+.hero .lede{
+  font-size:clamp(16px,1.6vw,19px);line-height:1.55;color:var(--text);
+  max-width:46ch;margin:0 0 16px;
+}
+.hero .lede.dim{color:var(--muted);font-size:15px;max-width:62ch;margin-bottom:34px;line-height:1.7}
+.hero .lede.dim b{color:var(--text);font-weight:500}
+.hero .fineprint{
+  margin:22px 0 0;color:var(--muted);font-size:11.5px;letter-spacing:.06em;max-width:64ch;line-height:1.75;
+}
+
+/* stat strip */
+.stats{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stats div{
+  flex:1 1 170px;padding:13px 0 13px 18px;border-left:1px solid var(--line);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:500;
+}
+.stats div:first-child{border-left:0;padding-left:0}
+.stats b{display:block;font-family:var(--display);font-weight:700;font-size:19px;
+  letter-spacing:.02em;color:var(--text);margin-bottom:2px;text-transform:none}
+
+/* ───────────────────────── Section frame ───────────────────────── */
+section{padding-top:clamp(5rem,10vw,9rem);padding-bottom:clamp(5rem,10vw,9rem)}
+.sec-head{margin-bottom:30px;max-width:62ch}
+.sec-head h2{font-size:clamp(26px,3.6vw,40px);line-height:1.06;text-transform:uppercase;margin:14px 0 14px}
+.sec-head p{color:var(--muted);margin:0;max-width:56ch;font-size:14.5px}
+
+/* ───────────────────────── Ways in ───────────────────────── */
+.tabbar{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:32px;scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tabbtn{
+  --cut:9px;flex:0 0 auto;background:var(--line);padding:1px;border:0;cursor:pointer;
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+  font:inherit;
+}
+.tabbtn > span{
+  display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--ground);color:var(--muted);
+  clip-path:polygon(calc(var(--cut) - 1px) 0,100% 0,100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,0 100%,0 calc(var(--cut) - 1px));
+  font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;white-space:nowrap;
+}
+.tabbtn em{font-family:var(--pixel);font-style:normal;font-size:12px;color:var(--line);letter-spacing:0}
+.tabbtn:hover > span{color:var(--text)}
+.tabbtn:hover em{color:var(--muted)}
+.tabbtn[aria-selected="true"]{background:var(--wc)}
+.tabbtn[aria-selected="true"] > span{background:var(--s2);color:var(--text)}
+.tabbtn[aria-selected="true"] em{color:var(--wc)}
+.tabbtn:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+.ways{display:grid;grid-template-columns:minmax(0,1fr) 256px;gap:clamp(24px,5vw,72px);align-items:start}
+.ways > *{min-width:0}
+@media (max-width:880px){.ways{grid-template-columns:minmax(0,1fr)}}
+
+.waypane[hidden]{display:none}
+.waypane{animation:fade .22s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.waypane .n{font-family:var(--pixel);font-size:13px;color:var(--wc);letter-spacing:.04em;display:block;margin-bottom:14px}
+.waypane h3{font-size:clamp(22px,2.8vw,30px);line-height:1.1;text-transform:uppercase;margin:0 0 18px}
+.waypane p{margin:0 0 18px;color:var(--muted);font-size:14.5px;max-width:52ch}
+.then{border-left:1px solid var(--line);padding:2px 0 2px 18px;margin-top:26px;max-width:50ch}
+.then b{
+  display:block;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--wc);
+  font-weight:500;margin-bottom:8px;
+}
+.then span{color:var(--text);font-size:14px;line-height:1.6;display:block}
+
+/* device column + focus overlay on the real screen */
+/* 256px parent → mockup-screens.js fits the 390×844 canvas to 226px wide. */
+.shotcol{width:100%;max-width:256px;margin:0 auto;position:relative}
+.shotcol .viewport{position:relative}
+.foc{
+  position:absolute;border:1px solid var(--wc);pointer-events:none;z-index:3;
+  box-shadow:0 0 0 1px rgba(11,12,15,.7),0 0 26px -6px var(--wc);
+  transition:top .22s ease,left .22s ease,width .22s ease,height .22s ease;
+}
+.foc b{
+  position:absolute;left:-1px;top:-19px;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--wc);white-space:nowrap;font-weight:500;line-height:1;
+  background:var(--ground);padding:4px 6px;
+}
+.foc.low b{top:auto;bottom:-19px}
+.shotcap{
+  margin:16px auto 0;max-width:300px;color:var(--muted);font-size:11px;letter-spacing:.06em;line-height:1.7;
+}
+.shotcap b{color:var(--text);font-weight:500;display:block;letter-spacing:.16em;text-transform:uppercase;
+  font-size:10px;margin-bottom:5px}
+
+/* ───────────────────────── Mechanic ───────────────────────── */
+.mech{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--s1)}
+.mech .inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(28px,5vw,64px);align-items:start}
+.mech .inner > *{min-width:0}
+@media (max-width:880px){.mech .inner{grid-template-columns:minmax(0,1fr)}}
+.mech h2{font-size:clamp(26px,3.8vw,42px);line-height:1.04;text-transform:uppercase;margin:14px 0 20px}
+.mech p{color:var(--muted);margin:0 0 16px;max-width:48ch;font-size:14.5px}
+.mech p.solid{color:var(--text)}
+.aside{
+  border-left:1px solid var(--line);padding:2px 0 2px 18px;margin-top:26px;max-width:50ch;
+}
+.aside b{display:block;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+  font-weight:500;margin-bottom:8px}
+.aside span{display:block;color:var(--text);font-size:14px;line-height:1.6}
+
+/* one-voice lane figure — real instrument icons and colours */
+.fig{--cut:18px}
+.fig .cin{background:var(--s1);padding:16px}
+.figbar{
+  display:flex;align-items:center;gap:10px;height:24px;margin:-2px 0 14px;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:500;
+}
+.figbar .dot{width:7px;height:7px;background:var(--cyan);flex:none;
+  clip-path:polygon(2px 0,100% 0,100% calc(100% - 2px),calc(100% - 2px) 100%,0 100%,0 2px)}
+.figbar .sp{flex:1}
+.figbar .pill{
+  border:1px solid var(--line);padding:3px 8px;color:var(--muted);font-size:9.5px;letter-spacing:.16em;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+}
+.figbar .pill.on{border-color:var(--cyan);color:var(--cyan)}
+.well{background:var(--ground);padding:14px 12px}
+.xlane{display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
+.xstep{
+  aspect-ratio:1/1;background:var(--s2);min-width:0;position:relative;
+  clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px);
+  display:flex;align-items:center;justify-content:center;
+}
+.xstep.on{background:var(--c)}
+.xstep .ink{width:58%;height:58%}
+.lanelab{display:flex;justify-content:space-between;margin-top:12px;font-family:var(--pixel);font-size:10px;
+  letter-spacing:.04em;color:var(--line)}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(58,63,75,.5);margin-top:16px}
+.readout > div{background:var(--s1);padding:12px 13px}
+.readout u{display:block;font-family:var(--pixel);font-size:10px;color:var(--cyan);margin-bottom:7px;text-decoration:none}
+.readout b{display:block;font-weight:500;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text)}
+.readout i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+@media (max-width:520px){.readout{grid-template-columns:1fr}}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px}
+.legend span{display:flex;align-items:center;gap:8px;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.legend i{width:9px;height:9px;background:var(--c);display:block;
+  clip-path:polygon(26% 0,74% 0,100% 26%,100% 74%,74% 100%,26% 100%,0 74%,0 26%)}
+
+/* ───────────────────────── Inside ───────────────────────── */
+.inside{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:start}
+@media (max-width:880px){.inside{grid-template-columns:minmax(0,1fr)}}
+.inside p{color:var(--muted);margin:0 0 14px;max-width:56ch;font-size:14.5px}
+.inside p b{color:var(--text);font-weight:500}
+.instlist{display:grid;gap:1px;background:rgba(58,63,75,.45)}
+.instlist div{background:var(--ground);padding:12px 18px}
+.instlist b{display:block;font-family:var(--mono);font-weight:500;font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text);margin-bottom:6px}
+.instlist span{display:block;color:var(--muted);font-size:12.5px;line-height:1.6}
+
+/* ───────────────────────── Close ───────────────────────── */
+.close{position:relative;overflow:hidden;border-top:1px solid var(--line)}
+.close .plate{position:absolute;inset:0;z-index:0}
+.close .plate img{width:100%;height:100%;object-fit:cover;object-position:center 44%;opacity:.5}
+.close .plate::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,var(--ground) 0%,rgba(11,12,15,.92) 42%,rgba(11,12,15,.42) 100%),
+             linear-gradient(180deg,var(--ground) 0%,rgba(11,12,15,0) 30%,rgba(11,12,15,0) 62%,var(--ground) 100%);
+}
+.close .inner{position:relative;z-index:1}
+.close h2{font-size:clamp(28px,4.4vw,46px);line-height:1.04;text-transform:uppercase;margin:16px 0 20px;max-width:16ch}
+.close p{color:var(--muted);max-width:48ch;margin:0 0 26px;font-size:14.5px}
+
+footer{border-top:1px solid var(--line);padding:28px 0 38px}
+footer .inner{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:center}
+footer img.fword{height:15px;width:auto;opacity:.75}
+footer .endorse{display:flex;align-items:center;gap:9px;flex-basis:100%;
+  border-top:1px solid var(--line);padding-top:20px;margin-top:4px}
+footer .endorse img{height:10px;width:auto;filter:invert(1);opacity:.6}
+footer .endorse i{font-style:normal;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+footer .sp{flex:1}
+footer a,footer p{color:var(--muted);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  text-decoration:none;margin:0;font-weight:500}
+footer a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ NAV ══════════════════════ -->
+<nav class="topnav">
+  <div class="wrap inner">
+    <a class="mark" href="#top"><img class="mk-glyph" src="../images/logo.svg" alt=""><img class="mk-word" src="assets/marks/jolt-wordmark.svg" alt="Jolt"></a>
+    <span class="sp"></span>
+    <a class="txt hide-s" href="#ways">Ways in</a>
+    <a class="txt hide-s" href="#inside">What's inside</a>
+    <a class="txt" href="../onboarding2.html">Demo</a>
+    <a class="txt" href="#appstore" style="color:var(--cyan)">App&nbsp;Store</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════ HERO ══════════════════════ -->
+<header id="top" class="wrap hero">
+  <p class="eyebrow kick">Groovebox · iPhone and iPad</p>
+  <h1>Groovebox simplicity,<br><span class="thin">Tracker flexibility</span></h1>
+  <p class="lede">Nobody agrees on where a track starts. Jolt takes no position on it.</p>
+  <p class="lede dim">Eight voices, each with its own step sequencer — and <b>a step owns its instrument</b>, so any voice can play any instrument on any step. Pick a way in below. They are doors onto the same machine.</p>
+  <div class="ctarow">
+    <a class="btn" href="#appstore"><span>Get it on the App&nbsp;Store</span></a>
+    <a class="btn ghost" href="../onboarding2.html"><span>Play a slice in the browser</span></a>
+  </div>
+  <p class="fineprint">The browser demo is a slice of the engine — the real DSP compiled to WebAssembly, behind a simple sequencer. It is not the app.</p>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div><b>8</b>Voices, each sequenced</div>
+    <div><b>64</b>Steps per pattern</div>
+    <div><b>4</b>Instruments, any step</div>
+    <div><b>iOS</b>iPhone and iPad</div>
+  </div>
+</div>
+
+<!-- ══════════════════════ 01 · WAYS IN ══════════════════════ -->
+<section id="ways" class="wrap">
+  <div class="sec-head">
+    <p class="eyebrow hot">Get started</p>
+    <h2>Four ways in</h2>
+    <p>Different people open a groovebox for different reasons. None of these is the beginner one; each is a door onto the same instrument.</p>
+  </div>
+
+  <div class="tabbar" role="tablist" aria-label="Ways into Jolt">
+    <button class="tabbtn" role="tab" id="tab-1" aria-controls="pane-1" aria-selected="true" style="--wc:var(--i-kick)"><span><em>01</em>Begin with a beat</span></button>
+    <button class="tabbtn" role="tab" id="tab-2" aria-controls="pane-2" aria-selected="false" tabindex="-1" style="--wc:var(--i-hat)"><span><em>02</em>Sample what's nearby</span></button>
+    <button class="tabbtn" role="tab" id="tab-3" aria-controls="pane-3" aria-selected="false" tabindex="-1" style="--wc:var(--i-chord)"><span><em>03</em>Play something melodic</span></button>
+    <button class="tabbtn" role="tab" id="tab-4" aria-controls="pane-4" aria-selected="false" tabindex="-1" style="--wc:var(--i-snare)"><span><em>04</em>Let it generate</span></button>
+  </div>
+
+  <div class="ways">
+    <div>
+      <!-- ── 01 ── -->
+      <div class="waypane" id="pane-1" role="tabpanel" aria-labelledby="tab-1" style="--wc:var(--i-kick)"
+           data-foc="2,16.6,94.9,11.2" data-label="Steps · two rows of eight">
+        <span class="n">01 / 04</span>
+        <h3>Begin with a beat</h3>
+        <p>Tap steps until it moves. The Drum Synth is x0x-style and synthesised rather than sampled, so hi-hats, snares and heavy kicks are tuned rather than chosen from a folder.</p>
+        <p>Sixteen steps on screen. Up to sixty-four when the idea needs the room.</p>
+        <div class="then">
+          <b>And then</b>
+          <span>That kick belongs to the step, not to the voice. Step four of the same lane can be a chord, and nothing had to be added to hold it.</span>
+        </div>
+      </div>
+
+      <!-- ── 02 ── -->
+      <div class="waypane" id="pane-2" role="tabpanel" aria-labelledby="tab-2" hidden style="--wc:var(--i-hat)"
+           data-foc="2,28.1,94.9,4.1" data-label="Instrument palette">
+        <span class="n">02 / 04</span>
+        <h3>Sample what's nearby</h3>
+        <p>Record through the microphone, or load a wav or an mp3. Play it pitched — repitched the old way, so it speeds up on the way up — or slice it and lay the slices across the steps.</p>
+        <p>A radio, a door, a record. It does not have to be interesting yet.</p>
+        <div class="then">
+          <b>And then</b>
+          <span>Reverse a single step. Then send the whole thing through insert effects — eleven of them, on any instrument, any number, in any order.</span>
+        </div>
+      </div>
+
+      <!-- ── 03 ── -->
+      <div class="waypane" id="pane-3" role="tabpanel" aria-labelledby="tab-3" hidden style="--wc:var(--i-chord)"
+           data-foc="2,33.2,94.9,61.2" data-label="Instrument panel" data-low="1">
+        <span class="n">03 / 04</span>
+        <h3>Play something melodic</h3>
+        <p>Classic Synth is a wavetable with four modes: spread, 2-op FM, paraphony, and in-scale chords, where a chord is a step rather than a decision. Macro Synth holds sixteen sub-synths based on a classic Eurorack module.</p>
+        <p>Draw the notes, play them in over MIDI, or generate them.</p>
+        <div class="then">
+          <b>And then</b>
+          <span>Three layers of modulation sit under every instrument — an assignable LFO, a pattern automation lane, and a song automation lane above that.</span>
+        </div>
+      </div>
+
+      <!-- ── 04 ── -->
+      <div class="waypane" id="pane-4" role="tabpanel" aria-labelledby="tab-4" hidden style="--wc:var(--i-snare)"
+           data-foc="2,11.7,94.9,3.4" data-label="Pages · up to 64 steps">
+        <span class="n">04 / 04</span>
+        <h3>Let it generate</h3>
+        <p>A pattern can be programmed by hand, played in over MIDI, or generated. What comes out is an ordinary pattern — every step editable, across as many as four pages.</p>
+        <p>Useful when the blank grid is the problem rather than the ideas.</p>
+        <div class="then">
+          <b>And then</b>
+          <span>Patterns chain into songs. Song automation runs bar to bar, or you take a fader and override it live while it plays.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real app mockup: Pattern Editor, iPhone. One screen; the highlight moves. -->
+    <div>
+      <div class="shotcol">
+        <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-editor">
+          <div class="bar top">
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+            <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+            <span class="song-title" style="margin-left:4px">Pattern</span>
+            <span class="spacer"></span>
+            <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+            <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+          </div>
+          <div class="edit-body">
+              <div class="subnav">
+                <span class="name">Pattern</span>
+                <span class="icons">
+                  <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+                </span>
+              </div>
+              <div class="pagebar">
+                <div class="pageseq">
+                  <span class="pg label">Page</span>
+                  <span class="pg num on">1</span>
+                  <span class="pg num playing">2</span>
+                  <span class="pg num">3</span>
+                  <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/></svg></span>
+                </div>
+                <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+              </div>
+              <div class="steps" id="stepgrid"></div>
+              <div class="instr-strip">
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+                <div class="chips">
+                  <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+                  <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+                  <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+                  <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                  <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                  <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+                </div>
+              </div>
+              <div class="tabcard">
+                <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+                <div class="panel">
+                  <div class="dial-row">
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+                  </div>
+                  <div class="dial-row">
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Tune</span></div>
+                    <div class="dial"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+                  </div>
+                </div>
+                <div class="foot"><span class="on">Sound</span><span>Filter</span><span>F. Env</span><span>Noise</span><span>Amp</span></div>
+              </div>
+          </div>
+          <div class="bar bottom">
+            <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+            <span class="chip txt"><i>Solo</i></span>
+            <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+            <span class="spacer"></span>
+            <span class="chip txt"><i>VIZ</i></span>
+            <span class="chip txt"><i>FX</i></span>
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+            <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+          </div>
+        </div></div></div>
+        <p class="shotcap"><b>Pattern editor · iPhone</b>One voice's lane. Each step carries the icon of the instrument that plays it. Rendered from the app's design tokens, not captured.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ 02 · MECHANIC ══════════════════════ -->
+<div class="mech">
+  <section class="wrap inner">
+    <div>
+      <p class="eyebrow hot">Wherever you came in</p>
+      <h2>Any voice. Any instrument.<br>Any step.</h2>
+      <p class="solid">A voice is not a channel with one sound parked in it. Step 1 can be a kick, step 6 a chord, step 11 a sub-synth. The sequencer decides per step, and eight voices run at once.</p>
+      <p>Tracker semantics in a groovebox layout. It is the reason the easy ways in do not run out — you keep adding without needing to add tracks.</p>
+      <div class="aside">
+        <b>On restraint</b>
+        <span>We built the view that showed all eight lanes at once, then removed it: it stopped being followable as soon as song sequencing got complicated. Legibility won.</span>
+      </div>
+    </div>
+    <div>
+      <div class="cham fig jolt-mock"><div class="cin">
+        <div class="figbar"><span class="dot"></span>Voice 03<span class="sp"></span><span class="pill">One lane</span><span class="pill on">16 steps</span></div>
+        <div class="well">
+          <div class="xlane" id="lane"></div>
+          <div class="lanelab"><span>01</span><span>05</span><span>09</span><span>13</span></div>
+        </div>
+        <div class="readout">
+          <div><u>Step 01</u><b>Drum Synth</b><i>Kick</i></div>
+          <div><u>Step 06</u><b>Classic Synth</b><i>Chord, in scale</i></div>
+          <div><u>Step 11</u><b>Macro Synth</b><i>Sub-synth 09</i></div>
+        </div>
+        <div class="legend">
+          <span><i style="--c:var(--i-kick)"></i>Kick</span>
+          <span><i style="--c:var(--i-hat)"></i>Hi-hat</span>
+          <span><i style="--c:var(--i-chord)"></i>Chord</span>
+          <span><i style="--c:var(--i-waves)"></i>Sub-synth</span>
+        </div>
+      </div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════ 03 · INSIDE ══════════════════════ -->
+<section id="inside" class="wrap">
+  <div class="sec-head">
+    <p class="eyebrow">Specification</p>
+    <h2>The long version, short</h2>
+    <p>None of it needs reading before you start, and none of it is behind a door you have to find later.</p>
+  </div>
+
+  <div class="inside">
+    <div class="instlist">
+      <div><b>Classic Synth</b><span>Wavetable. Four modes: spread, 2-op FM, paraphony, in-scale chords.</span></div>
+      <div><b>Macro Synth</b><span>Sixteen sub-synths, based on a classic Eurorack module.</span></div>
+      <div><b>Sampler</b><span>Pitched or slicing. Old-skool repitching, per-step reversing, mic recording, mp3 and wav.</span></div>
+      <div><b>Drum Synth</b><span>x0x-style percussion — hi-hats, snares, heavy kicks.</span></div>
+    </div>
+    <div>
+      <p><b>Eleven insert effects</b> — overdrive, a four-stage ladder filter and a sixteen-step gater among them — on any instrument, any number, in any order. <b>Four sends</b> after that. Up to <b>five global macros</b> under your fingers in performance mode, and <b>three layers of modulation</b>, from an assignable LFO up to song automation.</p>
+      <p>Patterns chain into songs with automation. Light external MIDI sequencing for whatever else is on the desk.</p>
+      <p>iPhone in portrait, iPad in landscape. On iPad the editor clusters merge onto one surface where the phone uses sub-tabs, and the note editor shows three lanes against one. More controls resident, less menu-diving — that is the whole of the difference.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ CLOSE ══════════════════════ -->
+<section class="close">
+  <div class="plate"><img src="assets/plates/bar__A-riso.png" alt=""></div>
+  <div class="wrap inner">
+    <p class="eyebrow hot">Pick a door</p>
+    <h2>Start anywhere.<br>Finish here.</h2>
+    <p>Patterns, songs, automation and the mixdown happen in the same app. Groovebox simplicity, tracker flexibility.</p>
+    <div class="ctarow">
+      <a class="btn" href="#appstore"><span>Get it on the App&nbsp;Store</span></a>
+      <a class="btn ghost" href="../onboarding2.html"><span>Play a slice in the browser</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap inner">
+    <img class="fword" src="assets/marks/jolt-wordmark.svg" alt="Jolt">
+    <span class="sp"></span>
+    <a href="../onboarding2.html">Browser demo</a>
+    <a href="#appstore">App Store</a>
+    <a href="../privacy.html">Privacy</a>
+    <span class="endorse"><i>An</i><img src="assets/marks/lhmp-wordmark-chamfer.svg" alt="LHMP"><i>instrument</i></span>
+  </div>
+</footer>
+
+<script src="../mockup-screens.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ── One-voice lane: four instruments across sixteen steps.
+        Colours and icons are the app's own (InstrumentColors.fixed). ── */
+  var KICK='var(--i-kick)', HAT='var(--i-hat)', CHORD='var(--i-chord)', WAVES='var(--i-waves)';
+  var LANE = [
+    {c:KICK,ic:'kick'}, null, {c:HAT,ic:'hihat'}, null,
+    {c:KICK,ic:'kick'}, {c:CHORD,ic:'chord'}, null, {c:HAT,ic:'hihat'},
+    {c:KICK,ic:'kick'}, null, {c:WAVES,ic:'waves'}, {c:HAT,ic:'hihat'},
+    {c:KICK,ic:'kick'}, {c:CHORD,ic:'chord'}, null, {c:WAVES,ic:'waves'}
+  ];
+  var lane = document.getElementById('lane');
+  if(lane){
+    lane.innerHTML = LANE.map(function(s){
+      if(!s) return '<div class="xstep"></div>';
+      return '<div class="xstep on" style="--c:'+s.c+'"><span class="ink" style="--ic:var(--ic-'+s.ic+')"></span></div>';
+    }).join('');
+  }
+
+  /* ── Tabs. One product screen; the focus rectangle moves. ── */
+  var tabs  = Array.prototype.slice.call(document.querySelectorAll('.tabbtn'));
+  var panes = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+  var vp    = document.querySelector('.shotcol .viewport');
+  var foc   = null;
+
+  if(vp){
+    foc = document.createElement('span');
+    foc.className = 'foc';
+    foc.innerHTML = '<b></b>';
+    vp.appendChild(foc);
+  }
+
+  function moveFocus(pane){
+    if(!foc || !pane) return;
+    var d = (pane.getAttribute('data-foc') || '').split(',');
+    if(d.length !== 4) return;
+    foc.style.left   = d[0] + '%';
+    foc.style.top    = d[1] + '%';
+    foc.style.width  = d[2] + '%';
+    foc.style.height = d[3] + '%';
+    foc.style.setProperty('--wc', getComputedStyle(pane).getPropertyValue('--wc'));
+    foc.classList.toggle('low', pane.getAttribute('data-low') === '1');
+    foc.firstChild.textContent = pane.getAttribute('data-label') || '';
+  }
+
+  function select(idx){
+    tabs.forEach(function(t,i){
+      var on = i === idx;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      if(panes[i]) panes[i].hidden = !on;
+    });
+    moveFocus(panes[idx]);
+  }
+
+  tabs.forEach(function(t,i){
+    t.addEventListener('click', function(){ select(i); });
+    t.addEventListener('keydown', function(e){
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(!d) return;
+      e.preventDefault();
+      var next = (i + d + tabs.length) % tabs.length;
+      select(next);
+      tabs[next].focus();
+    });
+  });
+
+  select(0);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- LHMP · Jolt variant (dense / energetic): core dial + 3 stacked rings + centre step-plus. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="256" height="256" color="#14161d">
+  <path d="M23.13,76.87 A38,38 0 1 1 76.87,76.87" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/>
+  <path d="M23.13,76.87 A38,38 0 0 1 69.00,17.10" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="butt"/>
+  <polygon points="66,12 72,12 74,14 74,20 72,22 66,22 64,20 64,14" fill="currentColor"/>
+  <path d="M65.00,24.02 A30,30 0 0 0 28.79,28.79" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="butt"/>
+  <circle cx="28.79" cy="28.79" r="2.8" fill="currentColor"/>
+  <path d="M61.50,30.08 A23,23 0 0 1 72.91,47.99" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="butt"/>
+  <circle cx="72.91" cy="47.99" r="2.4" fill="currentColor"/>
+  <path d="M58.25,35.71 A16.5,16.5 0 0 0 43.03,35.05" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="butt"/>
+  <circle cx="43.03" cy="35.05" r="2.2" fill="currentColor"/>
+  <line x1="44" y1="50" x2="56" y2="50" stroke="currentColor" stroke-width="3"/>
+  <line x1="50" y1="44" x2="50" y2="56" stroke="currentColor" stroke-width="3"/>
+</svg>

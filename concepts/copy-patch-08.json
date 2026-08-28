@@ -1,0 +1,307 @@
+[
+  {
+    "before": "Any voice.<br>Any instrument.<br>Any step.",
+    "after": "Any step.<br>Any voice.<br>Any instrument.",
+    "nth": 0
+  },
+  {
+    "before": "One pattern holds all eight voices. No track is locked to a single sound.",
+    "after": "Any step can play any instrument.<br>Any voice can play any pattern.<br>Tracker-style flexibility, with a groovebox UI.",
+    "nth": 0
+  },
+  {
+    "before": "Free-form.",
+    "after": "Flexible.",
+    "nth": 0
+  },
+  {
+    "before": "Any instrument, on any of <span class=\"n\">64</span> steps.",
+    "after": "Every pattern has up to&nbsp;<span class=\"n\">128</span>&nbsp;steps.",
+    "nth": 0
+  },
+  {
+    "before": "<span class=\"n\">8</span> voices, <span class=\"n\">8</span> step sequencers.",
+    "after": "<span class=\"n\">8</span> voices, playing any instrument.",
+    "nth": 0
+  },
+  {
+    "before": "<span class=\"n\">11</span> inserts, <span class=\"n\">4</span> sends, any order.",
+    "after": "<span class=\"n\">Per-instrument</span>&nbsp;and global FX chains.",
+    "nth": 0
+  },
+  {
+    "before": "<span class=\"n\">3</span> modulation layers, any parameter.",
+    "after": "<span class=\"n\">3</span> modulation layers, for any parameter.",
+    "nth": 0
+  },
+  {
+    "before": "Program it. Generate it.<br>Play it live.",
+    "after": "Program. Generate.<br>Play.",
+    "nth": 0
+  },
+  {
+    "before": "Four doors.<br>One machine.",
+    "after": "Get straight to it",
+    "nth": 0
+  },
+  {
+    "before": "Different people open a groovebox for different reasons. None of these is the\n    beginner one. The screen below does not change — only where you are looking.",
+    "after": "Laser-focused on making music, not learning workflows. Jolt is designed from the ground-up to be mobile-first, inspired by classic handheld devices.<br><br>",
+    "nth": 0
+  },
+  {
+    "before": "Tap steps until it moves. The Drum Synth is x0x-style — hats, snares and heavy kicks,\n          synthesised rather than chosen from a folder.",
+    "after": "Choose an instrument, and tap in a rhythm or select the steps you want to play.",
+    "nth": 0
+  },
+  {
+    "before": "Sixteen steps on screen. Up to sixty-four when the idea needs the room.",
+    "after": "When your idea needs more space or variation, extend a pattern up to 8 pages of 16 steps.",
+    "nth": 0
+  },
+  {
+    "before": "And then",
+    "after": "The secret sauce",
+    "nth": 0
+  },
+  {
+    "before": "That kick belongs to the step, not to the voice. Step four of the same lane can be a\n            chord, and nothing had to be added to hold it.",
+    "after": "Mix instruments to make complex grooves - think of instruments as a preset, not a limitation.",
+    "nth": 0
+  },
+  {
+    "before": "Record through the mic, or load an mp3 or a wav. The Sampler plays pitched or sliced, with\n          old-skool repitching rather than time-stretching.",
+    "after": "Record through the mic, or load a sample in from your library.<br><br>Jolt's Sampler features slicing and old-skool repitching, for crafting awesome breaks or remixing classic samples.",
+    "nth": 0
+  },
+  {
+    "before": "And then",
+    "after": "Something special",
+    "nth": 1
+  },
+  {
+    "before": "Reversing is per step. One slice forward, the same slice backwards on the next step,\n            in the same lane.",
+    "after": "The granular instrument lets you turn any sample into a texture, as sparse or dense as you like.",
+    "nth": 0
+  },
+  {
+    "before": "The Classic Synth is wavetable, with four modes — spread, 2-op FM, paraphony, and\n          in-scale chords. The Macro Synth carries sixteen sub-synths built on the architecture of a\n          classic Eurorack module.",
+    "after": "JOLT's synths cover a wide set of styles, and are all designed for quickly testing out ideas.<br><br>Play notes in on the on-screen keyboard, or via MIDI, the load up the piano-roll to edit and tweak until you get the perfect line.<br>",
+    "nth": 0
+  },
+  {
+    "before": "And then",
+    "after": "Change the sound",
+    "nth": 2
+  },
+  {
+    "before": "Scale lives in a mode, not over the whole instrument. In-scale chords is one of the\n            Classic Synth’s four; the other three are not constrained.",
+    "after": "Sound editing is as simple as dragging dials and dialling in modulation - no menu diving, and immediately visible.",
+    "nth": 0
+  },
+  {
+    "before": "Generative is one of three ways a step arrives — alongside programming it by hand and\n          playing it in over MIDI. All three write to the same lane.",
+    "after": "JOLT's generative modes cover simple arpeggios, pounding acid patterns, and a complex chord progression editor.<br><br>Everything is kept in-scale, so inspiration is as simple as picking a mode and going wild.",
+    "nth": 0
+  },
+  {
+    "before": "And then",
+    "after": "Add more vibe",
+    "nth": 3
+  },
+  {
+    "before": "A per-instrument LFO — sine, ramp or random — is freely assignable, so what\n            the pattern does and what the sound does need not agree.",
+    "after": "Most generative modes also allow you to transpose your patterns, to break out of the loop and build up a song.",
+    "nth": 0
+  },
+  {
+    "before": "It is a groovebox.",
+    "after": "Features? JOLT has them.",
+    "nth": 0
+  },
+  {
+    "before": "One per voice, independent.",
+    "after": "Each voice plays independently",
+    "nth": 0
+  },
+  {
+    "before": "≤ 64 steps",
+    "after": "128 steps",
+    "nth": 0
+  },
+  {
+    "before": "3 methods",
+    "after": "Flexible",
+    "nth": 0
+  },
+  {
+    "before": "Programmed · MIDI input · generative.",
+    "after": "Programmed · MIDI input · Generative.",
+    "nth": 0
+  },
+  {
+    "before": "External MIDI seq.",
+    "after": "MIDI output",
+    "nth": 0
+  },
+  {
+    "before": "Light",
+    "after": "Sync and Notes",
+    "nth": 0
+  },
+  {
+    "before": "Classic Synth",
+    "after": "Wavetable Synth",
+    "nth": 0
+  },
+  {
+    "before": "Wavetable",
+    "after": "",
+    "nth": 0
+  },
+  {
+    "before": "Built on the architecture of a classic Eurorack module.",
+    "after": "Built on the architecture of the Eurorack classic, Mutable Instruments Plaits.",
+    "nth": 0
+  },
+  {
+    "before": "Pitched / slicing",
+    "after": "~40min Sample Memory",
+    "nth": 0
+  },
+  {
+    "before": "Old-skool repitching, per-step reversing, mic recording, mp3 and wav loading.",
+    "after": "Old-skool repitching, per-step reversing, and granular cloud.",
+    "nth": 0
+  },
+  {
+    "before": "Hats, snares, heavy kicks.",
+    "after": "Hats, snares, heavy kicks, instantly configurable.",
+    "nth": 0
+  },
+  {
+    "before": "any instrument · any number · any order",
+    "after": "Up to 5 per instrument",
+    "nth": 0
+  },
+  {
+    "before": "Stereo pan",
+    "after": "Modulated pan",
+    "nth": 0
+  },
+  {
+    "before": "\n        <b>04</b> 4-stage ladder, or resonant SVF (LP / HP / BP), with mod envelope. &nbsp;\n        <b>10</b> 16-step, synced.\n      ",
+    "after": "\n        <b>04</b>&nbsp;Filter: 4-stage ladder, or resonant SVF (LP / HP / BP), with mod envelope<br><b>10</b>&nbsp;Gater: 16-step, synced.\n      ",
+    "nth": 0
+  },
+  {
+    "before": "Sine, ramp, random. Freely assignable.",
+    "after": "Sine, ramp, and others. Assign to any parameter.",
+    "nth": 0
+  },
+  {
+    "before": "Lane",
+    "after": "Group",
+    "nth": 1
+  },
+  {
+    "before": "Bar-to-bar, or real-time fader override.",
+    "after": "Matched to the song, or real-time fader override.",
+    "nth": 0
+  },
+  {
+    "before": "Ping-pong",
+    "after": "Digital",
+    "nth": 0
+  },
+  {
+    "before": "Synced, with feedback.",
+    "after": "Tempo-synced, with ping-pong option.",
+    "nth": 0
+  },
+  {
+    "before": "Kick-keyed",
+    "after": "Classic Pumping",
+    "nth": 0
+  },
+  {
+    "before": "up to 5",
+    "after": "5 Groups",
+    "nth": 0
+  },
+  {
+    "before": "M",
+    "after": "",
+    "nth": 0
+  },
+  {
+    "before": "M",
+    "after": "",
+    "nth": 1
+  },
+  {
+    "before": "M",
+    "after": "",
+    "nth": 2
+  },
+  {
+    "before": "M",
+    "after": "",
+    "nth": 3
+  },
+  {
+    "before": "Resonant",
+    "after": "",
+    "nth": 0
+  },
+  {
+    "before": "Resonant",
+    "after": "",
+    "nth": 1
+  },
+  {
+    "before": "iPhone portrait. iPad landscape.",
+    "after": "Designed for mobile beat making",
+    "nth": 0
+  },
+  {
+    "before": "Light seq.",
+    "after": "Sync + Notes",
+    "nth": 0
+  },
+  {
+    "before": "Mic → sampler",
+    "after": "Sample anything",
+    "nth": 0
+  },
+  {
+    "before": "mp3 · wav",
+    "after": "Mp3 + WAV",
+    "nth": 0
+  },
+  {
+    "before": "Demo",
+    "after": "Demo NOW",
+    "nth": 0
+  },
+  {
+    "before": "It already runs<br>in this browser.",
+    "after": "Ready to play?",
+    "nth": 0
+  },
+  {
+    "before": "A slice of the engine — the real DSP, compiled to WebAssembly, behind a simple\n      sequencer. It is not the app.",
+    "after": "The JOLT onboarding runs in the browser, as well as in the app, so you can try it right now:",
+    "nth": 0
+  },
+  {
+    "before": "instrument",
+    "after": "project",
+    "nth": 0
+  },
+  {
+    "before": "instrument",
+    "after": "project",
+    "nth": 1
+  }
+]

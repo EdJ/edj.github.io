@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JOLT wordmark in the house (JLT) typeface. Letters are the native paths from
+     my-video/src/jolt.ts (J/L/T lifted from "Splash Font (flat).svg", O constructed on the
+     same grid: 3t wide, t stroke, hard 90° corners), each translated slotX − x0 onto the
+     common advance. Grid: stroke t=19.455, cap H=82.49 (4.24t), letter W=58.37 (3t),
+     spacing 12.92. viewBox 271.76 × 82.49. Recolour via currentColor. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 271.76 82.49"
+     fill="currentColor" fill-rule="evenodd" color="#EDEFF3">
+  <path d="M58.3662 82.4902H0V49.0273H19.4551V63.0352H38.9111V19.4551H0V0H58.3662V82.4902Z"/>
+  <path transform="translate(71.29 0)" d="M58.37 82.49H0V0H58.37V82.49ZM38.91 63.04V19.46H19.46V63.04H38.91Z"/>
+  <path transform="translate(71.29 0)" d="M129.183 82.4904V63.0351L90.6378 63.1408V0H71.2883L71.2881 82.4904H129.183Z"/>
+  <path transform="translate(71.76 0)" d="M200 19.4551H180.257V82.4902H160.907V19.4551H141.634V0H200V19.4551Z"/>
+</svg>

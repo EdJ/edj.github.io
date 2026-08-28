@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt — concept browser</title>
+<style>
+:root{
+  --ground:#0B0C0F; --s1:#14161D; --s2:#1E222C; --line:#3A3F4B;
+  --text:#EDEFF3; --muted:#8B93A6; --cyan:#7DFBFD; --acid:#E8FF00; --orange:#FF6A00;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --bar: 52px; --meta: 40px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ground);color:var(--text);font-family:var(--mono);font-size:13px;
+  display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── top bar ─────────────────────────────── */
+.bar{height:var(--bar);flex:0 0 auto;display:flex;align-items:center;gap:18px;
+  padding:0 16px;border-bottom:1px solid var(--line);background:var(--s1)}
+.brand{display:flex;align-items:baseline;gap:9px;white-space:nowrap}
+.brand b{font-size:14px;letter-spacing:.06em}
+.brand span{color:var(--muted);font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+
+nav{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto}
+nav button{background:transparent;color:var(--muted);border:1px solid var(--line);
+  font:inherit;font-size:11.5px;padding:6px 11px;cursor:pointer;white-space:nowrap;
+  letter-spacing:.04em;transition:color .12s,border-color .12s,background .12s}
+nav button:hover{color:var(--text);border-color:var(--muted)}
+nav button.on{color:var(--ground);background:var(--cyan);border-color:var(--cyan);font-weight:700}
+nav button .n{opacity:.55;margin-right:6px}
+nav button.on .n{opacity:.75}
+
+.right{display:flex;align-items:center;gap:14px;white-space:nowrap}
+.seg{display:flex;border:1px solid var(--line)}
+.seg button{background:transparent;color:var(--muted);border:0;border-right:1px solid var(--line);
+  font:inherit;font-size:11px;padding:6px 10px;cursor:pointer;letter-spacing:.06em}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--text)}
+.seg button.on{color:var(--ground);background:var(--text);font-weight:700}
+a.pop{color:var(--cyan);text-decoration:none;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;border-bottom:1px solid transparent}
+a.pop:hover{border-bottom-color:var(--cyan)}
+
+/* ── meta strip ──────────────────────────── */
+.meta{height:var(--meta);flex:0 0 auto;display:flex;align-items:center;gap:22px;
+  padding:0 16px;border-bottom:1px solid var(--line);background:var(--ground);
+  font-size:11.5px;overflow-x:auto;white-space:nowrap}
+.meta i{font-style:normal;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;
+  font-size:9.5px;margin-right:7px}
+.meta .ref{color:var(--cyan)}
+.meta .test{color:var(--text)}
+.meta .warn{color:var(--orange)}
+
+/* ── stage ───────────────────────────────── */
+.stage{flex:1;min-height:0;position:relative;background:#000;
+  display:flex;justify-content:center;align-items:stretch;overflow:auto}
+.frame{position:relative;background:var(--ground);width:100%;height:100%;
+  transition:width .18s ease;flex:0 0 auto}
+.frame::after{content:attr(data-w);position:absolute;top:6px;right:8px;z-index:3;
+  font-size:9.5px;letter-spacing:.14em;color:var(--muted);background:rgba(11,12,15,.9);
+  padding:2px 6px;pointer-events:none;opacity:0;transition:opacity .2s}
+.stage:hover .frame::after{opacity:1}
+iframe{width:100%;height:100%;border:0;display:block;background:var(--ground)}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;pointer-events:none;
+  background:var(--ground);transition:opacity .25s;z-index:2}
+.loading.gone{opacity:0}
+
+.hint{position:fixed;bottom:10px;left:16px;color:#5A6072;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="brand"><b>JOLT</b><span>concepts</span></div>
+  <nav id="nav"></nav>
+  <div class="right">
+    <div class="seg" id="seg">
+      <button data-w="390">Phone</button>
+      <button data-w="834">Tablet</button>
+      <button data-w="1280">Laptop</button>
+      <button data-w="0" class="on">Full</button>
+    </div>
+    <a class="pop" id="pop" href="#" target="_blank">Open ↗</a>
+  </div>
+</div>
+
+<div class="meta" id="meta"></div>
+
+<div class="stage" id="stage">
+  <div class="frame" id="frame" data-w="full">
+    <div class="loading" id="loading">Loading</div>
+    <iframe id="view" title="concept"></iframe>
+  </div>
+</div>
+
+<div class="hint">1–7 switch · ← → step · W cycles width</div>
+
+<script>
+const CONCEPTS = [
+  { n:'01', file:'01-figures.html',   name:'Figures',
+    ref:'Linear',
+    test:'Schematic first, then the same 16 steps in the real app — FIG 0.1 → FIG 0.2',
+    warn:'Calmest of the five. Does it argue hard enough?' },
+  { n:'02', file:'02-specsheet.html', name:'Spec sheet',
+    ref:'Dirtywave M8',
+    test:'The specification is the page; callouts anchored to the live iPad editor',
+    warn:'iPad frame leaves a void — the step grid is the smallest thing in it' },
+  { n:'03', file:'03-waysin.html',    name:'Ways in',
+    ref:'Ableton Note',
+    test:'Four doors onto one instrument; hero now names the mechanic too',
+    warn:'Mid-page schematic is 1×16 where the app is 2×8' },
+  { n:'04', file:'04-gallery.html',   name:'Gallery + tDR',
+    ref:'Slate + Ash, Designers Republic register',
+    test:'Spec sheet as flyer billing list; acid and orange as eruptions',
+    warn:'CLASS II / LHMP ◆ STD 04 are invented standards marks — decide' },
+  { n:'05', file:'05-synthesis.html', name:'Synthesis',
+    ref:'Raycast + Linear + Dirtywave + Bitwig',
+    test:'The hero pad grid IS the feature grid — one lane, 2 rows of 8',
+    warn:'Still the most content of the five, though now inside budget' },
+  { n:'06', file:'06-synthesis.html', name:'Synthesis 06',
+    ref:'04 chassis · 05 movement · 03 ways in · 02 spec · 01 icons',
+    test:'Does the assembly read as one page, or as five pages spliced?',
+    warn:'Height budget suspended for this pass — it runs ~6,400px' },
+  { n:'07', file:'07-open.html', name:'Open',
+    ref:'Dirtywave M8 — less chrome, more air',
+    test:'Seven sections, apparatus stripped, gaps doing the work',
+    warn:'Placeholder imagery in the demo plate; footer replaces the Get-it panel' },
+];
+
+const nav = document.getElementById('nav');
+const meta = document.getElementById('meta');
+const view = document.getElementById('view');
+const frame = document.getElementById('frame');
+const loading = document.getElementById('loading');
+const pop = document.getElementById('pop');
+const seg = document.getElementById('seg');
+
+let cur = 0;
+let width = 0; // 0 = full
+
+CONCEPTS.forEach((c, i) => {
+  const b = document.createElement('button');
+  b.innerHTML = '<span class="n">' + c.n + '</span>' + c.name;
+  b.onclick = () => show(i);
+  nav.appendChild(b);
+});
+
+function show(i){
+  cur = (i + CONCEPTS.length) % CONCEPTS.length;
+  const c = CONCEPTS[cur];
+  [...nav.children].forEach((b, k) => b.classList.toggle('on', k === cur));
+  meta.innerHTML =
+      '<span><i>Ref</i><span class="ref">' + c.ref + '</span></span>'
+    + '<span><i>Testing</i><span class="test">' + c.test + '</span></span>'
+    + '<span><i>Watch for</i><span class="warn">' + c.warn + '</span></span>';
+  loading.classList.remove('gone');
+  view.src = c.file;
+  pop.href = c.file;
+  document.title = 'Jolt — ' + c.n + ' ' + c.name;
+}
+
+view.addEventListener('load', () => loading.classList.add('gone'));
+
+function setWidth(w){
+  width = w;
+  [...seg.children].forEach(b => b.classList.toggle('on', +b.dataset.w === w));
+  frame.style.width = w ? w + 'px' : '100%';
+  frame.dataset.w = w ? w + 'px' : 'full';
+}
+[...seg.children].forEach(b => b.onclick = () => setWidth(+b.dataset.w));
+
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k >= '1' && k <= String(CONCEPTS.length)) show(+k - 1);
+  else if (k === 'ArrowRight') show(cur + 1);
+  else if (k === 'ArrowLeft')  show(cur - 1);
+  else if (k.toLowerCase() === 'w') {
+    const opts = [0, 390, 834, 1280];
+    setWidth(opts[(opts.indexOf(width) + 1) % opts.length]);
+  }
+});
+
+show(0);
+</script>
+</body>
+</html>
