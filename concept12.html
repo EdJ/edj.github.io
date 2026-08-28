@@ -29,6 +29,9 @@
        "concept-assets/vendor/paper-shaders/get-shader-color-from-string.js"
        "concept-assets/vendor/paper-shaders/shaders/image-dithering.js"
        "concept-assets/vendor/paper-shaders/LICENSE"
+     and the two sources the shader dithers:
+       "concept-assets/plates12/hands-src.jpg"
+       "concept-assets/plates12/backs-src.jpg"
 
      ─── inherited from 10 ───
      CONCEPT 10 — PLATES, CHOSEN.
@@ -1178,11 +1181,17 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
   padding:0;
 }
 .perf > img{transform:none}          /* .photoplate's 1.12 scale is for the close */
+/* With no type on this panel the scrim has almost nothing left to do, and the
+   heavy alpha wash it used to carry was what flattened the picture — alpha
+   lifts the blacks toward orange and takes the range with them.
+   The plate does the colour now: C-print is the orange treatment (orange and
+   black on cream), so the panel is orange because the PICTURE is, not because
+   something is painted over it. What is left here is a light gradient for
+   depth, nothing more.
+   Multiply was tried and is wrong for this plate — it is mean .13, and a dark
+   plate multiplied by orange goes near-black and loses the colour entirely. */
 .perf > .scrim{
-  background:
-    linear-gradient(96deg, rgba(255,106,0,.96) 0%,  rgba(255,106,0,.90) 30%,
-                           rgba(255,106,0,.46) 64%, rgba(255,106,0,.10) 92%),
-    linear-gradient(0deg,  rgba(255,106,0,.34) 0%,  rgba(255,106,0,0) 40%);
+  background:linear-gradient(96deg, rgba(255,106,0,.30) 0%, rgba(255,106,0,.05) 100%);
 }
 .perf > .plate-in{
   min-height:100svh;justify-content:center;
@@ -1207,6 +1216,9 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
   position:absolute;inset:0;z-index:0;
   opacity:0;transition:opacity .28s ease;
 }
+/* on #p03 the scrim sits above the plate, so the canvas has to go under it
+   rather than over — same z-index as the img it replaces */
+.perf > .ditherstage{z-index:0}
 .ditherstage.live{opacity:1}
 .ditherstage canvas{display:block;width:100%;height:100%}
 /* once the shader owns the panel the baked plate is redundant; keeping it
@@ -1216,6 +1228,32 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
   .ditherstage{transition:none}
 }
 
+/* ── THE FOUR DOORS, BROKEN OUT ON A PHONE ───────────────────────
+   The tab bar is a horizontal scroller at this width — it measures
+   822px inside a 350px column, so doors 03 and 04 are off-screen
+   with nothing saying so. Below 880px the panes stop being tabs and
+   become four sections, each with its own screen under it.
+   The move itself is done in script (the screens live in one
+   .shotcol so that they can cross-fade in place on desktop, and CSS
+   cannot interleave them); everything here is the layout it lands in. */
+@media (max-width:880px){
+  .tabbar{display:none}
+  .shotcol:empty{display:none}
+  /* all four are shown at once, so the per-pane fade would fire four times
+     on load and read as a stutter */
+  .waypane{animation:none}
+  .waypane + .waypane{
+    margin-top:clamp(34px,5vh,56px);
+    padding-top:clamp(28px,4vh,44px);
+    border-top:1px solid var(--hair);
+  }
+  /* the screen was absolutely stacked inside .shotcol; in a pane it is just
+     the next block */
+  .waypane .shot{
+    position:relative;inset:auto;opacity:1;
+    width:100%;max-width:262px;margin:clamp(18px,2.6vh,26px) auto 0;
+  }
+}
 </style>
 </head>
 <body data-tone="dark">
@@ -1507,15 +1545,18 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
        is not lost — it moves into the scrim, so the panel keeps its colour
        role and gains a picture under it.
        .tex-halftone is gone deliberately: the house rule is that dots go on
-       FLAT fields and never over photography. -->
-  <img src="concept-assets/plates10/perf-two-backs-news.jpg" alt="">
+       FLAT fields and never over photography.
+       12: the headline came off and the plate moved from D-news to C-print —
+       with no type to hold, the panel can be the picture at full contrast. -->
+  <img id="plate-perf" src="concept-assets/plates10/perf-two-backs-print.jpg" alt="">
+  <div class="ditherstage" id="ditherstage-perf" aria-hidden="true"></div>
   <div class="scrim" aria-hidden="true"></div>
 
-  <div class="plate-in">
-    <div class="chev" style="margin-bottom:clamp(14px,2.2vh,26px)"></div>
-    <h2 class="d lg">Program. Generate.<br>Play.</h2>
-    <div class="chev" style="margin-top:clamp(14px,2.2vh,26px)"></div>
-  </div>
+  <!-- The headline and its hazard rules are gone: this panel is the picture
+       now. Kept .plate-in, empty, because it is what holds the panel's height
+       — .panel.spacer would give it 100svh anyway, but the two agreeing is
+       what stops a future edit changing the rhythm by accident. -->
+  <div class="plate-in"></div>
 
 </section>
 
@@ -2141,6 +2182,7 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
   var tabs  = [].slice.call(document.querySelectorAll('.tabbtn'));
   var wpanes = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
   var shots = [].slice.call(document.querySelectorAll('#shotstack .shot'));
+  var tabbar = document.querySelector('.tabbar');
 
   /* One rectangle per screen, placed once. It is percentages of the viewport,
      which fitScreens() sizes to the scaled canvas, so it holds at any scale
@@ -2163,7 +2205,9 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
   }
   wpanes.forEach(function(pane, i){ placeFocus(pane, shots[i]); });
 
+  var current = 0;
   function selectWay(idx){
+    current = idx;
     tabs.forEach(function(t,i){
       var on = i === idx;
       t.setAttribute('aria-selected', on ? 'true' : 'false');
@@ -2186,6 +2230,43 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
     });
   });
   if (tabs.length) selectWay(0);
+
+  /* ── Phone: four doors instead of four tabs ────────────────────
+     The screens live together in .shotcol so desktop can cross-fade them in
+     place; that also means CSS cannot pair each one with its pane. So below
+     880px each .shot is MOVED into its .waypane and everything is shown at
+     once. Reversible, because a phone can be rotated into the other layout.
+     ARIA moves with it: a tabpanel whose tab is display:none is a broken
+     reference, so the panes drop their tab roles and become plain sections
+     with their own headings. */
+  var stack = document.getElementById('shotstack');
+  var narrow = window.matchMedia('(max-width: 880px)');
+
+  function asSections(on){
+    if (tabbar) {
+      if (on) tabbar.removeAttribute('role'); else tabbar.setAttribute('role','tablist');
+    }
+    wpanes.forEach(function (pane, i) {
+      var shot = shots[i];
+      if (on) {
+        pane.hidden = false;
+        pane.removeAttribute('role');
+        pane.removeAttribute('aria-labelledby');
+        if (shot) { shot.setAttribute('data-on','1'); pane.appendChild(shot); }
+      } else {
+        pane.setAttribute('role','tabpanel');
+        pane.setAttribute('aria-labelledby','tab-' + (i + 1));
+        if (shot && stack) stack.appendChild(shot);
+      }
+    });
+    if (!on) selectWay(current);
+    /* the screens are canvas-sized from their parent's width, and that width
+       just changed under them */
+    if (typeof fitScreens === 'function') fitScreens();
+  }
+
+  asSections(narrow.matches);
+  narrow.addEventListener('change', function (e) { asSections(e.matches); });
 
   /* ── Chrome tone — the fixed chrome inverts over light fields ── */
   function activate(p){
@@ -2295,81 +2376,92 @@ main > .panel.photoplate.close{display:flex;flex-direction:column}
     V("concept-assets/vendor/paper-shaders/shader-sizing.js")
   ]);
 
-  const stage = document.getElementById('ditherstage');
-  const baked = document.getElementById('plate-mid');
-  const panel = document.getElementById('p05');
-  if (!stage || !panel) throw new Error('no stage');
-
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* Two panels run this now, so the whole thing is a list. Each entry is a
+     panel, the canvas that goes in it, the baked plate it supersedes, the
+     source it dithers and the colours it dithers into. */
+  const PANELS = [
+    { panel: 'p05', stage: 'ditherstage',      baked: 'plate-mid',
+      src: "concept-assets/plates12/hands-src.jpg",
+      back: '#0B0C0F', front: '#7DFBFD', high: '#FF2D8C' },
+    { panel: 'p03', stage: 'ditherstage-perf', baked: 'plate-perf',
+      src: "concept-assets/plates12/backs-src.jpg",
+      /* the orange panel keeps its palette: house orange lit out of the same
+         ground, with the print treatment's cream as the top step */
+      back: '#0B0C0F', front: '#FF6A00', high: '#F2EFE6' }
+  ];
 
   /* The dither grid, in shader pixels. FINE as the panel arrives, COARSE as it
      leaves — the picture resolves, then dissolves into its own screen. */
   const PX_MIN = 1.4, PX_MAX = 13, PX_STILL = 3.2;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const src = new Image();
-  src.decoding = 'async';
-  src.src = "concept-assets/plates12/hands-src.jpg";
+  PANELS.forEach((cfg) => {
+    const stage = document.getElementById(cfg.stage);
+    const baked = document.getElementById(cfg.baked);
+    const panel = document.getElementById(cfg.panel);
+    if (!stage || !panel) return;
 
-  src.decode().then(() => {
-    let mount;
-    try {
-      mount = new ShaderMount(
-        stage,
-        imageDitheringFragmentShader,
-        {
-          u_image: src,
-          u_colorBack:      getShaderColorFromString('#0B0C0F'),
-          u_colorFront:     getShaderColorFromString('#7DFBFD'),
-          u_colorHighlight: getShaderColorFromString('#FF2D8C'),
-          u_type: 4,            /* 1 random · 2 bayer2 · 3 bayer4 · else bayer8 */
-          u_pxSize: reduce ? PX_STILL : PX_MIN,
-          u_colorSteps: 2,
-          u_originalColors: false,
-          u_inverted: false,
-          u_fit: ShaderFitOptions.cover,
-          u_scale: 1, u_rotation: 0,
-          u_offsetX: 0, u_offsetY: 0,
-          u_originX: 0.5, u_originY: 0.5,
-          u_worldWidth: 0, u_worldHeight: 0
-        },
-        undefined,
-        0,   /* speed 0 — scroll is the only thing that moves this */
-        0
-      );
-    } catch (e) {
-      /* no WebGL, or a context the mount refuses: leave 10's panel alone */
-      return;
-    }
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = cfg.src;
 
-    requestAnimationFrame(() => {
-      stage.classList.add('live');
-      if (baked) baked.classList.add('superseded');
-    });
+    img.decode().then(() => {
+      let mount;
+      try {
+        mount = new ShaderMount(
+          stage,
+          imageDitheringFragmentShader,
+          {
+            u_image: img,
+            u_colorBack:      getShaderColorFromString(cfg.back),
+            u_colorFront:     getShaderColorFromString(cfg.front),
+            u_colorHighlight: getShaderColorFromString(cfg.high),
+            u_type: 4,            /* 1 random · 2 bayer2 · 3 bayer4 · else bayer8 */
+            u_pxSize: reduce ? PX_STILL : PX_MIN,
+            u_colorSteps: 2,
+            u_originalColors: false,
+            u_inverted: false,
+            u_fit: ShaderFitOptions.cover,
+            u_scale: 1, u_rotation: 0,
+            u_offsetX: 0, u_offsetY: 0,
+            u_originX: 0.5, u_originY: 0.5,
+            u_worldWidth: 0, u_worldHeight: 0
+          },
+          undefined,
+          0,   /* speed 0 — scroll is the only thing that moves this */
+          0
+        );
+      } catch (e) {
+        /* no WebGL, or a context the mount refuses: leave the baked plate up */
+        return;
+      }
 
-    if (reduce) return;   /* mounted and static; the scroll link is the motion */
+      requestAnimationFrame(() => {
+        stage.classList.add('live');
+        if (baked) baked.classList.add('superseded');
+      });
 
-    /* Progress of the panel across the viewport, 0 as its top reaches the
-       bottom of the screen, 1 as its bottom leaves the top. */
-    let queued = false;
-    function update() {
-      queued = false;
-      const r = panel.getBoundingClientRect();
-      const span = window.innerHeight + r.height;
-      const t = Math.min(1, Math.max(0, (window.innerHeight - r.top) / span));
-      /* eased so the coarse end arrives late — most of the scroll is spent
-         somewhere legible rather than racing to pure pattern */
-      const e = t * t;
-      mount.setUniforms({ u_pxSize: PX_MIN + (PX_MAX - PX_MIN) * e });
-    }
-    function onScroll() {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(update);
-    }
-    addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', onScroll, { passive: true });
-    update();
-  }).catch(() => { /* image never decoded — baked plate stands */ });
+      if (reduce) return;   /* mounted and static; the scroll link is the motion */
+
+      let queued = false;
+      function update() {
+        queued = false;
+        const r = panel.getBoundingClientRect();
+        const span = window.innerHeight + r.height;
+        const t = Math.min(1, Math.max(0, (window.innerHeight - r.top) / span));
+        const e = t * t;   /* eased so the coarse end arrives late */
+        mount.setUniforms({ u_pxSize: PX_MIN + (PX_MAX - PX_MIN) * e });
+      }
+      function onScroll() {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(update);
+      }
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', onScroll, { passive: true });
+      update();
+    }).catch(() => { /* image never decoded — baked plate stands */ });
+  });
 </script>
 </body>
 </html>
