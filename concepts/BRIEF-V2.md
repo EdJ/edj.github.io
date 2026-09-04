@@ -146,7 +146,7 @@ the *simplicity* half of the tagline and is exactly the register the house voice
   *unconfirmed*; "no account / no ads" were invented. Leave all of them out this round.
 - **Footer: no personal credit.** `01-foundations.md` §6.2 makes LHMP faceless — no named founder on
   customer-facing surfaces. Use an LHMP endorsement, not "© EdJ".
-- App Store CTA → `#appstore`. Demo link → `../onboarding2.html`.
+- App Store CTA → `#appstore`. Demo link → `../onboarding.html`.
 - No external network requests. Fonts: `../geist/GeistMono/webfonts/GeistMono-{Regular,Medium,Bold}.woff2`,
   `../fonts/ChakraPetch-{Bold,SemiBold}.ttf`. Chakra Petch display, Geist Mono body/labels.
 - Marks available: `assets/marks/jolt-wordmark.svg` (hard-cornered — Tier-1),

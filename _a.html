@@ -1,0 +1,2747 @@
+<!-- CONCEPT 13 — ONE TREATMENT, AND THE DEMOS.
+     12-open with two changes, both of them decisions that 12-style and
+     12-beat were built to ask.
+
+     1 · THE NEWS SCREEN, ON ALL FOUR PLATES
+     12 wore four different treatments — a 1-bit dither on the cover, C-print
+     under the performance copy, A-riso mid-page, a warm duotone at the close.
+     12-style put a selector on that and ran each treatment across all four at
+     once, because a house style can only be judged four times in a row. NEWS
+     is the one that came out: a mono dot screen, one ink on the panel's own
+     ground, sized by BRIGHTNESS so the dots carry the light rather than the
+     dark. Every plate keeps ITS panel's palette — style is the variable here,
+     colour is not:
+
+       #p01  cover        Lasers     · white  #EDEFF3 on #0B0C0F
+       #p03  performance  Two backs  · cream  #F2EFE6 on #0B0C0F
+       #p05  mid-page     Hands      · magenta#FF2D8C on #0B0C0F
+       #p08  closing      Arms       · cream  #FFF1E2 on #15141A
+
+     The plates are the exact bytes 12-style baked, produced by
+     concepts/build_styles.py (s_news, dot cell 5px at 1400px wide), copied
+     into assets/plates13/ under the names this page uses. Re-bake with that
+     script if the sources change; nothing here is generated at runtime.
+
+     THE LIVE DITHER IS GONE, and with it ~60K of vendored ESM and two WebGL
+     contexts. A baked screen cannot be superseded by a shader painted over
+     the top of it, so 12's whole ditherstage apparatus — the stages, the
+     module block, the scroll link, .plateimg.superseded — comes out rather
+     than being left switched off. 13 is one self-contained HTML file again.
+
+     WHAT THE ORANGE DID. #p03 has been the page's one flat colour field
+     since 09, and in 12 it was orange because the PICTURE was — C-print is
+     the orange treatment. The news screen is cream on near-black, so an
+     orange field is no longer something the plate can supply, and the
+     panel's near-black ink (.t-orange) would sit on a near-black picture.
+     The colour role moves rather than being dropped: orange is now this
+     panel's ACCENT — its play buttons, its playheads, its rules — under
+     .t-plate-o. The scrim keeps a trace of it for warmth and nothing more.
+
+     2 · THE TWO EMPTY PLATES CARRY THE DEMOS
+     #p03 and #p05 were the only panels on the page with a picture and no
+     type at all. Each now carries four audio rows, in the player idiom from
+     ../lhmp-brand/brand/references/trance-landing: a row is a LINE OF TYPE
+     with a 2px playhead travelling through it, not a widget with a filling
+     bar, so audio arrives in the same hairline-list register as the
+     specification rather than as a foreign control. Plain <audio>, no Web
+     Audio, no waveform analysis. One rule beyond play/pause — starting any
+     row stops whatever else was playing, across BOTH panels, held by a
+     single `current` reference.
+
+     The two lists are composed against each other rather than repeated:
+     #p03's sits RIGHT with a right-weighted scrim, #p05's sits LEFT with a
+     left-weighted one, because the news plates put their mass in the centre
+     and the panels would otherwise read as the same picture twice.
+
+     PLACEHOLDER AUDIO, stated on the page. There are four bounces, from
+     ../Easter/songs/rendered, and eight rows — so the same four files serve
+     both lists until there are eight. Each list carries a .placemark saying
+     so, the same way the plates say they are placeholder imagery. Files are
+     preload="none": nothing is fetched until someone presses play, and a
+     missing or undecodable file disables its own row rather than leaving a
+     dead-looking control.
+       "assets/audio/ferrite.mp3"
+       "assets/audio/halogen.mp3"
+       "assets/audio/paperbell.mp3"
+       "assets/audio/wideangle.mp3"
+
+     ─── inherited from 12 ───
+     CONCEPT 12 — THE MID PLATE, DITHERED LIVE.
+     10 with #p05 driven by a Paper Shaders ImageDithering pass instead of a
+     baked riso PNG, and the dither's pixel size tied to scroll. Both the
+     shader and the two panels' scroll link are OUT in 13; what survives is
+     10's plate selection and the scrims built for it.
+
+     ─── inherited from 10 ───
+     CONCEPT 10 — PLATES, CHOSEN.
+     09 with the picker taken out and four plates committed:
+
+       #p01  hero         Lasers      · 1-bit dither on the site's ground
+       #p03  performance  Two backs   · D-news halftone under the orange
+       #p05  mid-page     Hands       · A-riso duotone
+       #p08  closing      Arms        · warm duotone, 10 levels
+
+     What 10 keeps from 09, and what 08 still lacks:
+       · a plate behind the hero at all. #p01 has carried .heroscrim — a
+         gradient whose only job is holding type over a picture — with no
+         picture under it.
+       · .heroground, a second and stronger ground under the plate. NOT
+         because .heroscrim is scoped to the device column — it is a
+         SIBLING of .herostage at inset:0, so it already spans the panel,
+         with .herocopy above it at z-index:3. .heroground earns its place
+         for two other reasons: below 1040px .heroscrim is display:none,
+         so this is the only ground a phone gets; and its desktop ramp is
+         stronger and reaches further right, which a full-strength plate
+         behind the subhead needs. Note the two STACK on desktop, .97 over
+         .86 at the left edge, so the plate is ~99.6% covered there.
+       · #p03, the one flat colour field, is a plate. See "WHAT THE ORANGE
+         DID" above for where that colour role has gone in 13.
+       · both of those scrims turn VERTICAL under 1040px, where the copy
+         stacks above the devices and a left-to-right wash is aimed at
+         nothing. #p08's scrim still has that bug on a phone.
+       · --chrome-veil. 08 gives light-toned panels no chrome scrim, which
+         was right while the only light panel was FLAT orange at 5.7:1.
+         #p03 is a photograph now and its top-right runs to near-black —
+         the bar measured 1.01:1 over it. The veil is a property of the
+         panel rather than of its tone, so any future light photo panel
+         just declares one. -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt Groovebox — Groovebox simplicity, Tracker flexibility</title>
+<meta name="description" content="Jolt Groovebox for iPhone and iPad. Eight voices. Any voice plays any instrument on any step. Synths, Sampler, and effects built-in.">
+<link rel="stylesheet" href="../mockup-screens.css">
+<style>
+/* ══════════════════════════════════════════════════════════════
+   CONCEPT 07 — OPEN
+   06, cut down. Reference is dirtywave.com: less chrome, more air.
+
+   Running order — hero, the mechanic, a spacer, four doors, the
+   specification, a spacer, the demo, and a footer strip. Gone:
+   the Interface panel, the Get-it panel (now the footer), and
+   most of the tDR apparatus.
+
+   The apparatus that went: registration targets, the exposed
+   column grid, hazard chevrons, stamps, deadpan small print, the
+   floorplan index, the section numbers and rules in the eyebrows,
+   and the in-page "next section" arrows. The grain stays, at half
+   strength — it is the one texture doing structural work.
+
+   Space is now padding rather than a fixed panel height: panels
+   size to their content and carry clamp(96px,15vh,200px) of it
+   top and bottom, so the gaps between sections are the point.
+
+   ─── inherited from 06 ───
+   CONCEPT 06 — SYNTHESIS
+   Built on 04's chassis. See concepts/SYNTHESIS.md for which
+   mechanism came from where and why. In short:
+     · 04  the panel system, duotone themes, grain, tDR apparatus.
+           The open space is structural — min-height:min(100svh,446px)
+           with content centred, so a panel is taller than its content.
+     · 05  the hero lane: playhead AND click-to-reassign per step.
+           The central claim is demonstrated, not asserted.
+     · 03  one resident product screen with a labelled focus
+           rectangle moving over it. Four doors, visibly one machine.
+     · 02  the four-column specification, and .sp-r.hi — the single
+           cyan-washed row that makes a datasheet argue.
+     · 01  instrument icons as CSS masks, so they tint per colour.
+
+   Standards marks: JLT-8V and LHMP IOS 01 only. CLASS II, ISSUE 02
+   and REV 12 are gone — they asserted conformance and a revision
+   history that do not exist (wsp jolt-site d2).
+
+   Height budget suspended for this iteration (wsp jolt-site d3).
+   The one-list rule is NOT: the specification is the only
+   enumeration on the page.
+
+   ─── inherited from 04 ───
+   CONCEPT 04 — GALLERY · v2
+   The page as a gallery floorplan: colour-blocked panels, one idea
+   and one arrow each, enormous display type carrying the load.
+
+   Held from v1 (do not re-derive):
+     · tone-on-tone ink — display type is a tonal step of its own
+       ground, never accent-on-dark. Full-strength cyan is spent
+       exactly once, on the App Store line in panel 08.
+     · the arrow cut once as an SVG symbol; glyphs as sole ornament
+     · scroll reveal that fails open (hidden state under a JS class)
+     · orange #FF6A00 structural only; acid #E8FF00 once
+     · panel 04 (acid) is unchanged from v1 by instruction
+
+   New in v2:
+     · 12 panels → 8. One list on the page (the spec plate, 02).
+     · Fig. 01 rebuilt as 2 rows of 8 — the real editor geometry —
+       and recoloured to InstrumentColors.fixed.
+     · Panel 05 embeds the real Pattern Editor mockup as live DOM
+       (../mockup-screens.css + ../mockup-screens.js) in place of
+       the stale jolt-a.png, and states the honest platform claim.
+     · The Designers Republic register — corporate/technical
+       apparatus at rave intensity — run hard on 02 and 06.
+
+   NAMESPACE NOTE: mockup-screens.css ships UNSCOPED .lane/.lanes/
+   .steps/.step/.dial. Everything of ours that would collide is
+   prefixed fg- / mk-.
+   ══════════════════════════════════════════════════════════════ */
+
+@font-face{font-family:'Chakra';src:url('../fonts/ChakraPetch-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra';src:url('../fonts/ChakraPetch-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('../geist/GeistMono/webfonts/GeistMono-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('../geist/GeistMono/webfonts/GeistMono-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('../geist/GeistMono/webfonts/GeistMono-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'GeistPixel';src:url('../geist/GeistPixel/webfonts/GeistPixel-Grid.woff2') format('woff2');font-weight:400;font-display:swap}
+
+:root{
+  /* house tokens */
+  --ground:#0B0C0F; --s1:#14161D; --s2:#1E222C; --line:#3A3F4B;
+  --text:#EDEFF3;  --muted:#8B93A6;
+  --cyan:#7DFBFD;  --orange:#FF6A00; --acid:#E8FF00;
+
+  /* tone-on-tone: the accent stepped toward its own ground */
+  --cyan-quiet:color-mix(in srgb, var(--cyan) 70%, var(--ground));
+
+  /* InstrumentColors.fixed — the only colour source for Fig. 01 */
+  --i-kick:#7DFBFD; --i-snare:#CFFB52; --i-hat:#FF9500; --i-chord:#EA3EE7;
+
+  --display:'Chakra','Chakra Petch',system-ui,sans-serif;
+  --mono:'GeistMono',ui-monospace,SFMono-Regular,monospace;
+  --pixel:'GeistPixel','GeistMono',ui-monospace,monospace;
+
+  --pad:clamp(20px,4.2vw,68px);
+  --chrome:52px;
+  /* capped, never bare vh — a headless render sets the window to the
+     full page height and an uncapped panel balloons to thousands of px */
+  --panelh:min(100svh, 446px);
+}
+
+*{box-sizing:border-box}
+html{
+  background:var(--ground);
+  scroll-behavior:smooth;
+  scroll-snap-type:y proximity;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--text);
+  font-family:var(--mono);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ── PANEL ─────────────────────────────────────────────────────
+   `main >` is load-bearing, not tidiness: mockup-screens.css has its
+   own `.tabcard .panel` — the instrument panel INSIDE the phone — and
+   an unscoped `.panel` rule reaches into the mockup and gives it a
+   viewport of height. Every page-level rule keyed on bare .panel must
+   stay scoped. ─────────────────────────────────────────────────── */
+main > .panel{
+  position:relative;
+  min-height:var(--panelh);
+  scroll-snap-align:start;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:calc(var(--chrome) + clamp(18px,2.6vh,32px)) var(--pad) clamp(20px,2.8vh,34px);
+  background:var(--bg);
+  color:var(--ink);
+  overflow:hidden;
+  isolation:isolate;
+}
+/* Deliberately NOT scoped like the rules above. This one has to stay at
+   (0,1,0) so the layers that position themselves absolutely — .herostage,
+   .tex, .plateimg — still outrank it on source order. Scoping it to
+   `main > .panel > *` raises it to (0,1,1), it wins, and every one of those
+   layers falls back into normal flow. It reaches into .tabcard .panel as a
+   result, which is harmless: position:relative + z-index:2 on siblings that
+   share a stacking context changes nothing. */
+.panel > *{position:relative;z-index:2}
+
+/* Duotone pairs. Each panel is a deliberate colour event. */
+.t-ground { --bg:#0B0C0F; --ink:#EDEFF3; --dim:#8B93A6; --hi:#7DFBFD; --rule:#3A3F4B; }
+.t-s1     { --bg:#14161D; --ink:#EDEFF3; --dim:#8B93A6; --hi:#7DFBFD; --rule:#333846; }
+.t-s2     { --bg:#1E222C; --ink:#EDEFF3; --dim:#8B93A6; --hi:#FF6A00; --rule:#3A3F4B; }
+.t-cyanq  { --bg:#0A1215; --ink:var(--cyan-quiet); --dim:#548789; --hi:#EDEFF3; --rule:#1E3A3C; }
+.t-acid   { --bg:#E8FF00; --ink:#0B0C0F; --dim:#4B520A; --hi:#0B0C0F; --rule:rgba(11,12,15,.34); }
+.t-orange { --bg:#FF6A00; --ink:#0B0C0F; --dim:#4E2103; --hi:#0B0C0F; --rule:rgba(11,12,15,.36); }
+.t-plate  { --bg:#0B0C0F; --ink:#EDEFF3; --dim:rgba(237,239,243,.66); --hi:#7DFBFD; --rule:rgba(237,239,243,.34); }
+/* 13: #p03's tone. .t-plate with the accent swapped to house orange, so the
+   panel keeps the colour role it has held since 09 — it moves from the FIELD
+   to the CONTROLS, because the news screen is cream on near-black and an
+   orange field is no longer something the plate can supply. */
+.t-plate-o{ --bg:#0B0C0F; --ink:#F2EFE6; --dim:rgba(242,239,230,.66); --hi:#FF6A00; --rule:rgba(242,239,230,.30); }
+
+/* ── TYPE ──────────────────────────────────────────────────── */
+.d{
+  font-family:var(--display);
+  font-weight:700;
+  text-transform:uppercase;
+  line-height:.85;
+  letter-spacing:-.022em;
+  margin:0;
+  text-wrap:balance;
+}
+.d.xl{font-size:clamp(2.4rem,7.8vw,6.9rem)}
+.d.lg{font-size:clamp(2.1rem,6.2vw,5.1rem)}
+.d.md{font-size:clamp(1.7rem,4.1vw,3.3rem)}
+/* panel 04 holds v1's display scale exactly — it is the page's loudest moment */
+#p04 .d.xl{font-size:clamp(2.75rem,11.2vw,10.5rem)}
+
+.eyebrow{
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(10.5px,.98vw,11.5px);
+  letter-spacing:.26em;text-transform:uppercase;
+  color:var(--dim);
+  margin:0 0 clamp(11px,1.7vh,19px);
+  display:flex;align-items:center;gap:14px;
+}
+.eyebrow b{font-family:var(--pixel);font-weight:400;letter-spacing:.1em;color:var(--ink)}
+.eyebrow i{flex:1;height:1px;background:var(--rule);font-style:normal;max-width:150px}
+.eyebrow .tail{margin-left:auto;opacity:.7;font-size:.92em;letter-spacing:.2em}
+
+.note{
+  margin:clamp(11px,1.6vh,17px) 0 0;
+  font-size:clamp(12px,1.08vw,13.5px);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  max-width:62ch;line-height:1.75;
+}
+.note em{font-style:normal;color:var(--ink)}
+/* technical-manual register: figures are captioned, not decorated */
+.fig{
+  margin:clamp(10px,1.4vh,16px) 0 0;
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(10.5px,.92vw,11.5px);letter-spacing:.22em;text-transform:uppercase;
+  color:var(--dim);opacity:1;
+}
+
+/* ── HIT AREA ────────────────────────────────────────────────
+   A control that should stay visually small but be reachable with
+   a thumb. The overlay is centred on the element and never smaller
+   than it, so a wide-but-short link grows only in height.
+   NOT for clip-path'd controls — the clip takes the pseudo with it. */
+.hit{position:relative}
+.hit::after{
+  content:'';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:max(100%,44px);height:max(100%,44px);
+}
+
+/* ── LINK — a discreet arrow. Never a filled button. ───────── */
+.arrow{
+  display:inline-flex;align-items:center;gap:.8em;
+  margin-top:clamp(15px,2.2vh,27px);
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(12.5px,1.22vw,14.5px);
+  letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink);
+  padding-bottom:7px;
+  border-bottom:1px solid transparent;
+  width:fit-content;
+  position:relative;
+  transition:border-color .18s ease;
+}
+.arrow::after{
+  content:'';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:100%;height:max(100%,44px);
+}
+.arrow .arr{width:1.9em;height:.62em;flex:none;overflow:visible}
+.arrow .arr svg{width:100%;height:100%;display:block;transition:transform .24s cubic-bezier(.2,.7,.3,1)}
+.arrow:hover{border-bottom-color:currentColor}
+.arrow:hover .arr svg{transform:translateX(.28em)}
+.arrow:focus-visible{outline:2px solid currentColor;outline-offset:6px}
+.arrow.big{font-size:clamp(13px,1.65vw,19px);letter-spacing:.14em;gap:.55em}
+.arrows{display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,48px);align-items:center}
+
+/* ── FIXED CHROME ──────────────────────────────────────────── */
+.chrome{
+  position:fixed;inset:0 0 auto 0;height:var(--chrome);z-index:60;
+  display:flex;align-items:center;gap:16px;
+  padding:0 var(--pad);
+  font-size:clamp(10.5px,.98vw,12px);font-weight:500;
+  letter-spacing:.24em;text-transform:uppercase;
+  color:#EDEFF3;
+  pointer-events:none;
+}
+/* the bar's own ground — see the note above. z-index:-1 keeps it
+   inside the chrome's stacking context, so it is under the links
+   and over the page. */
+.chrome::before{
+  content:'';position:absolute;inset:0 0 auto 0;z-index:-1;pointer-events:none;
+  height:calc(var(--chrome) * 1.9);
+  background:linear-gradient(180deg,
+    var(--scrim-c,rgba(11,12,15,.66)) 0,
+    var(--scrim-c,rgba(11,12,15,.66)) calc(var(--chrome) - 6px),
+    transparent 100%);
+}
+.chrome > *{pointer-events:auto}
+.chrome a{position:relative}
+.chrome a::after{
+  content:'';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:calc(100% + 12px);height:44px;
+}
+.chrome .mark{display:flex;align-items:center;gap:10px}
+.chrome .mark img{height:13px;width:auto;filter:var(--logofx,none)}
+.chrome .mark b{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.06em}
+.chrome .mark sup{font-family:var(--mono);font-size:8.5px;letter-spacing:0;vertical-align:super;opacity:.65}
+.chrome .code{font-family:var(--pixel);letter-spacing:.12em;opacity:.72;white-space:nowrap}
+.chrome .sp{flex:1}
+.chrome a{opacity:.85;transition:opacity .16s ease;white-space:nowrap}
+.chrome a:hover{opacity:1}
+.chrome a.store{opacity:1;border-bottom:1px solid currentColor;padding-bottom:2px}
+.chrome::after{
+  content:'';position:absolute;left:var(--pad);right:var(--pad);bottom:0;height:1px;
+  background:currentColor;opacity:.22;
+}
+
+/* Right-edge floorplan index */
+.floorplan{
+  position:fixed;right:calc(var(--pad) - 6px);top:50%;transform:translateY(-50%);
+  z-index:60;display:flex;flex-direction:column;gap:9px;align-items:flex-end;
+  font-family:var(--pixel);font-size:11px;letter-spacing:.08em;color:#EDEFF3;
+}
+.floorplan a{display:flex;align-items:center;gap:8px;opacity:.28;transition:opacity .18s ease}
+.floorplan a i{display:block;width:13px;height:1px;background:currentColor;font-style:normal;transition:width .18s ease}
+.floorplan a:hover{opacity:.7}
+.floorplan a[aria-current="true"]{opacity:1}
+.floorplan a[aria-current="true"] i{width:28px}
+/* the cover has nothing to index, and the index sits exactly where the
+   mockup bleeds off the right edge — so it arrives with the second panel */
+.floorplan{transition:opacity .3s ease}
+.floorplan.stand-down{opacity:0;pointer-events:none}
+
+/* Grain — the print register, one layer over the whole page. */
+.grain{
+  position:fixed;inset:0;z-index:55;pointer-events:none;
+  opacity:.15;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── PANEL TEXTURES ────────────────────────────────────────── */
+.tex{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.tex-node{opacity:.55}
+.tex-halftone{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(currentColor 1.35px,transparent 1.5px);
+  background-size:11px 11px;opacity:.28;
+  -webkit-mask-image:linear-gradient(200deg,#000 0%,transparent 62%);
+          mask-image:linear-gradient(200deg,#000 0%,transparent 62%);
+}
+.tex-scan{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:repeating-linear-gradient(0deg,currentColor 0 1px,transparent 1px 6px);
+  opacity:.09;
+  -webkit-mask-image:linear-gradient(160deg,#000 0%,transparent 70%);
+          mask-image:linear-gradient(160deg,#000 0%,transparent 70%);
+}
+
+/* ══ tDR APPARATUS ═══════════════════════════════════════════
+   Corporate and technical language at rave intensity: exposed
+   grid, registration targets, hazard chevrons, spec stamps,
+   deadpan small print. All CSS, no images. ═════════════════ */
+
+/* exposed column grid — the printer's guides left showing */
+.tex-grid{
+  position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.13;
+  background-image:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px calc(100% / 12));
+  background-size:calc(100% - (2 * var(--pad))) 100%;
+  background-position:var(--pad) 0;background-repeat:no-repeat;
+}
+
+/* registration targets, dropped at the panel corners */
+.regs{position:absolute;inset:0;z-index:1;pointer-events:none;color:var(--ink);opacity:.42}
+.regs span{
+  position:absolute;width:16px;height:16px;
+  background:
+    linear-gradient(currentColor,currentColor) center/1px 100% no-repeat,
+    linear-gradient(currentColor,currentColor) center/100% 1px no-repeat;
+}
+.regs span::after{
+  content:'';position:absolute;inset:3.5px;border:1px solid currentColor;border-radius:50%;
+}
+.regs .tl{top:calc(var(--chrome) + 14px);left:calc(var(--pad) - 26px)}
+.regs .tr{top:calc(var(--chrome) + 14px);right:calc(var(--pad) - 26px)}
+.regs .bl{bottom:16px;left:calc(var(--pad) - 26px)}
+.regs .br{bottom:16px;right:calc(var(--pad) - 26px)}
+
+/* hazard chevrons — flat, high contrast, no gradient softness */
+.chev{
+  height:12px;flex:none;
+  background:repeating-linear-gradient(115deg,
+    currentColor 0 9px, transparent 9px 20px);
+  opacity:.85;
+}
+
+/* a stamp: chamfered outline, tight-tracked, deadpan */
+.stamp{
+  display:inline-flex;align-items:center;gap:.7em;
+  font-family:var(--mono);font-weight:700;
+  font-size:clamp(8.5px,.86vw,10px);letter-spacing:.22em;text-transform:uppercase;
+  padding:7px 12px;color:var(--ink);
+  background:var(--rule);
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+.stamp > span{
+  display:inline-flex;align-items:center;gap:.7em;
+  background:var(--bg);padding:6px 11px;margin:-6px -11px;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+}
+.stamp em{font-style:normal;color:var(--dim)}
+.stamps{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:clamp(12px,1.8vh,20px)}
+
+/* deadpan small print */
+.smallprint{
+  margin:clamp(9px,1.3vh,14px) 0 0;
+  font-size:clamp(8.5px,.86vw,10px);line-height:1.8;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);max-width:78ch;
+}
+.smallprint b{font-weight:500;color:var(--ink);opacity:.7}
+
+/* ── PANEL 02 — the specification plate. The page's ONE list. ── */
+.plate-spec{margin-top:clamp(10px,1.6vh,18px)}
+.spec-head{
+  display:flex;align-items:center;gap:14px;
+  font-family:var(--mono);font-weight:700;
+  font-size:clamp(8.5px,.88vw,10px);letter-spacing:.3em;text-transform:uppercase;
+  color:var(--dim);padding-bottom:7px;border-bottom:1px solid var(--rule);
+}
+.spec-head .chev{width:clamp(40px,10vw,150px);margin-left:auto}
+.spec{list-style:none;margin:0;padding:0}
+.spec li{
+  display:flex;align-items:baseline;gap:clamp(8px,1.6vw,20px);
+  padding:clamp(5px,.85vh,9px) 0;border-bottom:1px solid var(--rule);
+  font-size:clamp(10px,1.06vw,12.5px);letter-spacing:.13em;text-transform:uppercase;
+}
+.spec .k{
+  font-family:var(--mono);font-weight:700;color:var(--ink);
+  flex:none;width:clamp(74px,10vw,132px);letter-spacing:.16em;
+}
+.spec .led{flex:1;min-width:14px;border-bottom:1px dotted var(--rule);transform:translateY(-3px)}
+.spec .v{color:var(--dim);text-align:right;max-width:62ch}
+.spec .v em{font-style:normal;color:var(--ink)}
+.spec .n{font-family:var(--pixel);font-size:10px;color:var(--dim);opacity:.6;flex:none;width:2.2em}
+
+/* ── FIGURE 01 — the mechanic, drawn. 2 rows of 8. ─────────── */
+/* chamfer lives on a wrapper with no absolutely-positioned children:
+   outer line layer, 1px-inset inner surface (clip-path can't take a border) */
+.frame{
+  --cut:14px;background:var(--rule);padding:1px;width:fit-content;max-width:100%;
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+.frame > .in{
+  background:var(--bg);
+  clip-path:polygon(calc(var(--cut) - 1px) 0,100% 0,100% calc(100% - var(--cut) + 1px),calc(100% - var(--cut) + 1px) 100%,0 100%,0 calc(var(--cut) - 1px));
+  padding:clamp(11px,1.4vw,18px);
+}
+.fg-rows{display:flex;flex-direction:column;gap:clamp(3px,.45vw,6px)}
+.fg-row{display:flex;align-items:center;gap:clamp(5px,.8vw,10px)}
+.fg-row .rn{font-family:var(--pixel);font-size:10px;color:var(--dim);width:1.4em;flex:none}
+.fg-steps{display:flex;gap:clamp(3px,.4vw,6px)}
+.fg-cell{
+  --c:transparent;
+  width:clamp(20px,3.3vw,44px);height:clamp(20px,3.3vw,44px);flex:none;
+  background:var(--c);border:1px solid var(--rule);
+  clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--pixel);font-size:clamp(8px,1vw,12px);color:#0B0C0F;
+  transition:filter .12s linear;
+}
+.fg-cell.play{filter:brightness(1.42)}
+.fg-cell.off.play{background:var(--rule)}
+.fg-legend{
+  display:flex;flex-wrap:wrap;gap:clamp(9px,1.5vw,22px);
+  margin-top:clamp(10px,1.5vh,16px);
+  font-size:clamp(10.5px,.95vw,11.5px);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+}
+.fg-legend span{display:flex;align-items:center;gap:7px}
+.fg-legend b{width:9px;height:9px;display:block;flex:none;background:var(--k)}
+
+/* two-column panel: headline left, figure right */
+.split{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  gap:clamp(22px,4vw,64px);align-items:center;
+}
+.split.narrow{grid-template-columns:minmax(0,1.15fr) auto}
+
+/* ── PANEL 05 — the real product screen, embedded ─────────────
+   mockup-screens.css ships an UNSCOPED :root holding the app's
+   colour and font tokens. This <style> is parsed after that link,
+   so our :root wins the shared names (identical colour values, but
+   our font families). Re-pin the app's own tokens under .jolt-mock
+   so the embedded screen keeps its data-URI faces whatever the
+   link order — and so nothing leaks into the panels either way. */
+.jolt-mock{
+  --ground:#0B0C0F; --surface-1:#14161D; --surface-2:#1E222C; --line:#3A3F4B;
+  --text:#EDEFF3; --muted:#8B93A6; --accent:#7DFBFD; --lane-purple:#BF5AF2;
+  --display:'ChakraPetch-Bold','Chakra Petch',sans-serif;
+  --display-semi:'ChakraPetch-SemiBold','Chakra Petch',sans-serif;
+  --mono:'GeistMono-Regular','Geist Mono',ui-monospace,monospace;
+  --mono-med:'GeistMono-Medium','Geist Mono',ui-monospace,monospace;
+}
+.mk-hold{width:clamp(164px,15.6vw,224px);flex:none}
+.mk-hold .device{border-radius:26px;padding:11px}
+.mk-hold .viewport{border-radius:16px}
+
+/* ── PHOTOGRAPHIC PLATE (full bleed) ───────────────────────── */
+/* absolutely-positioned bed, not a grid: a grid item at height:100%
+   in a content-sized row falls back to the image's intrinsic height
+   and blows the panel out to ~760px. */
+/* scoped to match `main > .panel`'s specificity — the panel rule is a
+   descendant selector now, and a bare .photoplate would lose to it and
+   get a second screen of padding on top of .plate-in's own. */
+main > .panel.photoplate{position:relative;display:block;padding:0}
+/* the plates carry their own printed border — scale past it */
+.photoplate > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transform:scale(1.12)}
+.photoplate > .scrim{position:absolute;inset:0;z-index:1;background:var(--scrim,none)}
+.photoplate > .plate-in{
+  position:relative;z-index:3;min-height:var(--panelh);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--chrome) + clamp(18px,2.6vh,32px)) var(--pad) clamp(20px,2.8vh,34px);
+}
+
+/* ── CLOSE ─────────────────────────────────────────────────── */
+.wordmark{width:min(44vw,368px);height:auto;margin:clamp(4px,1vh,12px) 0 clamp(16px,2.6vh,30px)}
+.close-foot{
+  margin-top:clamp(22px,3.4vh,42px);padding-top:clamp(15px,2.2vh,25px);border-top:1px solid var(--rule);
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;
+  font-size:clamp(10.5px,.95vw,11.5px);letter-spacing:.2em;text-transform:uppercase;color:var(--dim);
+}
+.close-foot .sp{flex:1}
+.endorse{display:flex;align-items:center;gap:10px}
+.endorse img{filter:invert(1);opacity:.34}
+.endorse .lhmp{height:11px;width:auto}
+.endorse .dialmark{height:20px;width:auto;opacity:.5}
+
+/* ── SCROLL REVEAL — fails open (hidden state only under .reveal-on) ── */
+html.reveal-on .rv{opacity:0;transform:translateY(14px)}
+html.reveal-on .rv.in{opacity:1;transform:none;
+  transition:opacity .7s cubic-bezier(.2,.7,.3,1) var(--rd,0ms),transform .7s cubic-bezier(.2,.7,.3,1) var(--rd,0ms)}
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width:1000px){
+  .split,.split.narrow{grid-template-columns:1fr;gap:clamp(18px,3vh,30px)}
+  .mk-hold{width:clamp(160px,30vw,220px)}
+  .regs{display:none}
+}
+@media (max-width:900px){
+  .floorplan{display:none}
+  /* the exposed grid is a device, not a texture — fewer columns when narrow */
+  .tex-grid{background-image:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px calc(100% / 6));opacity:.10}
+  .spec li{flex-wrap:wrap}
+  .spec .led{display:none}
+  .spec .v{text-align:left;width:100%;padding-left:calc(2.2em + 8px)}
+}
+@media (max-width:560px){
+  /* the tracking that gives the uppercase mono its register costs about
+     12% of the line on a phone. Easing it off is what buys the larger
+     type its room back — the letterforms carry the look on their own at
+     this width. */
+  .note{letter-spacing:.1em}
+  .eyebrow{letter-spacing:.2em}
+  .arrow{letter-spacing:.18em}
+  .chrome .code{display:none}
+  .chrome a.demo{display:none}
+  .eyebrow i{display:none}
+  .eyebrow .tail{display:none}
+  .fg-row .rn{display:none}
+  .panel{justify-content:flex-start}
+  .wordmark{width:74vw}
+  .spec .k{width:100%}
+}
+@media (max-height:620px){ .panel{justify-content:flex-start} }
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  html.reveal-on .rv{opacity:1;transform:none}
+  .arrow .arr svg{transition:none}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GRAFTS. Everything below arrived from another concept; the
+   comment on each block says which, so it can be traced back.
+   ══════════════════════════════════════════════════════════════ */
+
+:root{
+  --hair:rgba(58,63,75,.42);
+  --i-waves:#32E5C8;
+}
+
+/* mockup-screens.css scopes the instrument icon tokens under .jolt-mock,
+   because 04 only ever used them inside the embedded editor. The hero lane
+   sits outside that wrapper, so the four it needs are re-declared here.
+   Extracted from ../mockup-screens.css at build time — do not hand-edit. */
+:root{
+  --ic-kick: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAAThJREFUeAHtlkESgzAMA2mH/3+5nd7MHoIhcYBKPcXjxjYbKbAs/pmACSgTeBU8/KegZiw5dOZ3rKy4NgDFU4/PPMJP9PyImnFG1o+537qrny1AnGqxvALO+IeePFOjR2jsz1qH5pFXgAFQP2pxxi/0XGbPTI6cj72b89oCxKUWyytgveDE6dmmR6vnk1eAAVRL7O71Z9wBe57fy5cytAVK8T6guBXwgEMqHdEKKMX7gOLyCpjxHcBv/Uvf+xSlvAIMgJJQizN3wN08zDuEZ8Z5md/EtsAGh2Agr4DMHUBd0GP0JPPcfzRmfe7v6ievAAOgntTiM/6hJ1mD+dFM9/ox3+xvCzTxCCTlFZDxCz2d2RO1w/0xl1n39mvul1eAAWQ06P+YgAmYgAmYgAmYgAmYgAmYwL8R+AJfQBVoFXghTgAAAABJRU5ErkJggg==);
+  --ic-snare: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAATdJREFUeAHtV0ESAjEMWh3//2X1upxMgm0a8NaxJYRAq9fljxWwAsoKPBLNv+FMBgMgSssSn2ep9IDDFmDAEEstMPJbymCCPbWeI5CYwKgj8g5g3AHoCGpGv+BsvBtfeQdYgJsfBBf/uANQxmiGo/uxXmjtCITkGrhZ3gEDZ+qWrIAVCCjA+B2A73agPGVrqQf5V8ACUEx4MEgmP5j5DAZTshIfR4A5ihOx5B3wS35LGdvgihBfeQdYgA0WbVXSDmg1jg1k7IANorcq+UqwCb2zCfzoEeQTOu8IhOQauFneAZk7AP8/lDJIMFWJj7wDLADBgkdDZO4AbBgziN+3XjsCrcezgJy8AzL5xXc/g8GcbYmPvAMsANOLJ2Ix8osZXK1DqQdHYPW4utWTd0C3gZiPFbACaxX4AOnfFGZrsd+3AAAAAElFTkSuQmCC);
+  --ic-hihat: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAAQBJREFUeAHtlUEOgzAQAyni/19uxQ0QigFhirPTU0skxzv2lmHgAwEIQAACEIBAVQKfPwz+FXc+6mkUZro/BkD3EYsBaYAA1P0xDeg+YjHglXeueo+LK+3Hp2ZiBex5vPyC8g04si9q549oLHvwKr3yDQDAspsVv087Q2939OyO70haHyl/zXlYAWs2AeLlG6D2Z85wu0MBua4sNmcs3wAArMpS8EdzP0w81H/Ko55YAVPKMbI0ICYqk1EaYAIbI0sDYqIyGaUBJrAxsjQgJiqTURpgAhsjSwNiojIZpQEmsDGyNCAmKpNRGmACGyNbvgExSWEUAhCAAAQgAIHbCfwAHEIJXyBvFwIAAAAASUVORK5CYII=);
+  --ic-chord: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABdWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokXWQvUvDUBTFT6tS0DqIDh0cMolD1NIKdnFoKxRFMFQFq1OafgltfCQpUnETVyn4H1jBWXCwiFRwcXAQRAcR3Zw6KbhoeN6XVNoi3sfl/Ticc7lcwBtQGSv2AijplpFMxKS11Lrke4OHnlOqZrKooiwK/v276/PR9d5PiFlNu3YQ2U9cl84ul3aeAlN//V3Vn8maGv3f1EGNGRbgkYmVbYsJ3iUeMWgp4qrgvMvHgtMunzuelWSc+JZY0gpqhrhJLKc79HwHl4plrbWD2N6f1VeXxRzqUcxhEyYYilBRgQQF4X/8044/ji1yV2BQLo8CLMpESRETssTz0KFhEjJxCEHqkLhz634PrfvJbW3vFZhtcM4v2tpCAzidoZPV29p4BBgaAG7qTDVUR+qh9uZywPsJMJgChu8os2HmwiF3e38M6Hvh/GMM8B0CdpXzryPO7RqFn4Er/QcXKWq8UwZBywAAAARjSUNQDA0AAW4D4+8AAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAAECgAwAEAAAAAQAAAEAAAAAAZZlgigAAAS1JREFUeAHtl0EOgzAMBGnV/3+5vY+CYjcmUbLbW4gBM8wa9br8MwETUCbw2uDhv+ixtOc3Li63NAC5V44HLs0Trv3v8tHMsylHgETU1vIGrJgBzDilY0+s5z7PT63lDTCAlC8HFpfm6YYPM3xTFj5c2rMjEOZ+aKG8AaV5CkrSmwnsifXcD962XSZvgAG0xdA5+lnwqKUZHu3fERgluPv58gasmAH8rlOiqTNC3gADoH9q6xl562U+y7y0Z0cgi/+0enkDSvMUtKM3E9gT67kfvG27TN4AA2iLoXN0xX+B0gyPvipHYJTg7ufLG7BiBvC7Tommzgh5AwyA/qmtZ+Stl/ks89KeHYEs/tPq5Q0ozVPQjt5MmNqTvAEGENTWZSZgAiZgAiZgAiZwHIEfSqcOanFO1aYAAAAASUVORK5CYII=);
+}
+.ch14{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.ch20{clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px)}
+
+/* the one panel that opts out of the fixed-height rhythm — see
+   SYNTHESIS.md §3a. A real datasheet cannot be centred in 446px. */
+.panel.tall{
+  min-height:0;scroll-snap-align:none;
+  padding-top:calc(var(--chrome) + clamp(46px,7vh,96px));
+  padding-bottom:clamp(46px,7vh,96px);
+  justify-content:flex-start;
+}
+
+/* the transport blink, kept from 05 — now the live dot on the demo CTA */
+@keyframes blink{0%,50%{opacity:1}50.01%,100%{opacity:.25}}
+
+/* four claim pads in the same grid — Raycast's move, on the one
+   object that IS the product. Adjective + a measurable. */
+.claim{
+  grid-column:span 2;position:relative;background:#1E222C;overflow:hidden;
+  /* Content sits under the index rather than against the floor. The pads
+     are grid items, so they are already equal height; bottom-aligning them
+     made the headings ride up and down with however many lines the blurb
+     below happened to wrap to. Aligning to the top puts the four adjectives
+     on one line and lets the ragged edge fall where nobody reads. */
+  padding:34px 16px 15px;display:flex;flex-direction:column;justify-content:flex-start;
+  min-height:clamp(112px,9vw,134px);
+}
+.claim .ix{position:absolute;top:12px;left:17px;z-index:1;font-size:10.5px;letter-spacing:.16em;color:#8B93A6}
+.claim .hd{font-family:var(--display);font-weight:700;font-size:clamp(16px,1.7vw,22px);line-height:1;margin:0 0 7px;position:relative;z-index:1;color:var(--k)}
+.claim .sb{font-size:clamp(12px,1vw,13px);line-height:1.5;color:#8B93A6;position:relative;z-index:1;margin:0}
+.claim .sb .n{color:var(--k);font-weight:500}
+.claim::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--k);opacity:.9;z-index:1}
+@media(max-width:900px){.claim{grid-column:span 4}}
+@media(max-width:600px){.claim{grid-column:span 8;min-height:0}}
+
+/* ── FROM 03 — four doors, one machine ───────────────────────
+   The tabs are the dull half. The device is that ONE product
+   screen stays put and a labelled focus rectangle moves across
+   it, tinted to the door's instrument colour. ─────────────── */
+.tabbar{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:clamp(16px,2.4vh,26px) 0 clamp(20px,3vh,32px);scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tabbtn{
+  /* --i pulls the inner span's CLIP further in, widening the frame the
+     parent's background shows through. clip-path costs no layout, so the
+     focus state cannot shove the tab bar sideways the way growing the
+     padding would. The .4142 is (root-2 - 1): a chamfer inset perpendicular
+     by i moves its intercept by i*root-2, so its vertices travel that far
+     minus the i the straight edges have already moved. */
+  --cut:9px;--i:0px;
+  flex:0 0 auto;background:var(--rule);padding:1px;border:0;cursor:pointer;font:inherit;
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+.tabbtn > span{
+  display:flex;align-items:center;gap:10px;padding:14px 17px;background:var(--bg);color:var(--dim);
+  clip-path:polygon(
+    calc(var(--cut) - 1px + var(--i) * 0.4142) var(--i),
+    calc(100% - var(--i)) var(--i),
+    calc(100% - var(--i)) calc(100% - var(--cut) + 1px - var(--i) * 0.4142),
+    calc(100% - var(--cut) + 1px - var(--i) * 0.4142) calc(100% - var(--i)),
+    var(--i) calc(100% - var(--i)),
+    var(--i) calc(var(--cut) - 1px + var(--i) * 0.4142));
+  font-family:var(--mono);font-size:clamp(10.5px,1vw,11.5px);letter-spacing:.12em;
+  text-transform:uppercase;font-weight:500;white-space:nowrap;
+}
+.tabbtn em{font-family:var(--pixel);font-style:normal;font-size:11.5px;color:var(--dim);letter-spacing:0}
+.tabbtn:hover > span{color:var(--ink)}
+.tabbtn:hover em{color:var(--ink)}
+.tabbtn[aria-selected="true"]{background:var(--wc)}
+.tabbtn[aria-selected="true"] > span{background:#1E222C;color:var(--ink)}
+.tabbtn[aria-selected="true"] em{color:var(--wc)}
+/* as .demobtn: the outline was outside a clip-path and never painted.
+   The tab's 1px frame is its own background, so thickening the padding
+   thickens the frame, in the tab's shape. */
+.tabbtn:focus-visible{outline:none;--i:2px;background:var(--cyan)}
+
+.ways{display:grid;grid-template-columns:minmax(0,1fr) 262px;gap:clamp(24px,5vw,72px);align-items:start}
+.ways > *{min-width:0}
+@media (max-width:880px){.ways{grid-template-columns:minmax(0,1fr)}}
+
+.waypane[hidden]{display:none}
+.waypane{animation:fade .22s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.waypane .n{font-family:var(--pixel);font-size:13px;color:var(--wc);letter-spacing:.04em;display:block;margin-bottom:14px}
+.waypane h3{
+  font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;
+  font-size:clamp(20px,2.6vw,30px);line-height:1.05;margin:0 0 18px;color:var(--ink);
+}
+.waypane p{margin:0 0 16px;color:var(--dim);font-size:clamp(12.5px,1.12vw,14px);line-height:1.7;max-width:52ch}
+.then{border-left:1px solid var(--rule);padding:2px 0 2px 18px;margin-top:24px;max-width:50ch}
+.then b{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--wc);font-weight:500;margin-bottom:8px}
+.then span{color:var(--ink);font-size:clamp(12.5px,1.15vw,13.5px);line-height:1.6;display:block}
+
+.shotcol{width:100%;max-width:262px;margin:0 auto;position:relative}
+.shotcol .viewport{position:relative}
+/* One screen per door. They all stay laid out — fitScreens() measures
+   offsetWidth, and a display:none canvas measures 0 and scales to nothing —
+   so the inactive ones are hidden on opacity and lifted out of the hit area. */
+.shotcol .shot{transition:opacity .28s ease}
+.shotcol .shot[data-on="0"]{opacity:0;pointer-events:none}
+.shotcol .shot:not([data-way="0"]){position:absolute;inset:0}
+/* The mockup screens carry their own flat class namespace, and two names
+   collide with this page's. `.foot` here is the PAGE FOOTER — clamp padding,
+   flex-direction:column — and `.tabcard .foot` (0,2,0) only outranks it on the
+   properties it actually sets, so padding, flex-direction and gap leak through
+   and stack the panel's tab strip into a column. Reset them inside .jolt-mock. */
+.jolt-mock .tabcard .foot{padding:0;flex-direction:row;gap:0}
+.jolt-mock .tabcard .panel{padding:8px}
+.foc{
+  position:absolute;border:1px solid var(--wc);pointer-events:none;z-index:3;
+  box-shadow:0 0 0 1px rgba(11,12,15,.7),0 0 26px -6px var(--wc);
+  transition:top .22s ease,left .22s ease,width .22s ease,height .22s ease;
+}
+.foc b{
+  position:absolute;left:-1px;top:-21px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--wc);white-space:nowrap;font-weight:500;line-height:1;background:var(--bg);padding:4px 6px;
+}
+.foc.low b{top:auto;bottom:-21px}
+
+/* ── FROM 02 — the specification ─────────────────────────────
+   Renamed sp-* so it cannot collide with 04's own .spec plate,
+   whose markup this replaces. Asymmetric columns are what stop
+   it reading as a pricing table. ──────────────────────────── */
+.sp-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:clamp(26px,3.4vw,44px)}
+.sp-head .kick{font-size:clamp(10px,.92vw,11px);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+.sp-grid{display:grid;grid-template-columns:1fr 1.62fr 1.16fr .96fr;gap:0}
+.sp-col{padding:0 clamp(16px,2vw,30px);border-left:1px solid var(--rule);min-width:0}
+.sp-col:first-child{padding-left:0;border-left:0}
+.sp-col:last-child{padding-right:0}
+
+.sp-ghead{display:flex;align-items:flex-end;gap:10px;min-height:52px;padding-bottom:11px;border-bottom:1px solid var(--ink);margin-bottom:2px}
+.sp-ghead .idx{font-family:var(--pixel);color:var(--cyan);font-size:11.5px}
+.sp-ghead h3{font-family:var(--mono);font-weight:700;font-size:clamp(12px,1.12vw,13.5px);letter-spacing:.05em;line-height:1.2;text-transform:uppercase;margin:0;color:var(--ink)}
+.sp-ghead .ref{margin-left:auto;font-size:10px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;font-weight:500;white-space:nowrap}
+
+.sp-grp{margin:26px 0 2px;display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;border-bottom:1px solid var(--hair);padding-bottom:8px}
+.sp-grp .t{font-weight:700;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.sp-grp .c{margin-left:auto;font-size:10px;letter-spacing:.14em;color:var(--dim);text-align:right}
+
+/* Flex, not grid, so a value with no room beside its key drops to its own
+   line instead of crushing the key into two. Wrapping is decided on the
+   items' content widths before any shrinking, so .k keeps its shape and
+   .v is the one that moves. */
+.sp-r{display:flex;flex-wrap:wrap;column-gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--hair)}
+.sp-r:last-child{border-bottom:0}
+.sp-r .k{font-size:clamp(11px,.98vw,12.5px);font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);line-height:1.4}
+.sp-r .k{flex:1 1 auto;min-width:0}
+.sp-r .v{font-size:clamp(11px,.98vw,12.5px);font-weight:500;color:var(--cyan);letter-spacing:.06em;text-align:right;white-space:nowrap;margin-left:auto}
+.sp-r .v.q{color:var(--dim)}
+.sp-r .d{flex:0 0 100%;margin:5px 0 0;color:var(--dim);font-size:clamp(11px,.95vw,12px);line-height:1.6;letter-spacing:0;text-transform:none}
+/* the one row that argues */
+.sp-r.hi{background:linear-gradient(90deg,rgba(125,251,253,.075),transparent 80%);margin:0 -10px;padding:9px 10px}
+.sp-r.hi .k{color:var(--cyan)}
+.sp-inv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px}
+.sp-inv.one{grid-template-columns:1fr}
+.sp-fxnote{margin:14px 0 0;font-size:clamp(10.5px,.95vw,11.5px);line-height:1.68;color:var(--dim)}
+.sp-fxnote b{font-weight:700;color:var(--cyan);margin-right:4px}
+
+@media (max-width:1100px){ .sp-grid{grid-template-columns:1fr 1.5fr} .sp-col:nth-child(3){padding-left:0;border-left:0} .sp-col{margin-bottom:clamp(26px,4vh,44px)} }
+@media (max-width:760px){ .sp-grid{grid-template-columns:1fr} .sp-col{padding:0;border-left:0} .sp-inv{grid-template-columns:1fr} }
+
+/* ══════════════════════════════════════════════════════════════
+   HERO — the mockup IS the background, and the sequencer in it
+   is the real editor, running. Movement happens inside the
+   product UI rather than in a stylised diagram beside it.
+   ══════════════════════════════════════════════════════════════ */
+.panel.hero{
+  min-height:min(100svh,780px);       /* never bare vh — headless sets the
+                                         window to the full page height */
+  overflow:hidden;
+}
+.herostage{position:absolute;inset:0;z-index:1}
+/* fitScreens() sizes the canvas to parentWidth - 30 and caps it at the
+   screen's own 390px, so this width IS the phone's size. Deliberately well
+   under the cap: the headline leads here, the device corroborates it. */
+.herodev{
+  position:absolute;right:clamp(36px,7.5vw,150px);top:50%;transform:translateY(-50%);
+  width:280px;
+  /* fitScreens() renders a canvas at parentWidth - 30, so these two numbers
+     are the wrappers, not the devices: the phone lands at 250px wide (541 tall)
+     and the iPad at --pad-w. --pad-ratio is the iPad's height as a fraction of
+     the phone's; at 1/3 the iPad is only ~9px wider than the phone and hides
+     almost entirely behind it, so it is a knob rather than a constant. */
+  --pad-ratio:0.67;
+  --pad-h:calc(541px * var(--pad-ratio));
+  --pad-w:calc(var(--pad-h) * 1194 / 834);
+}
+.herophone{position:relative;z-index:2;width:280px}
+/* behind and to the left, tucked under the phone's lower half */
+.heropad{
+  position:absolute;z-index:1;
+  /* at 2/3 height the iPad is 519px wide against the phone's 250, so the phone
+     covers its right end and the rest reads on its own. Its left edge lands
+     near x=723 at 1440 — clear of the headline's last stroke (~660) and past
+     the scrim's 60% falloff. */
+  right:60px;bottom:-14px;
+  width:calc(var(--pad-w) + 30px);
+  pointer-events:none;
+}
+/* the ground, poured back over the left of the mockup so the
+   headline has something to sit on. Pointer-transparent, or it
+   would eat the clicks the step grid is advertising. */
+/* the phone clears the copy entirely now, so the scrim is down to a
+   vignette — just enough to stop the node grid fighting the headline */
+.heroscrim{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(11,12,15,.86) 0%,rgba(11,12,15,.55) 34%,rgba(11,12,15,0) 60%),
+    linear-gradient(0deg,rgba(11,12,15,.55) 0%,rgba(11,12,15,0) 26%);
+}
+.herocopy{position:relative;z-index:3;max-width:min(64%,800px)}
+.herocopy .note{max-width:none}
+/* the cover runs hotter than the page's xl step — it is the one headline
+   with nothing else competing for the panel */
+.hero h1.d.xl{font-size:clamp(2.5rem,7.2vw,6.8rem)}
+
+/* a stronger playhead than the app's own — this one is doing
+   marketing work, not reporting transport state */
+.herodev .stepwrap.play::before{background:#EDEFF3}
+.herodev .stepwrap .step{cursor:pointer;transition:filter .1s linear}
+.herodev .stepwrap .step:hover{filter:brightness(1.35)}
+
+/* ── PHONE WIDTHS ─────────────────────────────────────────────────
+   Two things the desktop layout gets away with and a phone does not. */
+@media (max-width:1040px){
+  /* 1. The mechanic figure is the app's real grid at the app's real cell size
+     — .steps.big pins .step to 58px, so nine of them make 466px and force the
+     whole .split column that wide inside a 390px viewport. The headline and
+     the note were being dragged out with it. Let the cells share the width
+     instead; the ink keeps its 48% of the cell. */
+  #mechgrid, #mechgrid .steprow{width:100%}
+  #mechgrid .stepwrap{flex:1 1 0;min-width:0}
+  #mechgrid .stepwrap .step{width:100%;height:auto;aspect-ratio:1}
+  #mechgrid .stepwrap .step .ink{width:48%;height:48%}
+
+  /* 2. The hero device runs 350 x 723 here and pushes the panel past 1200px.
+     Cutting it at half height turns it from a thing sitting in a lot of empty
+     scroll into something the panel is looking down into. The ratio is the
+     device's own 350:723 halved — fitScreens() sizes by width, so the
+     proportion holds at any phone size. */
+  .herophone{aspect-ratio:350 / 362;overflow:hidden}
+}
+
+@media (max-width:1040px){
+  .panel.hero{min-height:0}
+  .herostage{position:relative;inset:auto;margin-top:clamp(26px,4vh,44px);order:2}
+  .herodev{position:relative;right:auto;top:auto;transform:none;width:100%}
+  .herophone{width:100%}
+  .heropad{display:none}   /* no room to overlap two devices at this width */
+  .heroscrim{display:none}
+  .herocopy{max-width:none}
+}
+
+/* ── CALL TO ACTION ──────────────────────────────────────────
+   The App Store badge is Apple's standard artwork; the demo is
+   the thing no competitor has, so it gets equal weight beside
+   it rather than being a text link underneath. ─────────────── */
+.ctas{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(12px,1.7vw,22px);margin:clamp(20px,3vh,34px) 0 clamp(14px,2vh,22px)}
+
+.asbadge{display:block;width:clamp(140px,14.5vw,178px);line-height:0}
+.asbadge img{width:100%;height:auto;display:block;transition:opacity .16s ease}
+.asbadge:hover img{opacity:.84}
+.asbadge:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+
+.demobtn{
+  --cut:11px;
+  /* --ring is the weight of the rule; the fill is inset by it and the cut
+     backs off to match. The inner cut is NOT --cut minus the inset: two
+     parallel 45 degree lines inset by i are only i/root-2 apart
+     perpendicular, which would draw the chamfers thinner than the straight
+     edges. Backing off by i*(2 - root-2) puts the diagonal at a true i. */
+  --ring:1px;
+  --cut-in:calc(var(--cut) - var(--ring) * 0.5858);
+  position:relative;
+  display:inline-flex;align-items:center;gap:.8em;
+  height:clamp(46px,4.75vw,59px);padding:0 clamp(17px,1.8vw,26px);
+  /* The element itself is the rule — a solid cyan plate in the button's
+     shape — and ::before lays the fill back over it, one pixel in, in a
+     shape of its own. Same construction as .tabbtn.
+     An inset box-shadow cannot do this: it draws a RECTANGULAR ring, and
+     the clip-path then cuts that ring's corners away with the chamfers,
+     which left both diagonals unstroked. */
+  background:var(--cyan);color:var(--cyan);
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+  font-family:var(--mono);font-weight:700;
+  font-size:clamp(12px,1.12vw,14px);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;
+}
+/* z-index:-1 keeps this above the cyan plate and below the label: clip-path
+   makes the button a stacking context, and negative-z children paint after
+   its background but before its content. */
+.demobtn::before{
+  content:'';position:absolute;inset:var(--ring);z-index:-1;
+  clip-path:polygon(var(--cut-in) 0,100% 0,100% calc(100% - var(--cut-in)),calc(100% - var(--cut-in)) 100%,0 100%,0 var(--cut-in));
+  /* the wash has to be composited over an opaque ground here, or the cyan
+     plate beneath would read straight through it */
+  background:linear-gradient(rgba(125,251,253,.10),rgba(125,251,253,.10)),var(--bg);
+  transition:background .18s ease;
+}
+.demobtn:hover::before{background:linear-gradient(rgba(125,251,253,.19),rgba(125,251,253,.19)),var(--bg)}
+/* clip-path clips the outline too, and this one sat 4px OUTSIDE the border
+   box, so the button had no visible focus indicator at all. The ring is the
+   shape's own rule instead: 1px -> 3px, which follows the chamfers and
+   cannot be clipped away. */
+.demobtn:focus-visible{outline:none;--ring:3px}
+.demobtn .live{width:7px;height:7px;flex:none;background:var(--cyan);animation:blink 1.6s steps(2) infinite}
+.demobtn .arr{width:1.7em;height:.6em;flex:none;overflow:visible}
+.demobtn .arr svg{width:100%;height:100%;display:block;transition:transform .24s cubic-bezier(.2,.7,.3,1)}
+.demobtn:hover .arr svg{transform:translateX(.26em)}
+@media (prefers-reduced-motion:reduce){
+  .demobtn .live{animation:none}
+  .demobtn .arr svg{transition:none}
+}
+
+/* the four claim pads, rehoused on the mechanic panel */
+.claims{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1vw,14px);margin-top:clamp(24px,3.4vh,40px)}
+.claims .claim{grid-column:auto}
+@media (max-width:900px){.claims{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.claims{grid-template-columns:1fr}}
+
+/* ══════════════════════════════════════════════════════════════
+   OPEN — the 07 restyle. Everything here overrides 06 above.
+   ══════════════════════════════════════════════════════════════ */
+
+html{scroll-snap-type:none}
+
+/* every panel is one screen. Space is structural again rather than
+   padding — the panel holds a viewport of height and the content
+   centres inside it. min-height, not height: the specification is
+   allowed to run past a screen rather than be clipped by one.
+   svh, not vh — vh is the mobile-toolbar trap, and headless Chrome
+   resolves bare vh against the whole page. */
+main > .panel{
+  min-height:100svh;
+  scroll-snap-align:none;
+  justify-content:center;
+  /* the panel already holds a screen of height, so padding is only
+     keeping content off the edges — it is not making the space any more */
+  padding:clamp(52px,7.5vh,118px) var(--pad);
+}
+/* the datasheet is the one panel that may exceed its screen, so it
+   runs the tightest gutters on the page */
+.panel.tall{
+  min-height:100svh;
+  justify-content:center;
+  padding:clamp(40px,5.5vh,88px) var(--pad);
+}
+.panel.hero{
+  min-height:100svh;
+  /* symmetric on purpose. The top pad clears the fixed header, and matching it
+     at the bottom is what puts the copy on the same centreline as the phone —
+     with the old short bottom pad the whole copy block sat ~25px low against a
+     device that centres on the panel. */
+  padding:calc(var(--chrome) + clamp(18px,2.6vh,32px)) var(--pad);
+  justify-content:center;
+}
+
+/* a spacer is a colour field and one line. Add class="plate" and an
+   <img> if a picture should carry it instead — the demo panel below
+   shows that pattern already. */
+.panel.spacer{
+  min-height:100svh;
+  justify-content:center;
+  padding:clamp(52px,7.5vh,118px) var(--pad);
+}
+.panel.spacer .d{max-width:22ch}
+
+/* the index is furniture; the page is short enough to scroll */
+.floorplan{display:none}
+/* half strength — present, not a filter */
+.grain{opacity:.08}
+
+/* eyebrows lose their rule and index and become a plain label */
+.eyebrow{display:block;margin-bottom:clamp(14px,2.2vh,24px)}
+.eyebrow i,.eyebrow b,.eyebrow .tail{display:none}
+
+/* claim pads lose their boxes — the numbers were the content */
+.claims{gap:clamp(16px,2.4vw,40px);margin-top:clamp(34px,5vh,60px)}
+.claims .claim{
+  background:none;min-height:0;padding:0 0 0 clamp(12px,1.2vw,18px);
+  clip-path:none;border-left:1px solid var(--rule);
+}
+.claims .claim::before{display:none}
+.claims .claim .ix{position:static;display:block;margin-bottom:10px;padding:0}
+
+/* the specification loses its rules-on-every-column look */
+.sp-col{border-left:0;padding-left:0;padding-right:clamp(20px,2.6vw,44px)}
+.sp-grid{gap:0 clamp(10px,1.4vw,24px)}
+
+/* the demo plate is full-bleed as before, and now a full screen too */
+.photoplate > .plate-in{padding:clamp(48px,6.5vh,110px) var(--pad)}
+
+/* ── THE CLOSE — demo and footer on one screen ────────────────────
+   The photograph holds the top, the bottom fades to the ground, and the
+   footer sits on that fade. One surface, two registers: the delineation
+   is tonal rather than a second panel costing another whole screen. */
+main > .panel.photoplate.close{display:flex;flex-direction:column}
+.close > .plate-in{
+  flex:1;min-height:0;                    /* the panel owns the 100svh now */
+  display:flex;flex-direction:column;justify-content:center;
+  padding-bottom:clamp(20px,3vh,40px);
+}
+.close > .blend{
+  position:absolute;left:0;right:0;bottom:0;height:70%;z-index:1;
+  /* solid by 60% of the blend, which lands just above the wordmark — the
+     footer reads as its own black ground, and the photograph is still
+     visibly the same picture arriving there */
+  background:linear-gradient(180deg,
+    rgba(11,12,15,0) 0%, rgba(11,12,15,.55) 26%, rgba(11,12,15,.92) 48%, #0B0C0F 60%);
+}
+/* the footer keeps its own classes, so it loses only the ground it used to
+   paint for itself — the blend behind it is doing that job now */
+.close > .foot{
+  background:none;
+  padding:0 var(--pad) clamp(26px,4vh,46px);
+  gap:clamp(18px,2.6vh,32px);
+}
+
+/* ── FOOTER — the close, reduced to a strip ─────────────────── */
+.foot{
+  padding:clamp(70px,10vh,130px) var(--pad) clamp(34px,5vh,56px);
+  background:var(--ground);color:var(--text);
+  --ink:#EDEFF3;--dim:#8B93A6;--rule:#3A3F4B;--bg:#0B0C0F;
+  display:flex;flex-direction:column;gap:clamp(26px,4vh,44px);
+}
+.footmark{width:min(30vw,232px);height:auto}
+.footcta{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(12px,1.7vw,22px)}
+.footline{
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;
+  padding-top:clamp(18px,2.6vh,30px);border-top:1px solid var(--rule);
+  font-size:clamp(10.5px,.95vw,11.5px);letter-spacing:.2em;text-transform:uppercase;color:var(--dim);
+}
+.footline .sp{flex:1}
+.footline .endorse{display:flex;align-items:center;gap:10px}
+.footline .endorse img{filter:invert(1);opacity:.34}
+.footline .lhmp{height:11px;width:auto}
+
+/* the cover is the mark, at the size the footer sets it — the words that
+   were here have moved into the sub-text below it */
+.herowordmark{margin:0;line-height:0}
+.herowordmark img{width:min(52vw,600px);height:auto;display:block}
+.hero .herocopy .note{margin-top:clamp(22px,3.4vh,40px)}
+
+/* the mechanic figure is now the app's own grid, at the app's own size */
+#mechgrid{flex:none}
+#mechgrid .stepwrap .step{cursor:default}
+#mechgrid .stepwrap.play::before{background:#EDEFF3}
+
+/* logo and wordmark, set to a common height rather than a common width */
+.footbrand{display:flex;align-items:center;gap:clamp(14px,1.8vw,26px)}
+.footbrand img{height:clamp(38px,4.6vw,58px);width:auto;display:block}
+.footmark{width:auto}
+
+/* ── HALFTONE — the acid panel's dots, rehoused ───────────────
+   Rule: dots go on FLAT fields — a colour spacer, a plain dark
+   panel, the footer. Never over photography (the plates carry
+   their own screen and the two moiré), and never behind the
+   specification, where they cost legibility for nothing. */
+.tex-halftone.soft{opacity:.10;
+  -webkit-mask-image:linear-gradient(150deg,#000 0%,transparent 58%);
+          mask-image:linear-gradient(150deg,#000 0%,transparent 58%);}
+.foot{position:relative;isolation:isolate}
+.foot > *{position:relative;z-index:2}
+
+/* ── PLACEHOLDER PLATES ──────────────────────────────────────
+   Full-bleed image bands standing in for photography. The band
+   is a fixed height and the picture covers it, so swapping in a
+   different crop cannot change the page's rhythm. */
+.panel.spacer.plate{
+  padding:0;display:block;position:relative;overflow:hidden;
+  min-height:100svh;height:100svh;
+}
+.plateimg{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+  /* soft top and bottom so the band meets the ground rather than butting it.
+     mask-image reads ALPHA — opaque keeps, transparent hides. */
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 90px,#000 calc(100% - 90px),transparent 100%);
+          mask-image:linear-gradient(180deg,transparent 0,#000 90px,#000 calc(100% - 90px),transparent 100%);
+}
+.placemark{
+  position:absolute;right:var(--pad);bottom:clamp(14px,2.2vh,24px);z-index:2;
+  font-family:var(--mono);font-size:clamp(8.5px,.86vw,10px);
+  letter-spacing:.24em;text-transform:uppercase;color:#EDEFF3;opacity:.34;
+}
+
+/* #p08's vertical scrim used to run .62 at the top, .22 through the middle and
+   .80 at the foot — three jobs at once: a ground for the fixed chrome, a
+   general knock-back, and a fade into the footer. .blend already does the
+   third, and the general knock-back is what was burying the plate, so this is
+   cut to the 17% band the chrome actually needs. Everything below that is the
+   plate's own business.
+   The horizontal half is untouched — it is what holds the copy. */
+
+/* ══════════════════════════════════════════════════════════════
+   PLATES — the layers 08 does not have. Four panels carry a
+   photograph now, and two of them needed a scrim built for them.
+   ══════════════════════════════════════════════════════════════ */
+
+/* z-index:0 puts the plate under .herostage (1) and .herocopy (3).
+   `.panel > *` would otherwise hand it 2 and float it over the devices. */
+.heroplate{
+  position:absolute;inset:0;z-index:0;
+  width:100%;height:100%;object-fit:cover;
+  object-position:var(--plate-pos,50% 50%);
+  opacity:var(--plate-op,.55);
+}
+/* A second ground under the plate. .heroscrim is a sibling of .herostage at
+   inset:0 and already covers the panel — this is not a fix for scope. It is
+   here because .heroscrim is display:none below 1040px, and because its own
+   ramp is stronger and reaches further right. The two stack on desktop. */
+.heroground{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(11,12,15,.97) 0%,rgba(11,12,15,.90) 30%,
+                          rgba(11,12,15,.55) 58%,rgba(11,12,15,.30) 100%),
+    linear-gradient(0deg, rgba(11,12,15,.70) 0%,rgba(11,12,15,0) 34%);
+}
+@media (max-width:1040px){
+  /* the copy stacks ABOVE the devices here, so a left-to-right gradient is
+     aimed at nothing — the same bug #p08's scrim still has on a phone. */
+  .heroground{
+    background:linear-gradient(180deg,rgba(11,12,15,.93) 0%,
+                                      rgba(11,12,15,.78) 42%,
+                                      rgba(11,12,15,.58) 100%);
+  }
+}
+
+/* A bottom bar, not a floating panel: the hero's CTAs sit low-left and the
+   floorplan index sits mid-right, so anything boxy in a corner covers the
+   thing you are trying to judge. A full-width strip clears both. */
+/* The performance plate. 12's scrim ran the opposite way to every other one
+   here — the panel's ink was #0B0C0F and a headline on it needed a LIGHT
+   ground, which orange supplied. 13 inverts that back: the news screen is
+   cream on near-black, the ink is cream (.t-plate-o), and the four demo rows
+   need the ordinary dark ground everything else on the page gets.
+   The fixed CHROME was already handled this way and is unchanged —
+   data-tone="dark" hands it light ink and the same dark scrim every other
+   panel gives it. */
+.perf{
+  padding:0;
+}
+.perf > img{transform:none}          /* .photoplate's 1.12 scale is for the close */
+/* Right-weighted, because the list is right and the news plate puts its mass
+   in the centre. The orange is down from .30 to a trace: enough that the
+   panel still reads warm against the cyan ones either side of it, not enough
+   to lift the blacks — alpha on this plate is what flattened it in 10, and a
+   dot screen has nothing but blacks to lose.
+   Multiply is still wrong here for the reason 12 found: mean .13, and a dark
+   plate multiplied by orange goes near-black and loses the colour entirely. */
+.perf > .scrim{
+  background:
+    linear-gradient(264deg, rgba(11,12,15,.94) 0%, rgba(11,12,15,.88) 45%,
+                            rgba(11,12,15,.34) 76%, rgba(11,12,15,.04) 100%),
+    linear-gradient(96deg,  rgba(255,106,0,.16) 0%, rgba(255,106,0,.04) 100%);
+}
+.perf > .plate-in{
+  min-height:100svh;justify-content:center;
+  padding:clamp(52px,7.5vh,118px) var(--pad);
+}
+@media (max-width:1040px){
+  /* as the hero: the column is full-width here, so a sideways wash is aimed
+     at nothing. Weight it to the middle, where the list sits. */
+  .perf > .scrim{
+    background:
+      linear-gradient(180deg, rgba(11,12,15,.55) 0%, rgba(11,12,15,.88) 34%,
+                              rgba(11,12,15,.92) 74%, rgba(11,12,15,.60) 100%),
+      linear-gradient(180deg, rgba(255,106,0,.14) 0%, rgba(255,106,0,.04) 100%);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THE DEMO LISTS — #p03 and #p05 (concept 13)
+   Ported from ../lhmp-brand/brand/references/trance-landing, kept
+   in this page's tokens rather than that page's: --ink, --dim,
+   --hi and --rule come from whichever panel the list is standing
+   on, so the same markup is cream-and-orange on #p03 and
+   white-and-cyan on #p05 without a second copy of the rules.
+
+   WHY A LINE OF TYPE AND NOT A PLAYER. Progress is a 2px playhead
+   travelling THROUGH the row, not a bar filling up. The row stays
+   a hairline list item — the same register as the specification —
+   so audio does not arrive on this page as a foreign widget.
+
+   PREFIX. mockup-screens.css ships unscoped .pad/.pg/.pcell/.pseg
+   among others; everything here is dm- so nothing can collide.
+   ══════════════════════════════════════════════════════════════ */
+
+/* the column. Held to a measure rather than the panel width — a
+   full-bleed row on a 1600px screen is a rule with a word at each
+   end, and the picture underneath is the point of the panel. */
+.demos{
+  width:min(100%, 560px);
+  display:flex;flex-direction:column;
+}
+.perf .demos{margin-left:auto}    /* #p03 sits right */
+.plate .demos{margin-right:auto}  /* #p05 sits left  */
+
+.dm-list{margin:clamp(14px,2.2vh,26px) 0 0;padding:0;list-style:none}
+/* the UA sheet already hides a controls-less <audio>, but .dm-row is a
+   GRID and an element that ever escapes that rule would take a cell */
+.dm-row > audio{display:none}
+.dm-row{
+  position:relative;overflow:hidden;
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;column-gap:clamp(12px,1.6vw,22px);
+  padding:clamp(8px,1.1vh,12px) 0;
+  border-bottom:1px solid var(--rule);
+}
+.dm-row:first-child{border-top:1px solid var(--rule)}
+
+/* the chamfer is the page's own — the same corner the spec plate
+   and the tab buttons cut. 40px square keeps the 44px hit target
+   without .hit, which cannot be used here: the clip-path would
+   take the pseudo-element with it. */
+.dm-btn{
+  flex:none;width:44px;height:44px;padding:0;cursor:pointer;
+  background:transparent;border:1px solid var(--rule);color:var(--hi);
+  display:grid;place-items:center;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+.dm-btn:hover{border-color:var(--hi)}
+.dm-btn:focus-visible{outline:2px solid var(--hi);outline-offset:3px}
+.dm-btn[disabled]{cursor:default;opacity:.4}
+.dm-btn svg{width:13px;height:13px;fill:currentColor;display:block}
+.dm-btn .ic-pause{display:none}
+.dm-row.playing .dm-btn{background:var(--hi);color:var(--bg);border-color:var(--hi)}
+.dm-row.playing .dm-btn .ic-play{display:none}
+.dm-row.playing .dm-btn .ic-pause{display:block}
+
+.dm-name{
+  min-width:0;
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(12px,1.08vw,13.5px);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.dm-row.playing .dm-name{color:var(--ink)}
+.dm-name b{font-weight:500;opacity:.62}   /* what it was made with */
+.dm-time{
+  font-family:var(--mono);font-size:clamp(10px,.92vw,11.5px);
+  letter-spacing:.18em;color:var(--dim);font-variant-numeric:tabular-nums;
+}
+
+/* the seek strip covers the row but not the button. A <button> and
+   not a bare div so it is in the tree with a name; tabindex -1
+   because the play button is already the row's keyboard control
+   and two stops per row is one too many. */
+.dm-seek{
+  position:absolute;inset:0 0 0 44px;
+  cursor:pointer;background:none;border:0;padding:0;
+}
+.dm-head{
+  position:absolute;top:0;bottom:0;left:0;width:2px;
+  background:var(--hi);opacity:0;pointer-events:none;
+  transform:translateX(var(--px,0px));
+}
+.dm-row.playing .dm-head{opacity:1}
+/* a row stopped by another row keeps its playhead as a bookmark */
+.dm-row.paused .dm-head{opacity:.4}
+
+/* the placeholder note, in the same register as .placemark but in
+   flow under the list rather than pinned to the panel corner */
+.dm-note{
+  margin:clamp(10px,1.5vh,18px) 0 0;
+  font-family:var(--mono);font-size:clamp(8.5px,.86vw,10px);
+  letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink);opacity:.34;
+}
+
+/* ── #p05 gains an inner and a scrim ──────────────────────────
+   It was a picture band with nothing in it: padding:0, display:block
+   and no z-index:2 child at all. The inner mirrors .photoplate's so
+   the two demo panels share one measure and one vertical rhythm. */
+.panel.spacer.plate > .plate-in{
+  position:relative;z-index:3;min-height:100svh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--chrome) + clamp(18px,2.6vh,32px)) var(--pad) clamp(20px,2.8vh,34px);
+}
+/* left-weighted, because the list is left and the news plate puts
+   its magenta mass dead centre. Vertical below 1040px for the same
+   reason every other scrim here turns: the column is full-width
+   there and a sideways wash is aimed at nothing. */
+.panel.spacer.plate > .scrim{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,
+    rgba(11,12,15,.94) 0%, rgba(11,12,15,.88) 45%,
+    rgba(11,12,15,.34) 76%, rgba(11,12,15,.04) 100%);
+}
+@media (max-width:1040px){
+  .panel.spacer.plate > .scrim{
+    background:linear-gradient(180deg,
+      rgba(11,12,15,.55) 0%, rgba(11,12,15,.88) 34%,
+      rgba(11,12,15,.92) 74%, rgba(11,12,15,.60) 100%);
+  }
+}
+
+@media (max-width:1040px){
+  /* both lists go full-measure and centre when the panels stack */
+  .demos{width:100%;max-width:560px}
+  .perf .demos,.plate .demos{margin-left:0;margin-right:0}
+}
+
+/* ── THE FOUR DOORS, BROKEN OUT ON A PHONE ───────────────────────
+   The tab bar is a horizontal scroller at this width — it measures
+   822px inside a 350px column, so doors 03 and 04 are off-screen
+   with nothing saying so. Below 880px the panes stop being tabs and
+   become four sections, each with its own screen under it.
+   The move itself is done in script (the screens live in one
+   .shotcol so that they can cross-fade in place on desktop, and CSS
+   cannot interleave them); everything here is the layout it lands in. */
+@media (max-width:880px){
+  .tabbar{display:none}
+  .shotcol:empty{display:none}
+  /* all four are shown at once, so the per-pane fade would fire four times
+     on load and read as a stutter */
+  .waypane{animation:none}
+  .waypane + .waypane{
+    margin-top:clamp(34px,5vh,56px);
+    padding-top:clamp(28px,4vh,44px);
+    border-top:1px solid var(--hair);
+  }
+  /* the screen was absolutely stacked inside .shotcol; in a pane it is just
+     the next block */
+  .waypane .shot{
+    position:relative;inset:auto;opacity:1;
+    width:100%;max-width:262px;margin:clamp(18px,2.6vh,26px) auto 0;
+  }
+}
+</style>
+</head>
+<body data-tone="dark">
+
+<!-- the arrow, cut once -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="arrow" viewBox="0 0 44 18">
+    <path d="M1 9H41M32.5 1.5 41 9l-8.5 7.5" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="square"/>
+  </symbol>
+</defs></svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="chrome" id="chrome">
+  <a class="mark" href="#p01">
+    <img src="../images/logo.svg" alt="">
+    <b>JOLT<sup>&trade;</sup></b>
+  </a>
+  <span class="code">JLT&#8226;8V</span>
+  <span class="sp"></span>
+  <a class="demo" href="../onboarding.html">Demo NOW</a>
+  <a class="store" href="#appstore">App&nbsp;Store&nbsp;&#8599;</a>
+</header>
+
+<nav class="floorplan" aria-label="Panel index" id="floorplan"></nav>
+
+<main>
+
+<section class="panel hero t-ground" id="p01" data-tone="dark" data-label="Cover">
+  <!-- 09 only. The plate sits under everything; .heroground is the scrim
+       .heroscrim is not: stronger, reaches further right, and the only
+       one still painting below 1040px where .heroscrim is display:none. -->
+  <img class="heroplate" src="assets/plates13/hero-lasers-news.jpg" alt="">
+  <div class="heroground" aria-hidden="true"></div>
+  <svg class="tex tex-node" aria-hidden="true">
+    <defs>
+      <pattern id="node1" width="72" height="72" patternUnits="userSpaceOnUse">
+        <path d="M36 0V72M0 36H72" stroke="#3A3F4B" stroke-width=".5" opacity=".55"/>
+        <circle cx="36" cy="36" r="2" fill="#7DFBFD" opacity=".5"/>
+        <circle cx="0" cy="0" r="1.2" fill="#3A3F4B"/>
+        <circle cx="72" cy="72" r="1.2" fill="#3A3F4B"/>
+      </pattern>
+      <radialGradient id="nodefade1" cx="16%" cy="88%" r="90%">
+        <stop offset="0%" stop-color="#fff" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="nodemask1"><rect width="100%" height="100%" fill="url(#nodefade1)"/></mask>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#node1)" mask="url(#nodemask1)"/>
+  </svg>
+
+  <div class="herostage">
+    <div class="herodev">
+      <div class="heropad" aria-hidden="true">
+        <div class="jolt-mock device"><div class="viewport"><div class="screen pad" id="scr-editor-pad">
+              <div class="bar top">
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+                <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+                <span class="song-title" style="margin-left:4px">Pattern</span>
+                <span class="spacer"></span>
+                <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+                <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+              </div>
+              <div class="edit-body edit-cols">
+        <div class="ecol-l">
+        <div class="subnav">
+                    <span class="name">Pattern</span>
+                    <span class="icons">
+                      <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+                      <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+                      <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+                    </span>
+                  </div>
+                  <div class="pagebar">
+                    <div class="pageseq">
+                      <span class="pg label">Page</span>
+                      <span class="pg num on">1</span>
+                      <span class="pg num on">2</span>
+                      <span class="pg num on">3</span>
+                      <span class="pg num on last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/></svg></span>
+                    </div>
+                    <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+                  </div>
+        <div class="steps big" id="stepgrid-pad"></div>
+        <div class="instr-strip">
+                    <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+                    <div class="chips">
+                      <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+                      <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+                      <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+                      <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                      <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                      <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+                    </div>
+                  </div>
+        </div>
+        <div class="ecol-r">
+        <div class="tabcard">
+                    <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+                    <div class="panel">
+                      <div class="cluster"><div class="ch">Sound</div>
+                        <div class="dial-row">
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+                        </div>
+                        <div class="xfade"><span class="end">Classic waves</span><span class="track"><span class="handle" style="--v:.25"></span></span><span class="end">Hardsync waves</span></div>
+                      </div>
+                      <div class="cluster"><div class="ch">Filter</div>
+                        <div class="dial-row">
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.55"></span><span class="val">55</span></span><span class="cap">Cutoff</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.3"></span><span class="val">30</span></span><span class="cap">Resonance</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.4"></span><span class="val">40</span></span><span class="cap">Env Amt</span></div>
+                        </div>
+                      </div>
+                      <div class="cluster"><div class="ch">F. Env</div>
+                        <div class="dial-row">
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.1"></span><span class="val">10</span></span><span class="cap">Attack</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.7"></span><span class="val">70</span></span><span class="cap">Sustain</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.35"></span><span class="val">35</span></span><span class="cap">Release</span></div>
+                        </div>
+                      </div>
+                      <div class="cluster"><div class="ch">Noise</div>
+                        <div class="dial-row">
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.2"></span><span class="val">20</span></span><span class="cap">Level</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.6"></span><span class="val">60</span></span><span class="cap">Color</span></div>
+                        </div>
+                      </div>
+                      <div class="cluster"><div class="ch">Amp</div>
+                        <div class="dial-row">
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.05"></span><span class="val">5</span></span><span class="cap">Attack</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Decay</span></div>
+                          <div class="dial sm"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+        </div>
+      </div>
+      <div class="bar bottom">
+                <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+                <span class="chip txt"><i>Solo</i></span>
+                <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+                <span class="spacer"></span>
+                <span class="chip txt"><i>VIZ</i></span>
+                <span class="chip txt"><i>FX</i></span>
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+              </div>
+            </div></div></div>
+      </div>
+      <div class="herophone">
+      <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-editor-hero">
+      <div class="bar top">
+      <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+      <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+      <span class="song-title" style="margin-left:4px">Pattern</span>
+      <span class="spacer"></span>
+      <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+      <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+      </div>
+      <div class="edit-body">
+      <div class="subnav">
+      <span class="name">Pattern</span>
+      <span class="icons">
+      <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+      <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+      <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+      </span>
+      </div>
+      <div class="pagebar">
+      <div class="pageseq">
+      <span class="pg label">Page</span>
+      <span class="pg num on">1</span>
+      <span class="pg num playing">2</span>
+      <span class="pg num">3</span>
+      <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/></svg></span>
+      </div>
+      <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+      </div>
+      <div class="steps" id="stepgrid-hero"></div>
+      <div class="instr-strip">
+      <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+      <div class="chips">
+      <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+      <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+      <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+      <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+      <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+      <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+      </div>
+      </div>
+      <div class="tabcard">
+      <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+      <div class="panel">
+      <div class="dial-row">
+      <div class="dial"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+      <div class="dial"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+      <div class="dial"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+      </div>
+      <div class="dial-row">
+      <div class="dial"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+      <div class="dial"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Tune</span></div>
+      <div class="dial"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+      </div>
+      <div class="xfade"><span class="end">Classic waves</span><span class="track"><span class="handle" style="--v:.25"></span></span><span class="end">Hardsync</span></div>
+      </div>
+      <div class="foot"><span class="on">Sound</span><span>Filter</span><span>F. Env</span><span>Noise</span><span>Amp</span></div>
+      </div>
+      </div>
+      <div class="bar bottom">
+      <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+      <span class="chip txt"><i>Solo</i></span>
+      <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+      <span class="spacer"></span>
+      <span class="chip txt"><i>VIZ</i></span>
+      <span class="chip txt"><i>FX</i></span>
+      <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+      <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+      </div>
+      </div></div></div>
+      </div>
+    </div>
+    <div class="heroscrim" aria-hidden="true"></div>
+  </div>
+
+  <div class="herocopy">
+    <h1 class="herowordmark"><img src="assets/marks/jolt-wordmark.svg" alt="Jolt" width="272" height="82"></h1>
+    <p class="note">Eight voices, each with its own step sequencer.<br><em>Synths, Sampler, and effects built&#8209;in</em></p>
+
+    <div class="ctas">
+      <!-- Apple's own artwork, from the official badge pack in
+           ../Download-on-the-App-Store (US/UK, black lockup — its #a6a6a6
+           border is what makes it legible on a near-black ground). The white
+           lockup is beside it in assets/marks if this ever needs to shout. -->
+      <a class="asbadge" href="#appstore">
+        <img src="assets/marks/appstore-badge-black.svg" alt="Download on the App Store"
+             width="120" height="40">
+      </a>
+
+      <a class="demobtn" href="../onboarding.html">
+        <span class="live" aria-hidden="true"></span>
+        Play the browser demo
+        <span class="arr" aria-hidden="true"><svg><use href="#arrow"/></svg></span>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel t-cyanq" id="p02" data-tone="dark" data-label="The mechanic">
+  <div class="tex-halftone soft" aria-hidden="true"></div>
+  <div class="split">
+    <div>
+      <h2 class="d md">Any step.<br>Any voice.<br>Any instrument.</h2>
+      <p class="note">Any step can play any instrument.<br>Any voice can play any pattern.<br>Tracker-style flexibility, with a groovebox UI.</p>
+    </div>
+    <div>
+      <div class="steps big" id="mechgrid"></div>
+    </div>
+  </div>
+  <div class="claims">
+    <div class="claim ch14" style="--k:var(--i-kick)">
+      <span class="ix">01 / MECHANIC</span>
+      <p class="hd">Flexible.</p>
+      <p class="sb">Every pattern has up to&nbsp;<span class="n">128</span>&nbsp;steps.</p>
+    </div>
+    <div class="claim ch14" style="--k:var(--i-snare)">
+      <span class="ix">02 / VOICES</span>
+      <p class="hd">Multitimbral.</p>
+      <p class="sb"><span class="n">8</span> voices, playing any instrument.</p>
+    </div>
+    <div class="claim ch14" style="--k:var(--i-hat)">
+      <span class="ix">03 / SIGNAL</span>
+      <p class="hd">Processed.</p>
+      <p class="sb"><span class="n">Per-instrument</span>&nbsp;and global FX chains.</p>
+    </div>
+    <div class="claim ch14" style="--k:var(--i-chord)">
+      <span class="ix">04 / MOTION</span>
+      <p class="hd">Automated.</p>
+      <p class="sb"><span class="n">3</span> modulation layers, for any parameter.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel spacer photoplate perf t-plate-o" id="p03" data-tone="dark" data-label="Performance">
+  <!-- 09: the one flat colour field on the page becomes a plate. The orange
+       is not lost — it moves into the scrim, so the panel keeps its colour
+       role and gains a picture under it.
+       .tex-halftone is gone deliberately: the house rule is that dots go on
+       FLAT fields and never over photography. The news screen is the plate's
+       OWN dots, printed into the picture, which is a different thing.
+       12: the headline came off and the plate moved from D-news to C-print —
+       with no type to hold, the panel could be the picture at full contrast.
+       13: it goes back to news with the other three, and the emptiness the
+       headline left is what the demo list now occupies. The orange moves once
+       more, out of the field and into the controls — see .t-plate-o. -->
+  <img id="plate-perf" src="assets/plates13/perf-two-backs-news.jpg" alt="">
+  <div class="scrim" aria-hidden="true"></div>
+
+  <!-- .plate-in was kept empty in 12 because it is what holds the panel's
+       height. It holds the first demo list now, right-aligned against the
+       plate's centred mass. -->
+  <div class="plate-in">
+    <div class="demos">
+      <p class="eyebrow">Made in Jolt</p>
+      <h2 class="d md">Sounds like this</h2>
+      <p class="note">Four tracks, start to finish, made on the device. Nothing was finished in a DAW.</p>
+
+      <ol class="dm-list">
+        <li class="dm-row">
+          <button class="dm-btn" type="button" aria-label="Play Ferrite">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name">Ferrite&nbsp; <b>&middot; Sampler</b></span>
+          <span class="dm-time">0:30</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/ferrite.mp3"></audio>
+        </li>
+        <li class="dm-row">
+          <button class="dm-btn" type="button" aria-label="Play Halogen">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name">Halogen&nbsp; <b>&middot; Macro synth</b></span>
+          <span class="dm-time">0:31</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/halogen.mp3"></audio>
+        </li>
+        <li class="dm-row">
+          <button class="dm-btn" type="button" aria-label="Play Paper Bell">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name">Paper Bell&nbsp; <b>&middot; FM</b></span>
+          <span class="dm-time">0:29</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/paperbell.mp3"></audio>
+        </li>
+        <li class="dm-row">
+          <button class="dm-btn" type="button" aria-label="Play Wide Angle">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name">Wide Angle&nbsp; <b>&middot; Sampler + FX</b></span>
+          <span class="dm-time">0:29</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/wideangle.mp3"></audio>
+        </li>
+      </ol>
+
+      <p class="dm-note">Placeholder audio</p>
+    </div>
+  </div>
+
+</section>
+
+<section class="panel t-s1" id="p04" data-tone="dark" data-label="Ways in">
+  <h2 class="d md">Get straight to it</h2>
+  <p class="note">Laser-focused on making music, not learning workflows. Jolt is designed from the ground-up to be mobile-first, inspired by classic handheld devices.<br><br></p>
+
+  <div class="tabbar" role="tablist" aria-label="Ways into Jolt">
+    <button class="tabbtn" role="tab" id="tab-1" aria-controls="pane-1" aria-selected="true" style="--wc:var(--i-kick)"><span><em>01</em>Begin with a beat</span></button>
+    <button class="tabbtn" role="tab" id="tab-2" aria-controls="pane-2" aria-selected="false" tabindex="-1" style="--wc:var(--i-hat)"><span><em>02</em>Sample what&rsquo;s nearby</span></button>
+    <button class="tabbtn" role="tab" id="tab-3" aria-controls="pane-3" aria-selected="false" tabindex="-1" style="--wc:var(--i-chord)"><span><em>03</em>Play something melodic</span></button>
+    <button class="tabbtn" role="tab" id="tab-4" aria-controls="pane-4" aria-selected="false" tabindex="-1" style="--wc:var(--i-snare)"><span><em>04</em>Let it generate</span></button>
+  </div>
+
+  <div class="ways">
+    <div>
+      <div class="waypane" id="pane-1" role="tabpanel" aria-labelledby="tab-1" style="--wc:var(--i-kick)"
+           data-foc="2,16.6,94.9,11.2" data-label="Steps">
+        <span class="n">01 / 04</span>
+        <h3>Begin with a beat</h3>
+        <p>Choose an instrument, and tap in a rhythm or select the steps you want to play.</p>
+        <p>When your idea needs more space or variation, extend a pattern up to 8 pages of 16 steps.</p>
+        <div class="then">
+          <b>The secret sauce</b>
+          <span>Mix instruments to make complex grooves - think of instruments as a preset, not a limitation.</span>
+        </div>
+      </div>
+
+      <div class="waypane" id="pane-2" role="tabpanel" aria-labelledby="tab-2" style="--wc:var(--i-hat)" hidden
+           data-foc="4.1,51.1,91.8,35.5" data-label="Sample window">
+        <span class="n">02 / 04</span>
+        <h3>Sample what&rsquo;s nearby</h3>
+        <p>Record through the mic, or load a sample in from your library.<br><br>Jolt's Sampler features slicing and old-skool repitching, for crafting awesome breaks or remixing classic samples.</p>
+        <div class="then">
+          <b>Something special</b>
+          <span>The granular instrument lets you turn any sample into a texture, as sparse or dense as you like.</span>
+        </div>
+      </div>
+
+      <div class="waypane" id="pane-3" role="tabpanel" aria-labelledby="tab-3" style="--wc:var(--i-chord)" hidden
+           data-foc="2.1,21.3,95.9,28.4" data-label="Note grid">
+        <span class="n">03 / 04</span>
+        <h3>Play something melodic</h3>
+        <p>JOLT's synths cover a wide set of styles, and are all designed for quickly testing out ideas.<br><br>Play notes in on the on-screen keyboard, or via MIDI, the load up the piano-roll to edit and tweak until you get the perfect line.<br></p>
+        <div class="then">
+          <b>Change the sound</b>
+          <span>Sound editing is as simple as dragging dials and dialling in modulation - no menu diving, and immediately visible.</span>
+        </div>
+      </div>
+
+      <div class="waypane" id="pane-4" role="tabpanel" aria-labelledby="tab-4" style="--wc:var(--i-snare)" hidden
+           data-foc="4.1,39.6,91.8,9.0" data-label="Chord timeline">
+        <span class="n">04 / 04</span>
+        <h3>Let it generate</h3>
+        <p>JOLT's generative modes cover simple arpeggios, pounding acid patterns, and a complex chord progression editor.<br><br>Everything is kept in-scale, so inspiration is as simple as picking a mode and going wild.</p>
+        <div class="then">
+          <b>Add more vibe</b>
+          <span>Most generative modes also allow you to transpose your patterns, to break out of the loop and build up a song.</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="shotcol" id="shotstack">
+      <div class="shot" data-way="0"><div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-editor">
+        <div class="bar top">
+          <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+          <div class="pattern-tile" style="background:#7DFBFD"><span class="ink" style="--ic:var(--ic-kick)"></span><span class="badge">2</span></div>
+          <span class="song-title" style="margin-left:4px">Pattern</span>
+          <span class="spacer"></span>
+          <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+          <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+        </div>
+        <div class="edit-body">
+            <div class="subnav">
+              <span class="name">Pattern</span>
+              <span class="icons">
+                <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 8.5 4.7 5.2"/></svg></i></span>
+                <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="3" y="2.5" width="10" height="4.5"/><rect x="3" y="9" width="10" height="4.5"/></g></svg></i></span>
+                <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+              </span>
+            </div>
+            <div class="pagebar">
+              <div class="pageseq">
+                <span class="pg label">Page</span>
+                <span class="pg num on">1</span>
+                <span class="pg num playing">2</span>
+                <span class="pg num">3</span>
+                <span class="pg num last">4<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/></svg></span>
+              </div>
+              <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+            </div>
+            <div class="steps" id="stepgrid"></div>
+            <div class="instr-strip">
+              <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 4h8M6 8h8M6 12h8"/><g class="f"><circle cx="2.8" cy="4" r="1.1"/><circle cx="2.8" cy="8" r="1.1"/><circle cx="2.8" cy="12" r="1.1"/></g></svg></i></span>
+              <div class="chips">
+                <span class="ichip sel" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+                <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+                <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+                <span class="ichip" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+              </div>
+            </div>
+            <div class="tabcard">
+              <div class="tabs"><span>Type</span><span class="on">Sound</span><span>LFO</span><span>FX</span><span>Mix</span></div>
+              <div class="panel">
+                <div class="dial-row">
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.64"></span><span class="val">64</span></span><span class="cap">Harmonics</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.38"></span><span class="val">38</span></span><span class="cap">Timbre</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.52"></span><span class="val">52</span></span><span class="cap">Morph</span></div>
+                </div>
+                <div class="dial-row">
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.45"></span><span class="val">45</span></span><span class="cap">Decay</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.5"></span><span class="val">50</span></span><span class="cap">Tune</span></div>
+                  <div class="dial"><span class="wrap"><span class="ring" style="--v:0.8"></span><span class="val">80</span></span><span class="cap">Level</span></div>
+                </div>
+                <div class="xfade"><span class="end">Classic waves</span><span class="track"><span class="handle" style="--v:.25"></span></span><span class="end">Hardsync</span></div>
+              </div>
+              <div class="foot"><span class="on">Sound</span><span>Filter</span><span>F. Env</span><span>Noise</span><span>Amp</span></div>
+            </div>
+        </div>
+        <div class="bar bottom">
+          <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+          <span class="chip txt"><i>Solo</i></span>
+          <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+          <span class="spacer"></span>
+          <span class="chip txt"><i>VIZ</i></span>
+          <span class="chip txt"><i>FX</i></span>
+          <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+          <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+        </div>
+      </div></div></div></div>
+      <div class="shot" data-way="1">
+        <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-sampler">
+              <div class="bar top">
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+                <div class="pattern-tile" style="background:#32E5C8"><span class="ink" style="--ic:var(--ic-waves)"></span></div>
+                <span class="song-title" style="margin-left:4px">Sampler</span>
+                <span class="spacer"></span>
+                <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span><span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+              </div>
+              <div class="edit-body">
+                <div class="subnav">
+                  <span class="name">Sampler</span>
+                  <span class="icons">
+                    <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M1 8h2.2l1.6-4.2 2.2 8.6 2-6.2 1.4 3.4h4.6"/></svg></i></span>
+                    <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4.8 4v4.5M8 4v4.5M11.2 4v4.5"/></svg></i></span>
+                  </span>
+                </div>
+                <div class="tabcard">
+                  <div class="tabs"><span>Type</span><span class="on">Sample</span><span>Grains</span><span>LFO</span><span>Mix</span></div>
+                  <div class="panel" style="justify-content:space-evenly;gap:8px">
+                    <div class="samp-head">
+                      <span class="fname">break_02.wav</span>
+                      <span class="len">2.41s</span>
+                      <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M1 8h2.2l1.6-4.2 2.2 8.6 2-6.2 1.4 3.4h4.6"/></svg></i></span>
+                    </div>
+                    <div class="samp-row">
+                      <div class="ctl"><div class="tune"><span>+0</span><span>+0</span></div><span class="cap">Tune</span></div>
+                      <div class="dial"><span class="wrap"><span class="ring" style="--v:0.62"></span><span class="val">1.24</span></span><span class="cap">Gain</span></div>
+                    </div>
+                    <div class="slice-bar">
+                      <span class="lbl">Slices:</span>
+                      <span class="chip txt"><i>4</i></span>
+                      <span class="chip txt sel"><i>8</i></span>
+                      <span class="chip txt"><i>16</i></span>
+                      <span class="spacer" style="flex:1"></span>
+                      <span class="chip txt"><i>&#8722;</i></span>
+                      <span class="chip txt"><i>+</i></span>
+                    </div>
+                    <div class="wave">
+                      <svg viewBox="0 0 358 110" preserveAspectRatio="none"><path d="M0 54.4L0 54.4L1 54.4L2 54.4L3 54.4L4 54.4L5 54.4L6 54.4L7 54.4L8 54.4L9 54.4L10 7.4L11 4.4L12 13.6L13 14.3L14 23.2L15 27.6L16 31.1L17 34.6L18 33.4L19 37.3L20 35.4L21 40.8L22 40.5L23 44.2L24 44.4L25 45.1L26 44.8L27 44.1L28 45.4L29 45.1L30 48L31 47.5L32 49.1L33 48L34 48.2L35 47.4L36 47.5L37 48.3L38 48.5L39 49.8L40 49.2L41 50.2L42 48.6L43 49.2L44 48.5L45 49.2L46 49.5L47 49.7L48 50.2L49 49.5L50 50.1L51 48.9L52 50L53 24.8L54 29.6L55 32.5L56 39.7L57 41.1L58 45.5L59 43.6L60 44.7L61 43.2L62 44.6L63 46L64 47.9L65 49.8L66 49.7L67 50.2L68 48.4L69 49.1L70 48.1L71 49.6L72 50.3L73 51.2L74 51.4L75 50.8L76 50.6L77 49.6L78 50.7L79 50.2L80 51.6L81 51.5L82 51.8L83 51.3L84 50.9L85 50.8L86 50.6L87 51.5L88 51.4L89 52.3L90 51.7L91 51.9L92 51.2L93 51.3L94 51.2L95 51.4L96 6.3L97 19.3L98 20.3L99 27.7L100 29.4L101 30.6L102 32.4L103 31.5L104 36.7L105 36.4L106 42.3L107 41.7L108 44.1L109 42.8L110 43.1L111 43.1L112 43.6L113 45.8L114 46.3L115 48.6L116 47.5L117 48.4L118 46.7L119 47.4L120 47.2L121 48.2L122 49.2L123 49.3L124 50L125 48.9L126 49.7L127 48.3L128 49.5L129 49.2L130 50.1L131 50.2L132 50.1L133 50.1L134 49.4L135 50.1L136 49.3L137 50.7L138 50L139 30.2L140 34.9L141 41.1L142 41L143 44L144 41.2L145 43.6L146 43.8L147 46.8L148 48.7L149 49.8L150 50.2L151 48.9L152 49.1L153 47.8L154 49.7L155 49.8L156 51.5L157 51.6L158 51.6L159 50.9L160 50.1L161 50.4L162 50.2L163 51.7L164 51.7L165 52.5L166 51.8L167 51.7L168 51L169 50.9L170 51.3L171 51.6L172 52.4L173 52.2L174 52.6L175 51.7L176 51.9L177 51.4L178 51.8L179 52L180 52.3L181 52.6L182 9.4L183 9.9L184 18.6L185 19.6L186 22.6L187 27L188 29L189 36.2L190 36.9L191 42.3L192 40.1L193 42.1L194 40.5L195 42.1L196 43.3L197 44.9L198 47.1L199 46.9L200 48.1L201 46.2L202 47.4L203 46.1L204 47.7L205 48L206 49L207 49.3L208 48.8L209 49L210 47.8L211 49.2L212 48.3L213 49.8L214 49.4L215 50L216 49.5L217 49.2L218 49.2L219 48.8L220 49.8L221 49.4L222 50.7L223 49.7L224 50.3L225 30.6L226 35.3L227 33.5L228 38.4L229 36.7L230 42.2L231 43.6L232 46.8L233 47.4L234 47.1L235 46.8L236 45.7L237 47.4L238 47.4L239 50.2L240 50.2L241 51L242 50L243 49.5L244 49L245 49.1L246 50.2L247 50.6L248 51.9L249 51.3L250 51.5L251 50.3L252 50.5L253 50.2L254 50.8L255 51.5L256 51.6L257 52L258 51.3L259 51.6L260 50.6L261 51.4L262 51.1L263 51.8L264 51.9L265 51.9L266 51.8L267 51.3L268 12.6L269 18.3L270 17.9L271 22.1L272 27.3L273 29.9L274 35.7L275 34.4L276 38.7L277 34.8L278 38.2L279 37.3L280 40.6L281 42.2L282 43.6L283 44.7L284 43.4L285 44.8L286 42.9L287 45.7L288 45L289 47.2L290 47.1L291 47.6L292 47.2L293 46.5L294 47.2L295 46.6L296 48.6L297 48L298 49.4L299 48.4L300 48.7L301 48L302 48L303 48.4L304 48.4L305 49.6L306 49L307 50.1L308 48.6L309 49.3L310 48.5L311 21.4L312 20.9L313 31.1L314 31.2L315 39L316 39.4L317 42L318 41.2L319 41.2L320 42.4L321 43.1L322 46.5L323 47.1L324 49.5L325 48.2L326 48.5L327 47L328 47.6L329 48.1L330 49.1L331 50.4L332 50.4L333 50.9L334 49.5L335 50.1L336 49L337 50.1L338 50.3L339 51L340 51.3L341 50.9L342 50.9L343 50L344 50.8L345 50.2L346 51.3L347 51.1L348 51.6L349 51.2L350 50.9L351 50.9L352 50.5L353 51.3L354 51.3L355 51.3L356 51.3L357 51.3L357 58.7L356 58.7L355 58.7L354 58.7L353 58.7L352 59.5L351 59.1L350 59.1L349 58.8L348 58.4L347 58.9L346 58.7L345 59.8L344 59.2L343 60L342 59.1L341 59.1L340 58.7L339 59L338 59.7L337 59.9L336 61L335 59.9L334 60.5L333 59.1L332 59.6L331 59.6L330 60.9L329 61.9L328 62.4L327 63L326 61.5L325 61.8L324 60.5L323 62.9L322 63.5L321 66.9L320 67.6L319 68.8L318 68.8L317 68L316 70.6L315 71L314 78.8L313 78.9L312 89.1L311 88.6L310 61.5L309 60.7L308 61.4L307 59.9L306 61L305 60.4L304 61.6L303 61.6L302 62L301 62L300 61.3L299 61.6L298 60.6L297 62L296 61.4L295 63.4L294 62.8L293 63.5L292 62.8L291 62.4L290 62.9L289 62.8L288 65L287 64.3L286 67.1L285 65.2L284 66.6L283 65.3L282 66.4L281 67.8L280 69.4L279 72.7L278 71.8L277 75.2L276 71.3L275 75.6L274 74.3L273 80.1L272 82.7L271 87.9L270 92.1L269 91.7L268 97.4L267 58.7L266 58.2L265 58.1L264 58.1L263 58.2L262 58.9L261 58.6L260 59.4L259 58.4L258 58.7L257 58L256 58.4L255 58.5L254 59.2L253 59.8L252 59.5L251 59.7L250 58.5L249 58.7L248 58.1L247 59.4L246 59.8L245 60.9L244 61L243 60.5L242 60L241 59L240 59.8L239 59.8L238 62.6L237 62.6L236 64.3L235 63.2L234 62.9L233 62.6L232 63.2L231 66.4L230 67.8L229 73.3L228 71.6L227 76.5L226 74.7L225 79.4L224 59.7L223 60.3L222 59.3L221 60.6L220 60.2L219 61.2L218 60.8L217 60.8L216 60.5L215 60L214 60.6L213 60.2L212 61.7L211 60.8L210 62.2L209 61L208 61.2L207 60.7L206 61L205 62L204 62.3L203 63.9L202 62.6L201 63.8L200 61.9L199 63.1L198 62.9L197 65.1L196 66.7L195 67.9L194 69.5L193 67.9L192 69.9L191 67.7L190 73.1L189 73.8L188 81L187 83L186 87.4L185 90.4L184 91.4L183 100.1L182 100.6L181 57.4L180 57.7L179 58L178 58.2L177 58.6L176 58.1L175 58.3L174 57.4L173 57.8L172 57.6L171 58.4L170 58.7L169 59.1L168 59L167 58.3L166 58.2L165 57.5L164 58.3L163 58.3L162 59.8L161 59.6L160 59.9L159 59.1L158 58.4L157 58.4L156 58.5L155 60.2L154 60.3L153 62.2L152 60.9L151 61.1L150 59.8L149 60.2L148 61.3L147 63.2L146 66.2L145 66.4L144 68.8L143 66L142 69L141 68.9L140 75.1L139 79.8L138 60L137 59.3L136 60.7L135 59.9L134 60.6L133 59.9L132 59.9L131 59.8L130 59.9L129 60.8L128 60.5L127 61.7L126 60.3L125 61.1L124 60L123 60.7L122 60.8L121 61.8L120 62.8L119 62.6L118 63.3L117 61.6L116 62.5L115 61.4L114 63.7L113 64.2L112 66.4L111 66.9L110 66.9L109 67.2L108 65.9L107 68.3L106 67.7L105 73.6L104 73.3L103 78.5L102 77.6L101 79.4L100 80.6L99 82.3L98 89.7L97 90.7L96 103.7L95 58.6L94 58.8L93 58.7L92 58.8L91 58.1L90 58.3L89 57.7L88 58.6L87 58.5L86 59.4L85 59.2L84 59.1L83 58.7L82 58.2L81 58.5L80 58.4L79 59.8L78 59.3L77 60.4L76 59.4L75 59.2L74 58.6L73 58.8L72 59.7L71 60.4L70 61.9L69 60.9L68 61.6L67 59.8L66 60.3L65 60.2L64 62.1L63 64L62 65.4L61 66.8L60 65.3L59 66.4L58 64.5L57 68.9L56 70.3L55 77.5L54 80.4L53 85.2L52 60L51 61.1L50 59.9L49 60.5L48 59.8L47 60.3L46 60.5L45 60.8L44 61.5L43 60.8L42 61.4L41 59.8L40 60.8L39 60.2L38 61.5L37 61.7L36 62.5L35 62.6L34 61.8L33 62L32 60.9L31 62.5L30 62L29 64.9L28 64.6L27 65.9L26 65.2L25 64.9L24 65.6L23 65.8L22 69.5L21 69.2L20 74.6L19 72.7L18 76.6L17 75.4L16 78.9L15 82.4L14 86.8L13 95.7L12 96.4L11 105.6L10 102.6L9 55.6L8 55.6L7 55.6L6 55.6L5 55.6L4 55.6L3 55.6L2 55.6L1 55.6L0 55.6Z" fill="#32E5C8" fill-opacity="0.9"/></svg>
+                      <span class="marks"><span class="dim" style="left:0;width:3.00%"></span><span class="beat" style="left:25%"></span><span class="beat" style="left:75%"></span><span class="beat barline" style="left:50%"></span><span class="sdiv" style="left:15.12%"></span><span class="sdiv" style="left:27.25%"></span><span class="sdiv" style="left:39.38%"></span><span class="sdiv" style="left:51.50%"></span><span class="sdiv" style="left:63.62%"></span><span class="sdiv" style="left:75.75%"></span><span class="sdiv" style="left:87.88%"></span><span class="cur" style="left:51.50%;width:12.12%;--c:#32E5C8"></span><span class="slab" style="left:3.00%;--c:#32E5C8">1</span><span class="slab" style="left:15.12%;--c:#32E5C8">2</span><span class="slab" style="left:27.25%;--c:#32E5C8">3</span><span class="slab" style="left:39.38%;--c:#32E5C8">4</span><span class="slab on" style="left:51.50%;--c:#32E5C8">5</span><span class="slab" style="left:63.62%;--c:#32E5C8">6</span><span class="slab" style="left:75.75%;--c:#32E5C8">7</span><span class="slab" style="left:87.88%;--c:#32E5C8">8</span></span>
+                      <span class="zoom"><span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M6 2H2v4M10 14h4v-4M2 10v4h4M14 6V2h-4"/></svg></i></span></span>
+                    </div>
+                  </div>
+                  <div class="foot"><span class="on">Sample</span><span>Amp</span></div>
+                </div>
+              </div>
+              <div class="bar bottom"><span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span><span class="chip txt"><i>Solo</i></span><span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span><span class="spacer"></span><span class="chip txt"><i>VIZ</i></span><span class="chip txt"><i>FX</i></span><span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span><span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span></div>
+            </div></div></div>
+      </div>
+      <div class="shot" data-way="2">
+        <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-notes">
+              <div class="bar top">
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+                <div class="pattern-tile" style="background:#EA3EE7"><span class="ink" style="--ic:var(--ic-chord)"></span></div>
+                <span class="song-title" style="margin-left:4px">Notes</span>
+                <span class="spacer"></span>
+                <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="0.5" y="2" width="3" height="3"/><rect x="4.5" y="2" width="3" height="3"/><rect x="8.5" y="2" width="3" height="3"/><rect x="12.5" y="2" width="3" height="3"/><rect x="0.5" y="6.5" width="3" height="3"/><rect x="4.5" y="6.5" width="3" height="3"/><rect x="8.5" y="6.5" width="3" height="3"/><rect x="12.5" y="6.5" width="3" height="3"/><rect x="0.5" y="11" width="3" height="3"/><rect x="4.5" y="11" width="3" height="3"/><rect x="8.5" y="11" width="3" height="3"/><rect x="12.5" y="11" width="3" height="3"/></g></svg></i></span>
+                <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+              </div>
+              <div class="edit-body">
+                <div class="notesmode">
+                  <span class="chip sel" style="--chip-border:transparent"><i><svg class="si" viewBox="0 0 16 16"><path d="M2 4h6M2 8h6M2 12h4"/><circle class="f" cx="11.4" cy="12.3" r="1.7"/><path d="M13.1 12.3V3.6l1.6 1.1"/></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M3.5 12.5 12.5 3.5"/><circle cx="4.6" cy="4.6" r="1.9"/><circle cx="11.4" cy="11.4" r="1.9"/></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2.5 11.5a6 6 0 0 1 11 0"/><path d="M8 11.5 10.8 7"/><circle class="f" cx="8" cy="11.5" r="1.2"/></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/></svg></i></span>
+                  <span class="chip flat"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><circle cx="3.5" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="12.5" cy="8" r="1.2"/></g></svg></i></span>
+                </div>
+                <div class="pagebar">
+                  <div class="pageseq">
+                    <span class="pg label">Page</span>
+                    <span class="pg num on playing">1</span>
+                    <span class="pg num last">2<svg class="grip" viewBox="0 0 10 10"><line x1="10" y1="2" x2="2" y2="10"/><line x1="10" y1="6" x2="6" y2="10"/></svg></span>
+                  </div>
+                  <span class="chip pencil"><i><svg class="si" viewBox="0 0 16 16"><path d="M3 13l1-3.2 6.8-6.8 2.2 2.2L6.2 12 3 13z"/></svg></i></span>
+                </div>
+                <div class="scale-row">
+                  <span class="chip txt scale-chip"><i>C&nbsp;&nbsp;Minor</i></span>
+                </div>
+                <div class="lanes" id="notelanes"></div>
+                <div class="notes-picker">
+                  <div class="chips">
+                    <span class="ichip" style="--c:#7DFBFD"><i><span class="ink" style="--ic:var(--ic-kick)"></span></i></span>
+                    <span class="ichip" style="--c:#CFFB52"><i><span class="ink" style="--ic:var(--ic-snare)"></span></i></span>
+                    <span class="ichip" style="--c:#FF9500"><i><span class="ink" style="--ic:var(--ic-hihat)"></span></i></span>
+                    <span class="ichip sel" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                    <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                    <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+                  </div>
+                </div>
+              </div>
+              <div class="bar bottom">
+                <span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span>
+                <span class="chip txt"><i>Solo</i></span>
+                <span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span>
+                <span class="spacer"></span>
+                <span class="chip txt"><i>VIZ</i></span>
+                <span class="chip txt"><i>FX</i></span>
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span>
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span>
+              </div>
+            </div></div></div>
+      </div>
+      <div class="shot" data-way="3">
+        <div class="jolt-mock device"><div class="viewport"><div class="screen" id="scr-gen">
+              <div class="bar top">
+                <span class="chip"><i><svg class="si" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></i></span>
+                <div class="pattern-tile" style="background:#EA3EE7"><span class="ink" style="--ic:var(--ic-chord)"></span></div>
+                <span class="song-title" style="margin-left:4px">Generate</span>
+                <span class="spacer"></span>
+              </div>
+              <div class="edit-body">
+                <div class="subnav"><span class="name">Chord Progression</span></div>
+                <div class="tabcard">
+                  <div class="tabs"><span class="on">Progression</span><span>Pattern</span></div>
+                  <div class="panel" style="justify-content:space-between;gap:6px">
+                    <div class="gen-row">
+                      <span class="ichip sel" style="--c:#EA3EE7"><i><span class="ink" style="--ic:var(--ic-chord)"></span></i></span>
+                      <span class="ichip" style="--c:#0080FF"><i><span class="ink" style="--ic:var(--ic-sine)"></span></i></span>
+                      <span class="ichip" style="--c:#32E5C8"><i><span class="ink" style="--ic:var(--ic-waves)"></span></i></span>
+                    </div>
+                    <div class="gen-row">
+                      <span class="chip txt"><i>C</i></span>
+                      <span class="chip txt"><i>Minor</i></span>
+                      <span class="spacer" style="flex:1"></span>
+                      <span class="chip txt"><i>Voice Lead</i></span>
+                    </div>
+                    <div class="gen-row">
+                      <span class="lbl">Bars</span><span class="numchip">4</span>
+                    </div>
+                    <div class="tlwrap"><div class="tl"><span class="ticks"><span class="tick" style="left:6.2500%"></span><span class="tick" style="left:12.5000%"></span><span class="tick" style="left:18.7500%"></span><span class="tick barline" style="left:25.0000%"></span><span class="tick" style="left:31.2500%"></span><span class="tick" style="left:37.5000%"></span><span class="tick" style="left:43.7500%"></span><span class="tick barline" style="left:50.0000%"></span><span class="tick" style="left:56.2500%"></span><span class="tick" style="left:62.5000%"></span><span class="tick" style="left:68.7500%"></span><span class="tick barline" style="left:75.0000%"></span><span class="tick" style="left:81.2500%"></span><span class="tick" style="left:87.5000%"></span><span class="tick" style="left:93.7500%"></span></span><span class="blk" style="left:0.0000%;width:25.0000%;--c:#EA3EE7"><b>Cm</b><i>C Eb G</i></span><span class="blk" style="left:25.0000%;width:12.5000%;--c:#EA3EE7"><b>Ab</b></span><span class="blk" style="left:37.5000%;width:12.5000%;--c:#EA3EE7"><b>Bb</b><i>Bb D F</i></span><span class="blk sel" style="left:50.0000%;width:50.0000%;--c:#EA3EE7"><b>Fm</b><i>Ab C F</i><u>1st &#183; +1</u></span><span class="dots"><i style="left:0.0000%"></i><i style="left:4.6875%"></i><i style="left:9.3750%"></i><i style="left:18.7500%"></i><i style="left:23.4375%"></i><i style="left:28.1250%"></i><i style="left:37.5000%"></i><i style="left:42.1875%"></i><i style="left:46.8750%"></i><i style="left:56.2500%"></i><i style="left:60.9375%"></i><i style="left:65.6250%"></i><i style="left:75.0000%"></i><i style="left:79.6875%"></i><i style="left:84.3750%"></i><i style="left:93.7500%"></i><i style="left:98.4375%"></i></span><span class="phead" style="left:34.3750%"></span></div><div class="tl"><span class="dead" style="left:0"></span></div></div>
+                    <div class="gen-row gap"><span class="optlist deg"><span>i</span><span>ii</span><span>III</span><span class="on">iv</span><span>v</span><span>VI</span><span>VII</span></span></div>
+                    <div class="gen-row"><span class="lbl" style="width:62px">Chord</span><span class="optlist "><span class="on">Mj/Mn</span><span>7th</span><span>9th</span><span>Add9</span><span>Sus4</span></span></div>
+                    <div class="gen-row"><span class="lbl" style="width:62px">Inversion</span><span class="optlist "><span>Root</span><span class="on">1st</span><span>2nd</span><span>3rd</span><span>Spread</span></span></div>
+                    <div class="genfoot">
+                      <span class="lbl" style="font-family:var(--mono);font-size:12px;color:var(--muted)">Octave</span>
+                      <span class="numchip">+1</span>
+                      <span class="spacer"></span>
+                      <span class="chip txt"><i>Delete</i></span>
+                    </div>
+                  </div>
+                  <div class="foot"><span>Cancel</span><span class="on">Apply</span></div>
+                </div>
+              </div>
+              <div class="bar bottom"><span class="chip sel"><i><svg class="si" viewBox="0 0 16 16"><g class="f"><rect x="4" y="3" width="2.6" height="10"/><rect x="9.4" y="3" width="2.6" height="10"/></g></svg></i></span><span class="chip txt"><i>Solo</i></span><span class="chip"><i style="color:#FF3B30"><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5"/></svg></i></span><span class="spacer"></span><span class="chip txt"><i>VIZ</i></span><span class="chip txt"><i>FX</i></span><span class="chip"><i><svg class="si" viewBox="0 0 16 16"><rect x="4" y="1.8" width="8" height="12.4" rx="1"/><circle cx="8" cy="5" r="1.1"/><circle cx="8" cy="10.2" r="2.1"/></svg></i></span><span class="chip"><i><svg class="si" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.8"/><path d="M8 1.6v2.2M8 12.2v2.2M1.6 8h2.2M12.2 8h2.2M3.5 3.5l1.5 1.5M11 11l1.5 1.5M12.5 3.5 11 5M5 11l-1.5 1.5"/></svg></i></span></div>
+            </div></div></div>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel spacer plate t-ground" id="p05" data-tone="dark" data-label="Plate">
+  <!-- PLACEHOLDER IMAGERY — a treated plate from ../lhmp-brand/brand/references/
+       dither-tests, standing in to mark where real photography goes. Swap the
+       src and delete the .placemark below; nothing else here depends on it. -->
+  <img class="plateimg" id="plate-mid" src="assets/plates13/mid-hands-news.jpg" alt="" style="object-position:50% 50%">
+  <!-- 13: the panel was a picture band with nothing in it. It carries the
+       second demo list now, so it needs the ground every other panel with
+       type on it has — left-weighted, against the plate's centred mass and
+       opposite #p03's. -->
+  <div class="scrim" aria-hidden="true"></div>
+  <span class="placemark">Placeholder imagery</span>
+
+  <div class="plate-in">
+    <div class="demos">
+      <p class="eyebrow">Four ways in</p>
+      <h2 class="d md">One from each door</h2>
+      <p class="note">The four routes above, each taken end to end. Same machine, four different places to start.</p>
+
+      <!-- Each row borrows its door's colour from InstrumentColors.fixed, the
+           same source the tab bar uses, by overriding --hi for that row only —
+           so the button, its focus ring and the playhead all move together
+           and the list reads as the four doors rather than as four files. -->
+      <ol class="dm-list">
+        <li class="dm-row" style="--hi:var(--i-kick)">
+          <button class="dm-btn" type="button" aria-label="Play Begin with a beat">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name"><b>01 &middot;</b> Begin with a beat</span>
+          <span class="dm-time">0:30</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/ferrite.mp3"></audio>
+        </li>
+        <li class="dm-row" style="--hi:var(--i-hat)">
+          <button class="dm-btn" type="button" aria-label="Play Sample what&rsquo;s nearby">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name"><b>02 &middot;</b> Sample what&rsquo;s nearby</span>
+          <span class="dm-time">0:29</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/wideangle.mp3"></audio>
+        </li>
+        <li class="dm-row" style="--hi:var(--i-chord)">
+          <button class="dm-btn" type="button" aria-label="Play Play something melodic">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name"><b>03 &middot;</b> Play something melodic</span>
+          <span class="dm-time">0:29</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/paperbell.mp3"></audio>
+        </li>
+        <li class="dm-row" style="--hi:var(--i-snare)">
+          <button class="dm-btn" type="button" aria-label="Play Let it generate">
+            <svg class="ic-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 0l9 6-9 6z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 0h3.4v12H1zM7.6 0H11v12H7.6z"/></svg>
+          </button>
+          <span class="dm-name"><b>04 &middot;</b> Let it generate</span>
+          <span class="dm-time">0:31</span>
+          <button class="dm-seek" type="button" tabindex="-1" aria-hidden="true"></button>
+          <i class="dm-head"></i>
+          <audio preload="none" src="assets/audio/halogen.mp3"></audio>
+        </li>
+      </ol>
+
+      <p class="dm-note">Placeholder audio &mdash; the same four bounces</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel tall t-s1" id="p06" data-tone="dark" data-label="Specification">
+
+  <p class="eyebrow">Specification</p>
+  <div class="sp-head">
+    <h2 class="d md">Features? JOLT has them.</h2>
+    <span class="kick">Jolt Groovebox &nbsp;/&nbsp; iOS</span>
+  </div>
+
+  <div class="sp-grid">
+
+    <div class="sp-col">
+      <div class="sp-ghead"><span class="idx">01</span><h3>Sequencer</h3><span class="ref">SEQ</span></div>
+      <div class="sp-r"><span class="k">Voices</span><span class="v">8</span></div>
+      <div class="sp-r"><span class="k">Step sequencers</span><span class="v">8</span>
+        <p class="d">Each voice plays independently</p></div>
+      <div class="sp-r"><span class="k">Pattern length</span><span class="v">128 steps</span></div>
+      <div class="sp-r hi"><span class="k">Per-step instrument</span><span class="v">Yes</span>
+        <p class="d">Any voice plays any instrument on any step. Multiple instruments mix into a single pattern.</p></div>
+      <div class="sp-r"><span class="k">Step entry</span><span class="v q">Flexible</span>
+        <p class="d">Programmed · MIDI input · Generative.</p></div>
+      <div class="sp-r"><span class="k">Song mode</span><span class="v q">Chained</span>
+        <p class="d">Patterns chain into songs, with automation.</p></div>
+      <div class="sp-r"><span class="k">Performance mode</span><span class="v q">Live</span>
+        <p class="d">Live parameter control while the song runs.</p></div>
+      <div class="sp-r"><span class="k">MIDI output</span><span class="v q">Sync and Notes</span></div>
+    </div>
+
+    <div class="sp-col">
+      <div class="sp-ghead"><span class="idx">02</span><h3>Instruments &amp; Effects</h3><span class="ref">INS &#183; FX</span></div>
+
+      <div class="sp-grp"><span class="t">Instruments</span><span class="c">4 engines</span></div>
+      <div class="sp-inv one">
+        <div class="sp-r"><span class="k">Wavetable Synth</span><span class="v"></span>
+          <p class="d">4 modes &mdash; spread, 2-op FM, paraphony, in-scale chords.</p></div>
+        <div class="sp-r"><span class="k">Macro Synth</span><span class="v">16 sub-synths</span>
+          <p class="d">Built on the architecture of the Eurorack classic, Mutable Instruments Plaits.</p></div>
+        <div class="sp-r"><span class="k">Sampler</span><span class="v">~40min Sample Memory</span>
+          <p class="d">Old-skool repitching, per-step reversing, and granular cloud.</p></div>
+        <div class="sp-r"><span class="k">Drum Synth</span><span class="v">x0x-style</span>
+          <p class="d">Hats, snares, heavy kicks, instantly configurable.</p></div>
+      </div>
+
+      <div class="sp-grp"><span class="t">Insert effects</span><span class="c">Up to 5 per instrument</span></div>
+      <div class="sp-inv">
+        <div class="sp-r"><span class="k">Overdrive</span><span class="v q">01</span></div>
+        <div class="sp-r"><span class="k">Saturator</span><span class="v q">02</span></div>
+        <div class="sp-r"><span class="k">Chorus</span><span class="v q">03</span></div>
+        <div class="sp-r"><span class="k">Filter</span><span class="v q">04</span></div>
+        <div class="sp-r"><span class="k">Band / EQ</span><span class="v q">05</span></div>
+        <div class="sp-r"><span class="k">Erode</span><span class="v q">06</span></div>
+        <div class="sp-r"><span class="k">Bitcrush</span><span class="v q">07</span></div>
+        <div class="sp-r"><span class="k">Sample rate red.</span><span class="v q">08</span></div>
+        <div class="sp-r"><span class="k">Phaser</span><span class="v q">09</span></div>
+        <div class="sp-r"><span class="k">Gater</span><span class="v q">10</span></div>
+        <div class="sp-r"><span class="k">Modulated pan</span><span class="v q">11</span></div>
+      </div>
+      <p class="sp-fxnote">
+        <b>04</b>&nbsp;Filter: 4-stage ladder, or resonant SVF (LP / HP / BP), with mod envelope<br><b>10</b>&nbsp;Gater: 16-step, synced.
+      </p>
+    </div>
+
+    <div class="sp-col">
+      <div class="sp-ghead"><span class="idx">03</span><h3>Modulation</h3><span class="ref">MOD &#183; SEND</span></div>
+
+      <div class="sp-r"><span class="k">LFO</span><span class="v">Per instrument</span>
+        <p class="d">Sine, ramp, and others. Assign to any parameter.</p></div>
+      <div class="sp-r"><span class="k">Pattern automation</span><span class="v">Lane</span></div>
+      <div class="sp-r"><span class="k">Song automation</span><span class="v">Group</span>
+        <p class="d">Matched to the song, or real-time fader override.</p></div>
+
+      <div class="sp-grp"><span class="t">Send buses</span><span class="c">4</span></div>
+      <div class="sp-r"><span class="k">Reverb</span><span class="v q">Plate</span></div>
+      <div class="sp-r"><span class="k">Delay</span><span class="v q">Digital</span>
+        <p class="d">Tempo-synced, with ping-pong option.</p></div>
+      <div class="sp-r"><span class="k">Multi-tap</span><span class="v q">8 taps</span></div>
+      <div class="sp-r"><span class="k">Sidechain</span><span class="v q">Classic Pumping</span></div>
+
+      <div class="sp-grp"><span class="t">Global macros</span><span class="c">5 Groups</span></div>
+      <div class="sp-r"><span class="k">Reverb</span><span class="v q"></span></div>
+      <div class="sp-r"><span class="k">Delay</span><span class="v q"></span></div>
+      <div class="sp-r"><span class="k">Phaser</span><span class="v q"></span></div>
+      <div class="sp-r"><span class="k">Beat repeat</span><span class="v q"></span></div>
+      <div class="sp-r"><span class="k">DJ filter &mdash; LP</span><span class="v q"></span></div>
+      <div class="sp-r"><span class="k">DJ filter &mdash; HP</span><span class="v q"></span></div>
+    </div>
+
+    <div class="sp-col">
+      <div class="sp-ghead"><span class="idx">04</span><h3>Platform</h3><span class="ref">SYS</span></div>
+
+      <div class="sp-r"><span class="k">Devices</span><span class="v">iPhone &#183; iPad</span>
+        <p class="d">Designed for mobile beat making</p></div>
+      <div class="sp-r"><span class="k">MIDI in</span><span class="v q">Note entry</span></div>
+      <div class="sp-r"><span class="k">MIDI out</span><span class="v q">Sync + Notes</span></div>
+      <div class="sp-r"><span class="k">Audio in</span><span class="v q">Sample anything</span></div>
+      <div class="sp-r"><span class="k">File import</span><span class="v q">Mp3 + WAV</span></div>
+      <div class="sp-r"><span class="k">Demo</span><span class="v"><a class="hit" href="../onboarding.html" style="color:var(--cyan)">Browser &rarr;</a></span></div>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="panel photoplate close t-plate" id="p08" data-tone="dark" data-label="Demo"
+         style="--scrim:linear-gradient(96deg,rgba(11,12,15,.94) 0%,rgba(11,12,15,.80) 30%,rgba(11,12,15,.18) 62%,rgba(11,12,15,0) 86%),linear-gradient(180deg,rgba(11,12,15,.58) 0%,rgba(11,12,15,0) 17%)">
+  <!-- PLACEHOLDER IMAGERY — a treated plate standing in until there is
+       real photography. Swap the src; the scrim and layout can stay. -->
+  <img src="assets/plates13/close-arms-news.jpg" alt="">
+  <div class="scrim" aria-hidden="true"></div>
+  <!-- the lower half fades to the ground, so the footer reads as its own
+       surface without needing a panel of its own -->
+  <div class="blend" aria-hidden="true"></div>
+
+  <div class="plate-in">
+    <p class="eyebrow">Demo</p>
+    <h2 class="d lg">Ready to play?</h2>
+    <p class="note">The JOLT onboarding runs in the browser, as well as in the app, so you can try it right now:</p>
+    <a class="arrow big" href="../onboarding.html"><span class="arr"><svg><use href="#arrow"/></svg></span> Play the demo</a>
+  </div>
+
+  <!-- role restores the landmark a nested <footer> would otherwise lose -->
+  <footer class="foot" role="contentinfo">
+    <div class="footbrand">
+      <img class="footlogo" src="../images/logo.svg" alt="" width="768" height="384">
+      <img class="footmark" src="assets/marks/jolt-wordmark.svg" alt="JOLT" width="272" height="82">
+    </div>
+    <div class="footcta">
+      <!-- the demo button that used to sit here is gone: its twin is now
+           three hundred pixels up the same screen -->
+      <a class="asbadge" href="#appstore">
+        <img src="assets/marks/appstore-badge-black.svg" alt="Download on the App Store" width="120" height="40">
+      </a>
+    </div>
+    <div class="footline">
+      <span>iPhone &amp; iPad</span>
+      <span class="sp"></span>
+      <span class="endorse">
+        <span>An</span>
+        <img class="lhmp" src="assets/marks/lhmp-wordmark-chamfer.svg" alt="LHMP">
+        <span>project</span>
+      </span>
+      <span>&copy;&nbsp;2026</span>
+    </div>
+  </footer>
+</section>
+
+</main>
+
+<!-- builds both embedded editors and scales their frames. It must run BEFORE
+     the page script, which takes the iPad step cells over once they exist. -->
+<script src="../mockup-screens.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var panels = [].slice.call(document.querySelectorAll('main > .panel'));
+
+  /* ── Floorplan index, built from the panels themselves ───── */
+  var fp = document.getElementById('floorplan');
+  panels.forEach(function(p,i){
+    var a = document.createElement('a');
+    a.href = '#' + p.id;
+    a.setAttribute('aria-label', p.getAttribute('data-label') || p.id);
+    a.innerHTML = '<span>' + String(i+1).padStart(2,'0') + '</span><i></i>';
+    fp.appendChild(a);
+  });
+  var links = [].slice.call(fp.querySelectorAll('a'));
+
+  /* ══ THE HERO MOCKUP — the real editor, running ══════════════
+     mockup-screens.js builds the iPad step grid from the app's own
+     data. This takes those finished cells over rather than drawing
+     a second, prettier sequencer beside them, so the movement and
+     the click-to-reassign gesture happen in the product UI itself.
+     Runs after mockup-screens.js — see the script order in the
+     markup; before it, there is no grid to clone or take over. ══ */
+  var INS = [
+    {k:null,    c:null,      n:'Empty'},
+    {k:'kick',  c:'#7DFBFD', n:'Kick'},
+    {k:'snare', c:'#CFFB52', n:'Snare'},
+    {k:'hihat', c:'#FF9500', n:'Hat'},
+    {k:'chord', c:'#EA3EE7', n:'Chord'}
+  ];
+  var IDX = {'#7DFBFD':1,'#CFFB52':2,'#FF9500':3,'#EA3EE7':4};
+
+  /* mockup-screens.js only knows two grid ids, #stepgrid (phone) and
+     #stepgrid-pad (tablet), and the page now has two phones. The hero's grid
+     is cloned from the one it did build, so both stay in step with the app's
+     own data and there is still a single source for it. */
+  var built = document.getElementById('stepgrid');
+  var heroGrid = document.getElementById('stepgrid-hero');
+  if (built && heroGrid && !heroGrid.children.length) heroGrid.innerHTML = built.innerHTML;
+
+  /* ── Transport ──────────────────────────────────────────────
+     One lane, two devices. The phone shows a single page of 16; the iPad shows
+     all four, so the same absolute step is cell `i` on the iPad and cell
+     `i % 16` on the phone, and the page bars report which page that is. Both
+     grids come from the one builder in mockup-screens.js and page 1 is the same
+     sixteen cells in the same order, so a single index is enough.
+     Editing page (.on) stays put — the app lets you edit one page while another
+     plays. Only the cyan .playing strip follows the transport. */
+  var hcells = [].slice.call(document.querySelectorAll('#stepgrid-hero .stepwrap'));
+  var pcells = [].slice.call(document.querySelectorAll('#stepgrid-pad .stepwrap'));
+  var STEPS  = hcells.length || 16;
+  var PAGES  = pcells.length ? Math.max(1, Math.round(pcells.length / STEPS)) : 1;
+  var TOTAL  = STEPS * PAGES;
+  var pagebars = ['#scr-editor-hero', '#scr-editor-pad'].map(function (sel) {
+    var scr = document.querySelector(sel);
+    return scr ? [].slice.call(scr.querySelectorAll('.pagebar .pg.num')) : [];
+  });
+
+  function cellPaint(w){
+    var d  = INS[+w.dataset.i];
+    var st = w.querySelector('.step');
+    if (!st) return;
+    var ink = st.querySelector('.ink');
+    if (!ink){
+      ink = document.createElement('span');
+      ink.className = 'ink';
+      st.insertBefore(ink, st.firstChild);
+    }
+    if (d.k){
+      st.classList.add('on');
+      st.style.setProperty('--c', d.c);
+      ink.style.setProperty('--ic', 'var(--ic-' + d.k + ')');
+      ink.style.display = '';
+    } else {
+      st.classList.remove('on');
+      st.style.removeProperty('--c');
+      ink.style.display = 'none';
+    }
+    w.setAttribute('aria-label', 'Step ' + w.dataset.s + ': ' + d.n + '. Activate to change instrument.');
+  }
+
+  hcells.forEach(function(w, i){
+    var st = w.querySelector('.step');
+    var m  = st ? (st.getAttribute('style') || '').match(/--c:\s*(#[0-9A-Fa-f]{6})/) : null;
+    var hit = m ? IDX[m[1].toUpperCase()] : 0;
+    w.dataset.i = hit ? hit : 0;
+    w.dataset.s = i + 1;
+    w.classList.remove('play');          /* the app's own static playhead */
+    w.setAttribute('role', 'button');
+    w.tabIndex = 0;
+    cellPaint(w);
+    function cycle(){
+      w.dataset.i = (+w.dataset.i + 1) % INS.length;
+      cellPaint(w);
+    }
+    w.addEventListener('click', cycle);
+    w.addEventListener('keydown', function(e){
+      if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); cycle(); }
+    });
+  });
+  /* the builder hard-codes a .play on step 5 and the markup a .playing on page
+     2, both as a still frame. Clear them and let the transport own the state. */
+  hcells.concat(pcells).forEach(function (c) { c.classList.remove('play'); });
+  pagebars.forEach(function (nums) {
+    nums.forEach(function (n) { n.classList.remove('playing'); });
+  });
+
+  var lp = 0, ltimer = null;
+
+  function lightStep(i, on) {
+    // The phone is showing page 1. A playhead on its grid while the transport is
+    // on page 3 would be claiming those steps are the ones sounding, so it only
+    // runs while the transport is actually on the page the phone is displaying.
+    // The page bar still reports where the transport really is.
+    if (Math.floor(i / STEPS) === 0 && hcells[i % STEPS]) {
+      hcells[i % STEPS].classList.toggle('play', on);
+    }
+    if (pcells[i]) pcells[i].classList.toggle('play', on);
+  }
+  function lightPage(i, on) {
+    var pg = Math.floor(i / STEPS);
+    pagebars.forEach(function (nums) {
+      if (nums[pg]) nums[pg].classList.toggle('playing', on);
+    });
+  }
+  lightStep(0, true); lightPage(0, true);
+  function runLane(on){
+    if (reduce || !hcells.length) return;
+    if (on && !ltimer){
+      ltimer = setInterval(function(){
+        var prev = lp;
+        lp = (lp + 1) % TOTAL;
+        lightStep(prev, false);
+        lightStep(lp, true);
+        if (Math.floor(prev / STEPS) !== Math.floor(lp / STEPS)) {
+          lightPage(prev, false);
+          lightPage(lp, true);
+        }
+      }, 125);
+    } else if (!on && ltimer){
+      clearInterval(ltimer); ltimer = null;
+    }
+  }
+
+  /* ══ THE MECHANIC FIGURE — the app's own grid, not a schematic ══
+     Cloned from the same built markup the hero uses, so the figure and
+     the product cannot drift apart. Not interactive here: this one is
+     making a point, and the cover already offers the gesture. ═══════ */
+  var mech = document.getElementById('mechgrid');
+  if (built && mech && !mech.children.length) mech.innerHTML = built.innerHTML;
+
+  var cells = [].slice.call(document.querySelectorAll('#mechgrid .stepwrap'));
+  cells.forEach(function(w){ w.classList.remove('play'); });
+
+  var step = 0, timer = null;
+  function runPlayhead(on){
+    if (reduce || !cells.length) return;
+    if (on && !timer){
+      timer = setInterval(function(){
+        cells[step].classList.remove('play');
+        step = (step + 1) % cells.length;
+        cells[step].classList.add('play');
+      }, 230);
+    } else if (!on && timer){
+      clearInterval(timer); timer = null;
+      cells.forEach(function(c){ c.classList.remove('play'); });
+    }
+  }
+
+  /* ══ FROM 03 — four doors ═══════════════════════════════════
+     Each door carries its own screen, cross-faded in place, with a
+     labelled focus rectangle over the region the copy is about,
+     tinted to the door's instrument colour. ════════════════ */
+  var tabs  = [].slice.call(document.querySelectorAll('.tabbtn'));
+  var wpanes = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+  var shots = [].slice.call(document.querySelectorAll('#shotstack .shot'));
+  var tabbar = document.querySelector('.tabbar');
+
+  /* One rectangle per screen, placed once. It is percentages of the viewport,
+     which fitScreens() sizes to the scaled canvas, so it holds at any scale
+     and never needs replacing on resize. */
+  function placeFocus(pane, shot){
+    if (!pane || !shot) return;
+    var vp = shot.querySelector('.viewport');
+    var d = (pane.getAttribute('data-foc') || '').split(',');
+    if (!vp || d.length !== 4) return;
+    var foc = document.createElement('span');
+    foc.className = 'foc' + (pane.getAttribute('data-low') === '1' ? ' low' : '');
+    foc.innerHTML = '<b></b>';
+    foc.style.left   = d[0] + '%';
+    foc.style.top    = d[1] + '%';
+    foc.style.width  = d[2] + '%';
+    foc.style.height = d[3] + '%';
+    foc.style.setProperty('--wc', getComputedStyle(pane).getPropertyValue('--wc'));
+    foc.firstChild.textContent = pane.getAttribute('data-label') || '';
+    vp.appendChild(foc);
+  }
+  wpanes.forEach(function(pane, i){ placeFocus(pane, shots[i]); });
+
+  var current = 0;
+  function selectWay(idx){
+    current = idx;
+    tabs.forEach(function(t,i){
+      var on = i === idx;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      if (wpanes[i]) wpanes[i].hidden = !on;
+      if (shots[i]) shots[i].setAttribute('data-on', on ? '1' : '0');
+    });
+  }
+
+  tabs.forEach(function(t,i){
+    t.addEventListener('click', function(){ selectWay(i); });
+    t.addEventListener('keydown', function(e){
+      var n = null;
+      if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') n = (i + tabs.length - 1) % tabs.length;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = tabs.length - 1;
+      if (n === null) return;
+      e.preventDefault(); selectWay(n); tabs[n].focus();
+    });
+  });
+  if (tabs.length) selectWay(0);
+
+  /* ── Phone: four doors instead of four tabs ────────────────────
+     The screens live together in .shotcol so desktop can cross-fade them in
+     place; that also means CSS cannot pair each one with its pane. So below
+     880px each .shot is MOVED into its .waypane and everything is shown at
+     once. Reversible, because a phone can be rotated into the other layout.
+     ARIA moves with it: a tabpanel whose tab is display:none is a broken
+     reference, so the panes drop their tab roles and become plain sections
+     with their own headings. */
+  var stack = document.getElementById('shotstack');
+  var narrow = window.matchMedia('(max-width: 880px)');
+
+  function asSections(on){
+    if (tabbar) {
+      if (on) tabbar.removeAttribute('role'); else tabbar.setAttribute('role','tablist');
+    }
+    wpanes.forEach(function (pane, i) {
+      var shot = shots[i];
+      if (on) {
+        pane.hidden = false;
+        pane.removeAttribute('role');
+        pane.removeAttribute('aria-labelledby');
+        if (shot) { shot.setAttribute('data-on','1'); pane.appendChild(shot); }
+      } else {
+        pane.setAttribute('role','tabpanel');
+        pane.setAttribute('aria-labelledby','tab-' + (i + 1));
+        if (shot && stack) stack.appendChild(shot);
+      }
+    });
+    if (!on) selectWay(current);
+    /* the screens are canvas-sized from their parent's width, and that width
+       just changed under them */
+    if (typeof fitScreens === 'function') fitScreens();
+  }
+
+  asSections(narrow.matches);
+  narrow.addEventListener('change', function (e) { asSections(e.matches); });
+
+  /* ── Chrome tone — the fixed chrome inverts over light fields ── */
+  function activate(p){
+    if (!p) return;
+    var tone = p.getAttribute('data-tone') || 'dark';
+    document.body.setAttribute('data-tone', tone);
+    var ink = tone === 'light' ? '#0B0C0F' : '#EDEFF3';
+    var chrome = document.getElementById('chrome');
+    chrome.style.color = ink;
+    chrome.style.setProperty('--logofx', tone === 'light' ? 'invert(1)' : 'none');
+    /* Dark tones can have anything under the bar — the photo plate is a
+       pale sky in its middle — so they get a scrim. The light tone is the
+       flat orange spacer, where dark ink measures 5.7:1 unaided and a veil
+       would only show as a band across a flat field. */
+    /* 08 gave light tones no scrim, which was right while the only light
+       panel was a FLAT orange field where dark ink measures 5.7:1. #p03 is a
+       photograph now, and its top-right corner runs to near-black — the bar
+       measured 1.01:1 over it. So the veil is a property of the panel, not of
+       its tone: a panel that needs one declares --chrome-veil. */
+    var veil = getComputedStyle(p).getPropertyValue('--chrome-veil').trim();
+    chrome.style.setProperty('--scrim-c',
+      veil || (tone === 'light' ? 'transparent' : 'rgba(11,12,15,.66)'));
+    fp.style.color = ink;
+    links.forEach(function(a){
+      a.setAttribute('aria-current', a.getAttribute('href') === '#' + p.id ? 'true' : 'false');
+    });
+    fp.classList.toggle('stand-down', p.id === 'p01');
+    runPlayhead(p.id === 'p02');
+    runLane(p.id === 'p01');
+  }
+
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting && e.intersectionRatio > 0.5) activate(e.target); });
+    }, {threshold:[0.51]});
+    panels.forEach(function(p){ io.observe(p); });
+  }
+  activate(panels[0]);
+
+  /* ── Scroll reveal — fails open ─────────────────────────────
+     The hidden state lives under html.reveal-on, added here, so a
+     no-JS or no-IntersectionObserver render is simply visible. */
+  if ('IntersectionObserver' in window && !reduce){
+    var doc = document.documentElement;
+    doc.classList.add('reveal-on');
+
+    var targets = [];
+    panels.forEach(function(p){
+      var host = p.querySelector('.plate-in') || p;
+      [].slice.call(host.children).forEach(function(el,i){
+        if (el.tagName === 'IMG' || el.tagName === 'SVG') return;
+        if (el.classList.contains('scrim') || el.classList.contains('regs')) return;
+        if (el.classList.contains('tex-scan') || el.classList.contains('tex-halftone')
+            || el.classList.contains('tex-grid')) return;
+        el.classList.add('rv');
+        el.style.setProperty('--rd', (i * 80) + 'ms');
+        targets.push(el);
+      });
+    });
+
+    var rio = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add('in'); rio.unobserve(e.target); }
+      });
+    }, {rootMargin:'0px 0px -8% 0px', threshold:0.01});
+    targets.forEach(function(t){ rio.observe(t); });
+
+    function sweep(){
+      var h = window.innerHeight || 800;
+      targets.forEach(function(t){
+        if (t.classList.contains('in')) return;
+        var r = t.getBoundingClientRect();
+        if (r.top < h && r.bottom > 0){ t.classList.add('in'); rio.unobserve(t); }
+      });
+    }
+    requestAnimationFrame(sweep);
+    window.addEventListener('load', sweep);
+    [200,700,1500].forEach(function(t){ setTimeout(sweep, t); });
+    setTimeout(function(){
+      var any = document.querySelector('.rv.in');
+      if (!any) doc.classList.remove('reveal-on');
+    }, 2500);
+  }
+})();
+</script>
+
+<!-- ══ THE DEMO PLAYERS — concept 13 ═══════════════════════════════════
+     Plain <audio> in a hand-built shell: no Web Audio, no waveform
+     analysis, nothing vendored. Ported from
+     ../lhmp-brand/brand/references/trance-landing, where the same shell
+     drives seven rows.
+
+     ONE RULE beyond play/pause — starting any row stops whatever else was
+     playing. Held by a single `current` reference rather than by each row
+     watching its siblings, which is also why it works ACROSS the two
+     panels for free: the query is over the document, not over a list.
+
+     preload="none" is doing real work: eight <audio> elements at ~600K
+     each would be 4.8MB fetched by a page most people will scroll past
+     without pressing anything. Nothing is requested until a play click. ══ -->
+<script>
+(function(){
+  var rows = [].slice.call(document.querySelectorAll('.dm-row'));
+  if (!rows.length) return;
+  var current = null;
+
+  function fmt(t){
+    if (!isFinite(t)) return '0:00';
+    var m = Math.floor(t / 60), s = Math.floor(t % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  rows.forEach(function(row){
+    var audio = row.querySelector('audio');
+    var btn   = row.querySelector('.dm-btn');
+    var seek  = row.querySelector('.dm-seek');
+    var head  = row.querySelector('.dm-head');
+    var time  = row.querySelector('.dm-time');
+    /* the authored duration, kept so the row reads correctly before the
+       file has been touched — preload="none" means there is no metadata
+       until the first play */
+    var stated = time.textContent;
+    var total = null;
+
+    function paint(){
+      var d = total || audio.duration;
+      if (!isFinite(d) || !d) return;
+      /* the playhead travels the SEEK STRIP, which starts after the
+         button — hence the 44px offset, matching .dm-seek's inset */
+      var w = seek.getBoundingClientRect().width;
+      head.style.setProperty('--px', (44 + (audio.currentTime / d) * w) + 'px');
+      time.textContent = fmt(audio.currentTime) + ' / ' + fmt(d);
+    }
+
+    btn.addEventListener('click', function(){
+      if (audio.paused){
+        if (current && current !== audio) current.pause();
+        current = audio;
+        audio.play().catch(function(){ row.classList.remove('playing'); });
+      } else {
+        audio.pause();
+      }
+    });
+
+    seek.addEventListener('click', function(e){
+      var d = total || audio.duration;
+      if (!isFinite(d) || !d) return;      /* nothing loaded yet — no target */
+      var r = seek.getBoundingClientRect();
+      audio.currentTime = Math.min(d, Math.max(0, (e.clientX - r.left) / r.width * d));
+      paint();
+    });
+
+    audio.addEventListener('loadedmetadata', function(){ total = audio.duration; paint(); });
+    audio.addEventListener('timeupdate', paint);
+    audio.addEventListener('play',  function(){ row.classList.add('playing'); row.classList.remove('paused'); });
+    audio.addEventListener('pause', function(){ row.classList.remove('playing'); row.classList.add('paused'); });
+    audio.addEventListener('ended', function(){
+      row.classList.remove('playing', 'paused');
+      audio.currentTime = 0;
+      head.style.setProperty('--px', '0px');
+      time.textContent = fmt(total || audio.duration);
+      if (current === audio) current = null;
+    });
+    /* a missing or undecodable file must not leave a dead-looking control.
+       This is the state the page ships in until the real bounces land. */
+    audio.addEventListener('error', function(){
+      row.classList.remove('playing', 'paused');
+      btn.disabled = true;
+      time.textContent = stated ? stated : '—';
+      row.setAttribute('data-unavailable', '');
+    });
+  });
+
+  /* the rows change width with the viewport, so the playhead — which is
+     positioned in px against the seek strip — has to be re-placed */
+  addEventListener('resize', function(){
+    rows.forEach(function(row){
+      var a = row.querySelector('audio');
+      if (!a.paused || a.currentTime > 0) a.dispatchEvent(new Event('timeupdate'));
+    });
+  }, { passive: true });
+})();
+</script>
+<script>window.__e=[];window.addEventListener("error",function(e){window.__e.push(String(e.message))},true);window.addEventListener("load",function(){setTimeout(function(){
+ var rows=document.querySelectorAll(".dm-row");
+ var btns=document.querySelectorAll(".dm-row button, .dm-row .dm-btn");
+ var o={rows:rows.length,audios:document.querySelectorAll("audio").length,btns:btns.length};
+ var a=document.querySelectorAll("audio");
+ // simulate: play row0 (p03) then row4 (p05) and see if row0 paused
+ try{ a[0].play(); }catch(e){}
+ setTimeout(function(){
+   btns[0]&&btns[0].click();
+   setTimeout(function(){
+     o.afterFirst=[a[0].paused,a[4].paused];
+     btns[4]&&btns[4].click();
+     setTimeout(function(){
+       o.afterSecond=[a[0].paused,a[4].paused];
+       o.errs=window.__e||[];
+       var p=document.createElement("pre");p.id="out";p.textContent=JSON.stringify(o);document.body.appendChild(p);
+     },700);
+   },700);
+ },600);
+},2200);});</script></body>
+</html>

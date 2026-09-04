@@ -31,7 +31,7 @@ Four artifacts in this repo, only one of which is live:
 | --- | --- |
 | `index.html` + `styles.css` | **Live** at joltgroovebox.com. March 2026, pre-brand. |
 | `index-mockups.html` | July trial — app screens dropped into the live layout. Never promoted. |
-| `onboarding2.html` | Working in-browser WASM sequencer demo. **Not linked from anywhere.** |
+| `onboarding.html` | Working in-browser WASM sequencer demo. **Not linked from anywhere.** |
 | `mockups.html` | Master source for the device frames. Correctly built on real LHMP tokens. |
 
 The two assets that best express the product — real app screens and a playable demo — are both
@@ -134,7 +134,7 @@ flat-clean field.
 These are worth separating out — they'd matter even if the visual direction stayed as-is.
 
 1. **There is no App Store link on the site.** Not in `index.html`, not in `privacy.html`, not in
-   `styles.css`. The demo's own download CTA points at `/` (`onboarding2.html:3025`, `:3334`).
+   `styles.css`. The demo's own download CTA points at `/` (`onboarding.html:3025`, `:3334`).
    Highest-value fix in this document regardless of design direction.
 2. **The footer credits an individual** — "Copyright © 2026 EdJ / Jolt Groovebox"
    (`index.html:187`). `01-foundations.md` §6.2 decided LHMP is **faceless**: no named founder on

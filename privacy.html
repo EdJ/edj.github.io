@@ -1,101 +1,391 @@
+<!-- JOLT GROOVEBOX — PRIVACY POLICY.
+     The March 2026 page (styles.css, pre-brand) is kept at old-privacy-1.html.
+     THE TEXT IS UNCHANGED: this is a re-housing, not a re-drafting. Every
+     word, including "Last updated", is the old page's verbatim.
+
+     WHAT IT TAKES FROM index.html. The tokens, the two faces, the fixed
+     chrome, the grain and the footer strip are lifted from that page so the
+     two read as one site. Copied rather than shared: index.html carries its
+     whole system inline and there is no stylesheet to link that would not
+     also drag in the device mockups. If a token moves there, it has to move
+     here — that is the cost of the arrangement, and it is a short file.
+
+     WHAT IT ADDS, AND WHY. index.html is uppercase mono nearly everywhere,
+     which is a register for eight words at a time. This document is fourteen
+     hundred, so it needs a READING setting the site does not otherwise own:
+     GeistMono regular, sentence case, 1.85 line-height, held to 74ch. The
+     house register still does all the structural work — the eyebrows, the
+     display headings, the pixel-face section numbers, the hairline rules —
+     so the page belongs to the system without being unreadable.
+
+     THE DEFINITIONS AND THE THIRD-PARTY LIST are marked up as hairline rows,
+     which is the page's own list idiom (the specification panel) rather than
+     a browser's bullets.
+
+     The eight sections are numbered 01–08 in the pixel face, the same way
+     index.html numbers its panels. -->
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Jolt Groovebox | iOS Groovebox for iPad and iPhone | Privacy Policy</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jolt Groovebox — Privacy Policy</title>
+<meta name="description" content="Privacy policy for Jolt Groovebox for iPhone and iPad. The application does not collect, transmit or share personal data.">
+
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta name="theme-color" content="#0B0C0F">
+<link rel="canonical" href="https://joltgroovebox.com/privacy.html">
+
+<!-- Embed card. og-cover.jpg is 1200x630, generated from the hero plate and
+     the real wordmark; regenerate it if either changes. og:image must be an
+     ABSOLUTE url — a relative one is silently dropped by every scraper. -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Jolt Groovebox">
+<meta property="og:title" content="Jolt Groovebox — Privacy Policy">
+<meta property="og:description" content="The application does not collect, transmit or share any personal data.">
+<meta property="og:url" content="https://joltgroovebox.com/privacy.html">
+<meta property="og:image" content="https://joltgroovebox.com/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="JOLT — eight voices, each with its own step sequencer.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jolt Groovebox — Privacy Policy">
+<meta name="twitter:description" content="The application does not collect, transmit or share any personal data.">
+<meta name="twitter:image" content="https://joltgroovebox.com/og-cover.jpg">
+<style>
+
+/* ── FACES — as index.html ─────────────────────────────────── */
+@font-face{font-family:'Chakra';src:url('fonts/ChakraPetch-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Chakra';src:url('fonts/ChakraPetch-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('geist/GeistMono/webfonts/GeistMono-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('geist/GeistMono/webfonts/GeistMono-Medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'GeistMono';src:url('geist/GeistMono/webfonts/GeistMono-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'GeistPixel';src:url('geist/GeistPixel/webfonts/GeistPixel-Grid.woff2') format('woff2');font-weight:400;font-display:swap}
+
+/* ── TOKENS — as index.html, less the ones only panels use ─── */
+:root{
+  --ground:#0B0C0F; --line:#3A3F4B;
+  --text:#EDEFF3;   --muted:#8B93A6;
+  --cyan:#7DFBFD;   --orange:#FF6A00;
+
+  --display:'Chakra','Chakra Petch',system-ui,sans-serif;
+  --mono:'GeistMono',ui-monospace,SFMono-Regular,monospace;
+  --pixel:'GeistPixel','GeistMono',ui-monospace,monospace;
+
+  --pad:clamp(20px,4.2vw,68px);
+  --chrome:52px;
+
+  /* the reading ink. --dim is right for a line of caps and too quiet for a
+     paragraph, so long-form copy gets a step of its own between the two. */
+  --read:rgba(237,239,243,.80);
+}
+.t-ground{ --bg:#0B0C0F; --ink:#EDEFF3; --dim:#8B93A6; --hi:#7DFBFD; --rule:#3A3F4B; }
+
+*{box-sizing:border-box}
+html{background:var(--ground);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--mono);overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ── GRAIN — the print register, one layer over the page ───── */
+.grain{
+  position:fixed;inset:0;z-index:55;pointer-events:none;
+  opacity:.15;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── FIXED CHROME ──────────────────────────────────────────── */
+.chrome{
+  position:fixed;inset:0 0 auto 0;height:var(--chrome);z-index:60;
+  display:flex;align-items:center;gap:16px;
+  padding:0 var(--pad);
+  font-size:clamp(10.5px,.98vw,12px);font-weight:500;
+  letter-spacing:.24em;text-transform:uppercase;
+  color:#EDEFF3;
+  pointer-events:none;
+}
+/* index.html's scrim is .66, which is enough over panels that are mostly
+   empty at the top. This page is a document: a display heading passes under
+   the bar every few hundred pixels and showed straight through it. Near-
+   opaque here, so the bar reads as a bar. */
+.chrome::before{
+  content:'';position:absolute;inset:0 0 auto 0;z-index:-1;pointer-events:none;
+  height:calc(var(--chrome) * 1.9);
+  background:linear-gradient(180deg,
+    rgba(11,12,15,.96) 0,
+    rgba(11,12,15,.94) calc(var(--chrome) - 6px),
+    transparent 100%);
+}
+.chrome > *{pointer-events:auto}
+/* the 44px hit target, laid over a link that is visually much shorter */
+.chrome a{position:relative}
+.chrome a::after{
+  content:'';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:calc(100% + 12px);height:44px;
+}
+.chrome .mark{display:flex;align-items:center;gap:10px}
+.chrome .mark img{height:13px;width:auto}
+.chrome .mark b{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.06em}
+.chrome .mark sup{font-family:var(--mono);font-size:8.5px;letter-spacing:0;vertical-align:super;opacity:.65}
+.chrome .code{font-family:var(--pixel);letter-spacing:.12em;opacity:.72;white-space:nowrap}
+.chrome .sp{flex:1}
+.chrome a{opacity:.85;transition:opacity .16s ease;white-space:nowrap}
+.chrome a:hover{opacity:1}
+.chrome a.demo{opacity:1;border-bottom:1px solid currentColor;padding-bottom:2px}
+.chrome::after{
+  content:'';position:absolute;left:var(--pad);right:var(--pad);bottom:0;height:1px;
+  background:currentColor;opacity:.22;
+}
+
+/* ── THE HOUSE REGISTER — eyebrow, display, note ───────────── */
+.eyebrow{
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(10.5px,.98vw,11.5px);
+  letter-spacing:.26em;text-transform:uppercase;
+  color:var(--dim);
+  margin:0 0 clamp(11px,1.7vh,19px);
+}
+.d{
+  font-family:var(--display);font-weight:700;text-transform:uppercase;
+  line-height:.85;letter-spacing:-.022em;margin:0;text-wrap:balance;
+}
+.d.md{font-size:clamp(1.7rem,4.1vw,3.3rem)}
+.note{
+  margin:clamp(11px,1.6vh,17px) 0 0;
+  font-size:clamp(12px,1.08vw,13.5px);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  max-width:62ch;line-height:1.75;
+}
+.note em{font-style:normal;color:var(--ink)}
+
+/* ── THE DOCUMENT ──────────────────────────────────────────── */
+.doc{padding:0 var(--pad) clamp(60px,9vh,110px)}
+
+.pp-head{
+  padding:calc(var(--chrome) + clamp(70px,14vh,170px)) 0 clamp(30px,4.6vh,54px);
+}
+
+/* the reading setting. Everything above this point is the site's; the
+   measure and the line-height are this page's own, because nothing else
+   here has ever had to hold a paragraph. */
+.pp p,
+.pp li{
+  font-family:var(--mono);font-weight:400;
+  font-size:clamp(13px,1.02vw,14.5px);
+  line-height:1.85;color:var(--read);
+  max-width:74ch;
+}
+.pp p{margin:clamp(12px,1.7vh,20px) 0 0}
+.pp strong{font-weight:500;color:var(--ink)}
+/* a link in running copy: the accent plus a rule, because colour alone is
+   not an affordance and the ground is already low-contrast. */
+.pp a{
+  color:var(--hi);
+  border-bottom:1px solid color-mix(in srgb, var(--hi) 45%, transparent);
+  transition:border-color .16s ease;
+}
+.pp a:hover{border-bottom-color:var(--hi)}
+.pp a:focus-visible{outline:2px solid var(--hi);outline-offset:3px}
+
+/* the lede — the two paragraphs that open the document, one step up */
+.pp-lede p{
+  font-size:clamp(14px,1.18vw,16px);
+  color:var(--ink);max-width:70ch;
+}
+
+/* a numbered section, opened by a hairline. The rule is the page's own —
+   every list on index.html is separated this way. */
+.pp-sec{
+  border-top:1px solid var(--rule);
+  margin-top:clamp(38px,6vh,74px);
+  padding-top:clamp(22px,3.2vh,38px);
+}
+.pp-h{
+  font-family:var(--display);font-weight:700;text-transform:uppercase;
+  font-size:clamp(1.1rem,2.1vw,1.75rem);line-height:1;letter-spacing:-.012em;
+  color:var(--ink);margin:0;
+  display:flex;align-items:baseline;gap:.62em;
+}
+/* the section number, in the pixel face — as index.html numbers its panels */
+.pp-h .idx{
+  font-family:var(--pixel);font-weight:400;
+  font-size:.46em;letter-spacing:.1em;color:var(--dim);
+  flex:none;
+}
+.pp-sh{
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(10.5px,.98vw,11.5px);
+  letter-spacing:.26em;text-transform:uppercase;color:var(--ink);
+  margin:clamp(26px,3.6vh,40px) 0 clamp(4px,.6vh,8px);
+}
+
+/* the definitions, and the third-party list: hairline rows, not bullets */
+.pp ul{list-style:none;margin:clamp(16px,2.2vh,26px) 0 0;padding:0;max-width:74ch}
+.pp li{
+  border-top:1px solid var(--rule);
+  padding:clamp(10px,1.4vh,15px) 0;margin:0;
+}
+.pp li:last-child{border-bottom:1px solid var(--rule)}
+
+/* ── FOOTER — the strip from index.html ────────────────────── */
+.foot{
+  padding:clamp(50px,8vh,96px) var(--pad) clamp(34px,5vh,56px);
+  background:var(--ground);color:var(--text);
+  --ink:#EDEFF3;--dim:#8B93A6;--rule:#3A3F4B;--bg:#0B0C0F;--hi:#7DFBFD;
+  display:flex;flex-direction:column;gap:clamp(26px,4vh,44px);
+  border-top:1px solid var(--rule);
+}
+.footbrand{display:flex;align-items:center;gap:clamp(14px,1.8vw,26px)}
+.footbrand img{height:clamp(38px,4.6vw,58px);width:auto;display:block}
+.footline{
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;
+  font-size:clamp(10.5px,.95vw,11.5px);letter-spacing:.2em;text-transform:uppercase;color:var(--dim);
+}
+.footline .sp{flex:1}
+.footline a{border-bottom:1px solid var(--rule);padding-bottom:2px;
+  transition:color .16s ease,border-color .16s ease}
+.footline a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+.footline a:focus-visible{outline:2px solid var(--hi);outline-offset:3px}
+.footline .endorse{display:flex;align-items:center;gap:10px}
+.footline .endorse img{filter:invert(1);opacity:.34}
+.footline .lhmp{height:11px;width:auto}
+
+@media (max-width:560px){
+  .eyebrow{letter-spacing:.2em}
+  .chrome .code{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important}
+}
+
+</style>
 </head>
-<body>
+<body class="t-ground">
 
-<header>
-  <nav class="nav">
-    <div class="nav-logo">
-        <img src="images/logo.svg" />
-    </div>
-    <ul class="nav-menu">
-        <li><a href="/">Home</a></li>
-        <li><a href="/privacy">Privacy Policy</a></li>
-    </ul>
-  </nav>
+<div class="grain" aria-hidden="true"></div>
 
-  <div class="hero">
-    <!-- Has a background image -->
-    <h1>Privacy Policy</h1>
-  </div>
+<header class="chrome">
+  <a class="mark" href="index.html">
+    <img src="images/logo.svg" alt="">
+    <b>JOLT<sup>&trade;</sup></b>
+  </a>
+  <span class="code">JLT-8V</span>
+  <span class="sp"></span>
+  <a class="demo" href="onboarding.html">Demo NOW</a>
 </header>
 
+<main class="doc pp">
 
-<section class="privacy">
-  <h2>Privacy Policy</h2>
-  <p>Last updated: September 13, 2023</p>
+  <div class="pp-head">
+    <p class="eyebrow">Legal</p>
+    <h1 class="d md">Privacy policy</h1>
+    <p class="note">Last updated <em>September&nbsp;13,&nbsp;2023</em></p>
+  </div>
 
-  <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
-  <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
+  <div class="pp-lede">
+    <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
+    <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
+  </div>
 
-  <h2>Interpretation and Definitions</h2>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">01</span>Interpretation and Definitions</h2>
 
-  <h3>Interpretation</h3>
-  <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
+    <h3 class="pp-sh">Interpretation</h3>
+    <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
 
-  <h3>Definitions</h3>
-  <p>For the purposes of this Privacy Policy:</p>
-  <ul>
-    <li><strong>Application</strong> refers to Jolt Groovebox, or JOLT, the software program provided by the Company.</li>
-    <li><strong>Company</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to Ed James, a solo app developer.</li>
-    <li><strong>Country</strong> refers to: Denmark</li>
-    <li><strong>Device</strong> means any device that can access the Service such as a computer, a cellphone or a digital tablet.</li>
-    <li><strong>Personal Data</strong> is any information that relates to an identified or identifiable individual.</li>
-    <li><strong>Service</strong> refers to the Application.</li>
-    <li><strong>Service Provider</strong> means any natural or legal person who processes the data on behalf of the Company. It refers to third-party companies or individuals employed by the Company to facilitate the Service, to provide the Service on behalf of the Company, to perform services related to the Service or to assist the Company in analyzing how the Service is used.</li>
-    <li><strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
-  </ul>
+    <h3 class="pp-sh">Definitions</h3>
+    <p>For the purposes of this Privacy Policy:</p>
+    <ul>
+      <li><strong>Application</strong> refers to Jolt Groovebox, or JOLT, the software program provided by the Company.</li>
+      <li><strong>Company</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to Ed James, a solo app developer.</li>
+      <li><strong>Country</strong> refers to: Denmark</li>
+      <li><strong>Device</strong> means any device that can access the Service such as a computer, a cellphone or a digital tablet.</li>
+      <li><strong>Personal Data</strong> is any information that relates to an identified or identifiable individual.</li>
+      <li><strong>Service</strong> refers to the Application.</li>
+      <li><strong>Service Provider</strong> means any natural or legal person who processes the data on behalf of the Company. It refers to third-party companies or individuals employed by the Company to facilitate the Service, to provide the Service on behalf of the Company, to perform services related to the Service or to assist the Company in analyzing how the Service is used.</li>
+      <li><strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
+    </ul>
+  </section>
 
-  <h2>Collecting and Using Your Personal Data</h2>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">02</span>Collecting and Using Your Personal Data</h2>
 
-  <h3>Types of Data Collected</h3>
+    <h3 class="pp-sh">Types of Data Collected</h3>
 
-  <h3>Personal Data</h3>
-  <p>The Application does not collect, transmit or share any personal data nor data related to your geographic location. The application requires access to the Device microphone and storage, for the express purpose of recording audio samples and loading audio files, respectively. Device storage is also used to store information about Your tracks and other content created within the Application.</p>
+    <h3 class="pp-sh">Personal Data</h3>
+    <p>The Application does not collect, transmit or share any personal data nor data related to your geographic location. The application requires access to the Device microphone and storage, for the express purpose of recording audio samples and loading audio files, respectively. Device storage is also used to store information about Your tracks and other content created within the Application.</p>
 
-  <h3>Usage Data</h3>
-  <p>No Usage Data is collected automatically when using the Service.</p>
+    <h3 class="pp-sh">Usage Data</h3>
+    <p>No Usage Data is collected automatically when using the Service.</p>
 
-  <h3>Use of Your Personal Data</h3>
-  <p>The Application does not use Your Personal Data in any capacity.</p>
+    <h3 class="pp-sh">Use of Your Personal Data</h3>
+    <p>The Application does not use Your Personal Data in any capacity.</p>
 
-  <h3>Sharing Your Personal Data</h3>
-  <p>The Company does not share Your Personal Data with any third party.</p>
+    <h3 class="pp-sh">Sharing Your Personal Data</h3>
+    <p>The Company does not share Your Personal Data with any third party.</p>
+  </section>
 
-  <h2>Children's Privacy</h2>
-  <p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If You are a parent or guardian and You are aware that Your child has provided Us with Personal Data, please contact Us. If We become aware that We have collected Personal Data from anyone under the age of 13 without verification of parental consent, We take steps to remove that information from Our servers.</p>
-  <p>If We need to rely on consent as a legal basis for processing Your information and Your country requires consent from a parent, We may require Your parent's consent before We collect and use that information.</p>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">03</span>Children&rsquo;s Privacy</h2>
+    <p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If You are a parent or guardian and You are aware that Your child has provided Us with Personal Data, please contact Us. If We become aware that We have collected Personal Data from anyone under the age of 13 without verification of parental consent, We take steps to remove that information from Our servers.</p>
+    <p>If We need to rely on consent as a legal basis for processing Your information and Your country requires consent from a parent, We may require Your parent's consent before We collect and use that information.</p>
+  </section>
 
-  <h2>Links to Other Websites</h2>
-  <p>Our Service may contain links to other websites that are not operated by Us. If You click on a third party link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.</p>
-  <p>We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">04</span>Links to Other Websites</h2>
+    <p>Our Service may contain links to other websites that are not operated by Us. If You click on a third party link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.</p>
+    <p>We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p>
+  </section>
 
-  <h2>Third-Party Services</h2>
-  <p>The Application does use third-party services that may collect information used to identify you.</p>
-  <p>Link to privacy policy of third-party service providers used by the app:</p>
-  <ul>
-    <li><a href="https://www.apple.com/legal/privacy/en-ww/">Apple</a></li>
-  </ul>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">05</span>Third-Party Services</h2>
+    <p>The Application does use third-party services that may collect information used to identify you.</p>
+    <p>Link to privacy policy of third-party service providers used by the app:</p>
+    <ul>
+      <li><a href="https://www.apple.com/legal/privacy/en-ww/">Apple</a></li>
+    </ul>
+  </section>
 
-  <h2>Cookies</h2>
-  <p>Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. Cookies are sent to your browser from a website and stored on your device. The Application does not collect or use Cookies for any purpose.</p>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">06</span>Cookies</h2>
+    <p>Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. Cookies are sent to your browser from a website and stored on your device. The Application does not collect or use Cookies for any purpose.</p>
+  </section>
 
-  <h2>Changes to this Privacy Policy</h2>
-  <p>We may update Our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy on this page.</p>
-  <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">07</span>Changes to this Privacy Policy</h2>
+    <p>We may update Our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy on this page.</p>
+    <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
+  </section>
 
-  <h2>Contact Us</h2>
-  <p>If you have any questions about this Privacy Policy, you can contact us by email: <a href="mailto:hi@joltgroovebox.com">hi@joltgroovebox.com</a></p>
+  <section class="pp-sec">
+    <h2 class="pp-h"><span class="idx">08</span>Contact Us</h2>
+    <p>If you have any questions about this Privacy Policy, you can contact us by email: <a href="mailto:hi@joltgroovebox.com">hi@joltgroovebox.com</a></p>
+  </section>
 
-</section>
+</main>
 
-<footer>
-  <p>Copyright © 2026 EdJ / Jolt Groovebox</p>
+<footer class="foot" role="contentinfo">
+  <div class="footbrand">
+    <img src="images/logo.svg" alt="" width="768" height="384">
+    <img src="concept-assets/marks/jolt-wordmark.svg" alt="JOLT" width="272" height="82">
+  </div>
+  <div class="footline">
+    <span>iPhone &amp; iPad</span>
+    <span class="sp"></span>
+    <span class="endorse">
+      <span>An</span>
+      <img class="lhmp" src="concept-assets/marks/lhmp-wordmark-chamfer.svg" alt="LHMP">
+      <span>project</span>
+    </span>
+    <a href="index.html">Index</a>
+    <span>&copy;&nbsp;2026</span>
+  </div>
 </footer>
 
 </body>

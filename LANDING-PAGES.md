@@ -28,7 +28,7 @@ Jolt already owns two assets that would out-perform every page in this survey, a
 
 - **`mockups.html`** is a live-DOM interface figure built on the real house tokens. This is precisely the technique that
   makes Linear's page work, and *no music brand in the survey does it* — they all ship flat screenshots or video.
-- **`onboarding2.html`** is a working in-browser groovebox running the real DSP. **Zero of sixteen** competitors offer a
+- **`onboarding.html`** is a working in-browser groovebox running the real DSP. **Zero of sixteen** competitors offer a
   playable web demo. Two offer inline audio at all.
 
 Meanwhile the live page is a pre-brand layout with a stock crowd photograph and **no App Store link anywhere on the

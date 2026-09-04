@@ -104,199 +104,38 @@ body {
   .ol-content { flex: 1 1 0; min-width: 0; }
 }
 
-/* ── FullPage: compact = full width, regular = centered ──────────────────── */
+/* ── FullPage: compact = full width, regular = centered half width ───────── */
 .fullpage {
   flex: 1; min-height: 0;
   display: flex; align-items: center; justify-content: center;
 }
-.fullpage .gpanel { max-width: 440px; }
+.fullpage .tpanel { width: 100%; }
+@media (min-width: 768px) {
+  .fullpage .tpanel { width: 50%; }
+}
 
-/* ── Guide panel ──────────────────────────────────────────────────────────── */
-.gpanel {
-  position: relative;
-  background: var(--darker);
-  border: 1px solid rgba(58, 63, 75, 0.55);
+/* ── Text panel (Onboarding.createTextPanel) ─────────────────────────────── */
+.tpanel {
+  background: var(--mid);
+  padding: 16px;
+  text-align: center;
   clip-path: var(--cham8);
-  padding: 15px 18px 14px;
   width: 100%;
   max-width: 560px;
-  text-align: left;
 }
-/* accent edge along the top — sits inside the chamfer */
-.gpanel::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 8px; right: 8px;
-  height: 2px;
-  background: var(--accent);
-  opacity: 0.85;
-}
-.gp-kicker {
-  display: flex; justify-content: space-between; align-items: baseline;
-  font-size: 10px; font-weight: 500;
-  letter-spacing: 0.24em; text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 9px;
-}
-.gp-kicker .gp-step {
-  color: var(--lightg);
-  letter-spacing: 0.12em;
-  opacity: 0.8;
-}
-.gpanel h1 {
+.tpanel h1 {
   font-family: 'Chakra Petch', sans-serif;
   font-weight: 600;
   font-size: 18px;
   line-height: 1.25;
-  margin: 0;
-  color: var(--text);
+  margin: 0 0 16px;
 }
-.gp-lead {
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--lightg);
-  margin: 8px 0 0;
+.tpanel p {
+  font-size: 16px;
+  line-height: 1.3;
+  margin: 0 0 8px;
 }
-.gp-hints {
-  margin-top: 12px;
-  display: flex; flex-direction: column;
-  gap: 8px;
-}
-.gp-hint {
-  display: flex; align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--text);
-}
-.gp-hint .gp-ic {
-  flex-shrink: 0;
-  width: 26px; height: 26px;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--dark);
-  clip-path: var(--diag6);
-  color: var(--lightg);
-}
-@media (min-width: 768px) {
-  .gpanel { max-width: 400px; padding: 26px 26px 24px; }
-  .gpanel h1 { font-size: 20px; }
-  .gp-kicker { margin-bottom: 14px; }
-  .gp-lead { font-size: 13px; line-height: 1.6; margin-top: 10px; }
-  .gp-hints { margin-top: 18px; gap: 10px; }
-  .gp-hint { font-size: 12.5px; }
-  .gp-hint .gp-ic { width: 28px; height: 28px; }
-}
-.gp-hint.primary .gp-ic { color: var(--accent); }
-.gp-hint .gp-ic svg { display: block; }
-a.gp-hint { text-decoration: none; color: var(--text); }
-a.gp-hint span { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(125,251,253,0.5); }
-a.gp-hint:hover span { text-decoration-color: var(--accent); }
-
-/* Full-page (welcome / done) variant */
-.gpanel.gp-center { text-align: center; padding: 34px 30px 30px; }
-.gpanel.gp-center .gp-kicker { justify-content: center; gap: 14px; }
-.gpanel.gp-center h1 { font-size: 24px; }
-.gpanel.gp-center .gp-lead { font-size: 14px; margin-top: 12px; }
-.gpanel.gp-center .gp-hints { margin-top: 22px; align-items: center; }
-
-/* ── Screen enter transition ──────────────────────────────────────────────── */
-@keyframes gp-enter {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-#screen-root > * { animation: gp-enter 0.32s cubic-bezier(0.2, 0.7, 0.3, 1); }
-@media (prefers-reduced-motion: reduce) {
-  #screen-root > * { animation: none; }
-}
-
-/* ── Sound indicator (nav row) ────────────────────────────────────────────── */
-#sound-pill { margin-right: 10px; align-self: center; }
-#sound-pill .ti { gap: 5px; padding: 0 9px; }
-#sound-pill #snd-ic { display: flex; }
-#sound-pill .meter {
-  display: none; align-items: center; gap: 2px; height: 15px;
-}
-#sound-pill .meter i {
-  width: 3px; height: 3px;
-  background: var(--accent);
-  transition: height 0.09s linear;
-}
-#sound-pill.snd-on { color: var(--accent); }
-#sound-pill.snd-on .meter { display: flex; }
-#sound-pill.snd-off { color: var(--lightg); }
-#sound-pill.snd-off #snd-ic { animation: snd-nudge 2.4s ease-in-out infinite; }
-@keyframes snd-nudge {
-  0%, 78%, 100% { transform: none; }
-  84% { transform: scale(1.18); }
-  90% { transform: scale(1); }
-  96% { transform: scale(1.12); }
-}
-#sound-pill.snd-fail { color: var(--mid); pointer-events: none; }
-@media (prefers-reduced-motion: reduce) {
-  #sound-pill.snd-off #snd-ic { animation: none; }
-}
-
-/* ── Sound check (welcome screen) ─────────────────────────────────────────── */
-#sound-check {
-  appearance: none; -webkit-appearance: none;
-  border: none; margin: 20px auto 0; padding: 1px;
-  display: block;
-  background: var(--accent);          /* border colour layer */
-  clip-path: var(--diag6);
-  cursor: pointer;
-  font-family: 'Geist Mono', monospace;
-  user-select: none; touch-action: manipulation;
-  width: 100%; max-width: 330px;
-  text-align: left;
-}
-#sound-check .sc-in {
-  clip-path: var(--diag5);
-  background: var(--dark);            /* fill layer */
-  display: flex; align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-}
-#sound-check .sc-ic {
-  flex-shrink: 0;
-  display: flex; align-items: center; gap: 6px;
-  color: var(--accent);
-}
-#sound-check .sc-tx { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-#sound-check .sc-t { font-size: 12.5px; font-weight: 500; color: var(--text); }
-#sound-check .sc-s { font-size: 11px; line-height: 1.45; color: var(--lightg); }
-#sound-check.sc-idle .sc-ic { animation: snd-nudge 2.4s ease-in-out infinite; }
-#sound-check.sc-on { background: var(--mid); }
-#sound-check:active:not(.sc-fail) .sc-in { background: var(--mid); }
-#sound-check.sc-fail { background: var(--mid); cursor: default; pointer-events: none; }
-#sound-check.sc-fail .sc-ic { color: var(--lightg); }
-#sound-check .meter { display: none; align-items: center; gap: 2px; height: 15px; }
-#sound-check.sc-on .meter { display: flex; }
-#sound-check .meter i {
-  width: 3px; height: 3px;
-  background: var(--accent);
-  transition: height 0.09s linear;
-}
-@media (prefers-reduced-motion: reduce) {
-  #sound-check.sc-idle .sc-ic { animation: none; }
-}
-
-/* ── Progress (nav row) ───────────────────────────────────────────────────── */
-#progress {
-  flex: 1;
-  display: flex; gap: 5px; align-items: center; justify-content: center;
-  padding: 0 12px;
-  min-width: 0;
-}
-#progress .pseg {
-  width: 11px; height: 3px;
-  background: var(--mid);
-  transition: background 0.25s;
-}
-#progress .pseg.on   { background: var(--accent); }
-#progress .pseg.past { background: var(--lightg); opacity: 0.55; }
-@media (max-width: 480px) {
-  #progress .pseg { width: 7px; }
-}
+.tpanel p:last-child { margin-bottom: 0; }
 
 /* ── ToggleableButtonStyle / InstrumentButtonStyle ───────────────────────── */
 .tbtn {
@@ -476,10 +315,6 @@ a.gp-hint:hover span { text-decoration-color: var(--accent); }
   <div id="screen-root"></div>
   <div id="navrow">
     <button class="tbtn" id="btn-back"><span class="ti">Back</span></button>
-    <div id="progress"></div>
-    <button class="tbtn small" id="sound-pill" title="Tap to enable sound">
-      <span class="ti"><span id="snd-ic"></span><span class="meter"><i></i><i></i><i></i></span></span>
-    </button>
     <button class="tbtn" id="btn-next"><span class="ti">Next</span></button>
   </div>
 </div>
@@ -711,13 +546,7 @@ const sel = {
 const inst0 = { harmonics: 0.6 };
 const inst1 = { morph: 0.3 };
 const inst2 = { morph: 0.4 };
-const inst3 = { morph: 0.35, laneOne: 0.4 };
-
-// Instruments 1 and 3 are both hi-hats and share the engine's single hat voice,
-// so whichever "duration" dial is on screen owns its decay. Screens claim it on
-// entry (screen 4 → inst1, screens 5-7 → inst3) and their dials write it as they
-// drag; `audio.sendHatLane` turns it into what the engine actually plays.
-let hatDuration = inst1.morph;
+const inst3 = { morph: 0.1, laneOne: 0.4 };
 
 // screens 5-7 state
 let showPresetPanel = true;
@@ -783,27 +612,15 @@ function applyPresetToLane() {
    Audio — kick_engine WASM worklet (harness protocol from index-interactive.html)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-// The drum voice has two sine layers: the BODY (SubGain/SubDecay), swept down onto
-// the played note by PitchDecay/PitchSweep, and the CLICK (ClickGain/ClickDecay),
-// swept down onto ClickTune semitones ABOVE the note by ClickSweep — so the two
-// stay on distinct frequencies instead of converging on the fundamental.
 const P = {
-  SubGain:0, SubDecay:1, ClickGain:2, PitchDecay:3,
+  SubGain:0, SubDecay:1, TransientGain:2, TransientDecay:3,
   NoiseGain:4, NoiseDecay:5, NoiseLowPass:6, NoiseHighPass:7,
   NoiseResonance:8, OverdriveAmt:9, ReverbSend:10,
-  ClickDecay:11, PitchSweep:12, ClickSweep:13, ClickTune:14,
 };
-const NUM_PARAMS = 15;
-// The hat's decay is never set directly: the engine multiplies it by (lane × 2),
-// so `sendHatLane` bakes the whole "duration + lane × amount" curve into the lane
-// and this reference stands in for a full-duration (1.0) hat.
-const HAT_REF_DECAY = 0.32;
-//        sub  subDec click pitchDec noise noiseDec  LP    HP    res  drive  rvb | clickDec pSweep cSweep cTune
 const DEF_BASE = [
-  [1.0,  0.35, 0.6,  0.05, 0.25, 0.06, 0.50, 0.20, 0.30, 0.0, 0.0,   0.03, 0.5,  0.5,  0.5 ],  // kick:  click +24 st
-  [0.0,  0.2,  0.0,  0.02, 0.9,  HAT_REF_DECAY, 0.88, 0.65, 0.65, 0.0, 0.0,
-                                                        0.02, 0.5,  0.5,  0.5 ],  // hat:   sines silent
-  [0.45, 0.18, 0.35, 0.05, 1.0,  0.22, 0.78, 0.35, 0.52, 0.0, 0.15,  0.05, 0.25, 0.25, 0.75],  // snare: click +36 st
+  [1.0,  0.35, 1.0,  0.08, 0.25, 0.06, 0.50, 0.20, 0.30, 0.0, 0.0],  // kick
+  [0.0,  0.2,  0.0,  0.05, 0.9,  0.08, 0.88, 0.65, 0.65, 0.0, 0.0],  // hat
+  [0.45, 0.18, 0.35, 0.05, 1.0,  0.22, 0.78, 0.35, 0.52, 0.0, 0.15], // snare
 ];
 const SW_P = { SPREAD:0, DRIFT:1, DECAY:2, CUTOFF:3, REVERB:4, GAIN:5, DELAY:6, ENV_AMT:7 };
 
@@ -822,57 +639,14 @@ const audio = {
     if (this.actx && this.actx.state !== 'running') this.actx.resume().catch(() => {});
   },
 
-  // iOS routes Web-Audio-only pages through the "ambient" audio session, which
-  // the ring/silent switch mutes with no way for us to detect it. Asking for the
-  // "playback" session (iOS 17+, no-op elsewhere) exempts us, like any media app.
-  // Pre-17 fallback: an actively playing media element promotes the whole page's
-  // session to playback, so loop a tiny silent <audio> (unmute-ios-audio trick).
-  // Must run inside a user gesture — init() is only ever called from one.
-  claimPlaybackSession() {
-    try { if ('audioSession' in navigator) { navigator.audioSession.type = 'playback'; return; } } catch (e) {}
-    if (this.silentEl) return;
-    const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
-                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (!iOS) return;
-    // 0.2s of 16-bit mono silence in a WAV container, built in place
-    const frames = 1600, bytes = 44 + frames * 2;
-    const b = new DataView(new ArrayBuffer(bytes));
-    const tag = (off, s) => { for (let i = 0; i < s.length; i++) b.setUint8(off + i, s.charCodeAt(i)); };
-    tag(0, 'RIFF'); b.setUint32(4, bytes - 8, true); tag(8, 'WAVEfmt ');
-    b.setUint32(16, 16, true); b.setUint16(20, 1, true); b.setUint16(22, 1, true);
-    b.setUint32(24, 8000, true); b.setUint32(28, 16000, true);
-    b.setUint16(32, 2, true); b.setUint16(34, 16, true);
-    tag(36, 'data'); b.setUint32(40, frames * 2, true);
-    const el = document.createElement('audio');
-    el.src = URL.createObjectURL(new Blob([b.buffer], { type: 'audio/wav' }));
-    el.loop = true;
-    el.setAttribute('playsinline', '');
-    el.play().catch(() => {});
-    this.silentEl = el;
-  },
-
   async init() {
     if (this.actx) { this.nudgeResume(); return; }
     if (this.failed) return;
-    this.claimPlaybackSession();
     try {
       this.actx = new AudioContext({ sampleRate: 48000 });
       const gain = this.actx.createGain();
-      // Headroom trim. The merged kick (body owns the pitch drop, click sits above
-      // it) no longer cancels against itself at the onset, so the same patch peaks
-      // ~2 dB hotter than the old two-oscillator voice — measured 1.028 → 1.283 on
-      // a 4 s render of the default pattern. 0.8 puts the peak back where it was,
-      // just short of clipping the destination.
-      gain.gain.value = 0.8;
+      gain.gain.value = 1;
       gain.connect(this.actx.destination);
-      this.gainNode = gain;
-      // Analyser tap: lets the sound pill show a real level meter, proving the
-      // engine is producing signal (the device's own volume is unobservable;
-      // the iOS silent switch is handled by claimPlaybackSession above)
-      this.analyser = this.actx.createAnalyser();
-      this.analyser.fftSize = 512;
-      gain.connect(this.analyser);
-      this.actx.onstatechange = () => sound.update();
       this.nudgeResume();
       await this.actx.audioWorklet.addModule('kick-worklet-bundle.js');
       const wasmBuf = await fetch('kick_engine.wasm').then(r => {
@@ -891,7 +665,7 @@ const audio = {
       this.send({ type: 'set_swing', amount: SWING });
       this.send({ type: 'set_reverb', decay: 0.994, lowPass: 20 * Math.pow(1200, 0.7) / 48000, preDelay: 0.5, ret: 1.0 });
       for (let v = 0; v < 3; v++)
-        for (let p = 0; p < NUM_PARAMS; p++)
+        for (let p = 0; p < 11; p++)
           this.send({ type: 'set_base', v, param: p, value: DEF_BASE[v][p] });
       this.pushDialParams();
       const swarmDefs = { SPREAD:0.35, DRIFT:0.25, DECAY:0.3, CUTOFF:0.6, REVERB:0.4, GAIN:0.8, DELAY:0.0, ENV_AMT:0.0 };
@@ -904,7 +678,6 @@ const audio = {
       this.actx = null;
       this.wNode = null;
     }
-    sound.update();
   },
 
   send(msg) { if (this.wNode) this.wNode.port.postMessage(msg); },
@@ -914,26 +687,18 @@ const audio = {
     this.send({ type: 'set_base', v: 0, param: P.OverdriveAmt, value: inst0.harmonics * 0.5 });
     this.send({ type: 'set_base', v: 2, param: P.NoiseDecay, value: 0.08 + inst2.morph * 0.3 });
   },
-  // A hat duration (0-1, what the dial reads) as the lane byte that produces it.
-  // The engine's hat decay is noiseDecayMs = (base × 798 + 2) × lane × 2, so with
-  // `base` pinned to HAT_REF_DECAY the lane alone carries the duration.
-  hatLaneByte(duration) {
-    const d = Math.max(0, Math.min(1, duration));
-    const ms    = (0.02 + d * 0.3) * 798 + 2;
-    const refMs = HAT_REF_DECAY * 798 + 2;
-    return Math.max(0, Math.min(255, Math.round(ms / (2 * refMs) * 255)));
+  pushHatDecayFrom(v) {
+    this.send({ type: 'set_base', v: 1, param: P.NoiseDecay, value: 0.02 + v * 0.3 });
   },
 
   sendHatLane() {
-    // Screen 7's mapping, exactly as the dial draws it: the orange ring is
-    // anchored at the duration and sweeps by the mod amount, so what the engine
-    // plays per step is duration + laneValue × amount, clamped to the dial's range.
+    // Pattern lane scaled by the laneOne mod amount (screen 7's dial)
     const amt = inst3.laneOne;
-    const laneActive = this.current && this.current.laneOn;
     const buf = new Uint8Array(128);
+    const laneActive = this.current && this.current.laneOn;
     for (let i = 0; i < 128; i++) {
-      const lane01 = laneActive ? patterns[5].lane[i] / 255 : 0;
-      buf[i] = this.hatLaneByte(hatDuration + lane01 * amt);
+      const v = laneActive ? 128 + (patterns[5].lane[i] - 128) * amt : 128;
+      buf[i] = Math.max(0, Math.min(255, Math.round(v)));
     }
     this.send({ type: 'set_lane', v: 1, buf: buf.buffer });
   },
@@ -1128,44 +893,13 @@ function tbtn(label, opts = {}) {
   return b;
 }
 
-/* ── Guide panel — kicker + title + lead + icon-led action hints ─────────── */
-
-const HINT_ICONS = {
-  tap:    '<circle cx="9" cy="9" r="2.4" fill="currentColor"/><circle cx="9" cy="9" r="6.4" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.55"/>',
-  hold:   '<circle cx="9" cy="9" r="2.4" fill="currentColor"/><circle cx="9" cy="9" r="6.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.6 2.4" opacity="0.7"/>',
-  dragv:  '<circle cx="9" cy="9" r="2" fill="currentColor"/><path d="M9 5.2V1.8M9 12.8v3.4M6.8 3.6L9 1.4l2.2 2.2M6.8 14.4L9 16.6l2.2-2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  drag:   '<circle cx="9" cy="9" r="2" fill="currentColor"/><path d="M5.2 9H1.8M12.8 9h3.4M3.6 6.8L1.4 9l2.2 2.2M14.4 6.8L16.6 9l-2.2 2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  swipe:  '<path d="M2 9h14M5.2 5.8L2 9l3.2 3.2M12.8 5.8L16 9l-3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  dial:   '<path d="M4.05 13.95a7 7 0 1 1 9.9 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 9L5.8 5.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
-  draw:   '<path d="M2 12.5c2.4 0 2.4-7 4.8-7s2.4 7 4.8 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12.4 12.9l1.8-4.6 1.7 1.7-4.5 1.9 1-1z" fill="currentColor"/>',
-  menu:   '<rect x="2.2" y="4.6" width="13.6" height="8.8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.6 8l2.4 2.4L11.4 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  shape:  '<path d="M2.5 15.5L15.5 2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="2.5" cy="15.5" r="1.8" fill="currentColor"/><circle cx="15.5" cy="2.5" r="1.8" fill="currentColor"/>',
-  apply:  '<path d="M3 9.5l4 4L15 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-  play:   '<path d="M5.5 3.5l9 5.5-9 5.5z" fill="currentColor"/>',
-  download: '<path d="M9 2v9M5.6 7.8L9 11.2l3.4-3.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 12.5v3h13v-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
-  mail:   '<rect x="2" y="4" width="14" height="10" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 4.8L9 10l6.5-5.2" fill="none" stroke="currentColor" stroke-width="1.5"/>',
-  replay: '<path d="M14.5 9A5.5 5.5 0 1 1 9 3.5h2.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9.8 1l2.4 2.5L9.8 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
-};
-
-function guidePanel(kicker, title, opts = {}) {
-  const p = h('div', { class: 'gpanel' + (opts.center ? ' gp-center' : '') });
-  p.append(h('div', { class: 'gp-kicker' },
-    h('span', {}, kicker),
-    h('span', { class: 'gp-step' }, `${String(nav.current + 1).padStart(2, '0')} / ${SCREENS.length}`)));
-  p.append(h('h1', {}, title));
-  if (opts.lead) p.append(h('p', { class: 'gp-lead' }, opts.lead));
-  if (opts.extra) p.append(opts.extra);
-  if (opts.hints && opts.hints.length) {
-    const rows = h('div', { class: 'gp-hints' });
-    opts.hints.forEach(([icon, text, href], i) => {
-      const ic = h('span', { class: 'gp-ic' });
-      ic.innerHTML = `<svg width="17" height="17" viewBox="0 0 18 18">${HINT_ICONS[icon] || ''}</svg>`;
-      const row = h(href ? 'a' : 'div',
-        { class: 'gp-hint' + (i === 0 ? ' primary' : ''), ...(href ? { href } : {}) },
-        ic, h('span', {}, text));
-      rows.append(row);
-    });
-    p.append(rows);
+function textPanel(title, lines = []) {
+  const p = h('div', { class: 'tpanel' }, h('h1', {}, title));
+  for (const line of lines) {
+    const el = h('p');
+    if (line === '') el.innerHTML = '&nbsp;';
+    else el.textContent = line;
+    p.append(el);
   }
   return p;
 }
@@ -1193,14 +927,12 @@ function seqRowWidget(pid, offset, steps = 8) {
     const w = canvas.offsetWidth || wrap.offsetWidth;
     if (!w) { setTimeout(layout, 60); return; }
     const totalSep = steps > 8 ? SEP * 3 : SEP;
-    // Compact only: cap the cell size so tall stacked screens don't overflow
-    const cap = isRegular() ? 9999 : 44;
-    const stepSize = Math.floor(Math.min((w - totalSep) / steps, cap));
+    const stepSize = Math.floor(Math.min((w - totalSep) / steps, 9999));
     const hgt = stepSize;
     canvas.style.height = hgt + 'px';
     canvas.width = Math.round(w * DPR());
     canvas.height = Math.round(hgt * DPR());
-    geom = { w, h: hgt, stepSize, xOff: Math.max(0, (w - (stepSize * steps + totalSep)) / 2) };
+    geom = { w, h: hgt, stepSize };
     draw();
   }
 
@@ -1220,7 +952,7 @@ function seqRowWidget(pid, offset, steps = 8) {
     const playingPage = audio.current ? audio.current.patternPages[pid] : undefined;
     const showPlay = playingPage === 0 && audio.step >= offset && audio.step < offset + steps && audio.playing;
 
-    let x = geom.xOff || 0;
+    let x = 0;
     for (let i = 0; i < steps; i++) {
       const sIdx = offset + i;
       if (i > 0 && i % 4 === 0) x += SEP;
@@ -1246,7 +978,7 @@ function seqRowWidget(pid, offset, steps = 8) {
     const r = canvas.getBoundingClientRect();
     const cx = e.clientX - r.left, cy = e.clientY - r.top;
     if (cy < 0 || cy > geom.stepSize) return -1;
-    let x = geom.xOff || 0;
+    let x = 0;
     for (let i = 0; i < steps; i++) {
       if (i > 0 && i % 4 === 0) x += SEP;
       if (cx >= x && cx < x + geom.stepSize) return offset + i;
@@ -1420,8 +1152,7 @@ function autoEditorWidget(pid, opts = {}) {
   const laneCanvas = h('canvas');
   const stepCanvas = h('canvas');
   wrap.append(laneCanvas, stepCanvas);
-  // Shorter lane on phones so the guide + lane + preset panel fit the viewport
-  const laneHeight = () => isRegular() ? 160 : 108;
+  const LANE_H = 160;
   let geom = null;
 
   function layout() {
@@ -1429,14 +1160,13 @@ function autoEditorWidget(pid, opts = {}) {
     if (!w) { setTimeout(layout, 60); return; }
     const cellW = Math.floor(w / 16);
     const stepH = Math.min(cellW, 40);
-    const laneH = laneHeight();
-    laneCanvas.style.height = laneH + 'px';
+    laneCanvas.style.height = LANE_H + 'px';
     laneCanvas.width = Math.round(w * DPR());
-    laneCanvas.height = Math.round(laneH * DPR());
+    laneCanvas.height = Math.round(LANE_H * DPR());
     stepCanvas.style.height = stepH + 'px';
     stepCanvas.width = Math.round(w * DPR());
     stepCanvas.height = Math.round(stepH * DPR());
-    geom = { w, cellW, stepH, laneH };
+    geom = { w, cellW, stepH };
     draw();
   }
 
@@ -1444,7 +1174,7 @@ function autoEditorWidget(pid, opts = {}) {
     const ctx = laneCanvas.getContext('2d');
     ctx.setTransform(DPR(), 0, 0, DPR(), 0, 0);
     const { w, cellW } = geom;
-    const H = geom.laneH;
+    const H = LANE_H;
     ctx.clearRect(0, 0, w, H);
 
     // playhead column (accent 20%)
@@ -1534,7 +1264,7 @@ function autoEditorWidget(pid, opts = {}) {
     let drag = null;
     const setAt = (x, y) => {
       const sub = Math.max(0, Math.min(127, Math.floor(x / (geom.cellW * 16) * 128)));
-      const v = Math.max(0, Math.min(1, (geom.laneH - y) / geom.laneH));
+      const v = Math.max(0, Math.min(1, (LANE_H - y) / LANE_H));
       patterns[pid].lane[sub] = Math.round(v * 255);
       return sub;
     };
@@ -1547,7 +1277,7 @@ function autoEditorWidget(pid, opts = {}) {
       for (let i = a; i <= b; i++) {
         const t = (i - a) / n;
         const y = ya + (yb - ya) * t;
-        patterns[pid].lane[i] = Math.round(Math.max(0, Math.min(1, (geom.laneH - y) / geom.laneH)) * 255);
+        patterns[pid].lane[i] = Math.round(Math.max(0, Math.min(1, (LANE_H - y) / LANE_H)) * 255);
       }
     };
     laneCanvas.addEventListener('pointerdown', e => {
@@ -1561,7 +1291,7 @@ function autoEditorWidget(pid, opts = {}) {
       } else {
         // single-bar mode: lock to the starting step, drag sets its 8 sub-values
         const step = Math.max(0, Math.min(15, Math.floor(x / geom.cellW)));
-        const v = Math.max(0, Math.min(1, (geom.laneH - y) / geom.laneH));
+        const v = Math.max(0, Math.min(1, (LANE_H - y) / LANE_H));
         for (let k = 0; k < 8; k++) patterns[pid].lane[step * 8 + k] = Math.round(v * 255);
         drag = { mode: 'bar', step };
       }
@@ -1578,7 +1308,7 @@ function autoEditorWidget(pid, opts = {}) {
         setRange(drag.last.x, drag.last.y, x, y);
         drag.last = { x, y };
       } else {
-        const v = Math.max(0, Math.min(1, (geom.laneH - y) / geom.laneH));
+        const v = Math.max(0, Math.min(1, (LANE_H - y) / LANE_H));
         for (let k = 0; k < 8; k++) patterns[pid].lane[drag.step * 8 + k] = Math.round(v * 255);
       }
       audio.sendHatLane();
@@ -1610,7 +1340,7 @@ function autoEditorWidget(pid, opts = {}) {
 }
 
 /* ── Preset panel (NoteEntryPresetPanel) ─────────────────────────────────── */
-function presetPanelWidget(onApply) {
+function presetPanelWidget(onApply, onCancel) {
   const panel = h('div', { class: 'preset-panel' });
   const chart = h('div', { class: 'pp-chart' });
   const chartCanvas = h('canvas');
@@ -1641,8 +1371,7 @@ function presetPanelWidget(onApply) {
     h('div', { class: 'pp-top' }, left, chart, right),
     h('div', { class: 'pp-div' }),
     h('div', { class: 'pp-bottom' },
-      // Cancel is kept for parity with the app but inert in the tour
-      (() => { const b = tbtn('Cancel', { small: true }); b.classList.add('disabled'); return b; })(),
+      tbtn('Cancel', { small: true, onclick: onCancel }),
       tbtn('Apply', { small: true, onclick: onApply })),
   );
 
@@ -2096,14 +1825,6 @@ function modSelectorWidget(dial) {
   btn.addEventListener('click', () => menu.classList.toggle('open'));
   optNone.addEventListener('click', () => setMod(null));
   optLane.addEventListener('click', () => setMod('laneOne'));
-  // Tapping away dismisses, like the app's pop-up button — otherwise the open
-  // menu sits on top of the dial the next hint asks you to drag. The listener
-  // retires itself once the screen has been replaced.
-  const dismiss = e => {
-    if (!document.body.contains(wrapper)) { document.removeEventListener('pointerdown', dismiss); return; }
-    if (!wrapper.contains(e.target)) menu.classList.remove('open');
-  };
-  document.addEventListener('pointerdown', dismiss);
   return { el: wrapper, layout() { dial.layout(); }, draw() { dial.draw(); } };
 }
 
@@ -3030,14 +2751,13 @@ const SCREENS = [
     audio: { type: 'none' },
     build() {
       return h('div', { class: 'fullpage' },
-        guidePanel('Web demo', 'Welcome to JOLT', {
-          center: true,
-          lead: 'This is a short, hands-on web demo of the Jolt groovebox — a small taste of how the real app plays.',
-          extra: soundCheck.build(),
-          hints: [
-            ['download', 'Like what you hear? Get the full app', '/'],
-          ],
-        }));
+        textPanel('Welcome to JOLT', [
+          'Thank you for testing this early beta',
+          "We're missing a few features, but we hope you enjoy what's already in place",
+          '',
+          'Feedback is extremely welcome',
+          'Please send feedback to hi@joltgroovebox.com',
+        ]));
     },
   },
   { // 1 — intro
@@ -3045,39 +2765,25 @@ const SCREENS = [
     onEnter() { sel.inst = 0; },
     build() {
       return olayout(
-        guidePanel('Patterns', 'This is a pattern', {
-          hints: [
-            ['tap', 'Tap the steps to toggle beats'],
-          ],
-        }),
+        textPanel('This is a pattern', ['Tap the steps to toggle beats']),
         [seqRowWidget(1, 0).el, seqRowWidget(1, 8).el]);
     },
   },
   { // 2 — patternsAreMixed
     audio: { type: 'pattern', pid: 2 },
-    onEnter() { sel.inst = 1; },   // start on the hi-hat so taps mix instruments
     build() {
       return olayout(
-        guidePanel('Patterns', 'Mix instruments in one pattern', {
-          lead: 'A pattern plays one instrument at a time per step.',
-          hints: [
-            ['tap', 'Pick an instrument below, then tap the steps'],
-          ],
-        }),
+        textPanel('Patterns can contain a mix of instruments',
+          ['Only one instrument can play at once in a single pattern']),
         [seqRowWidget(2, 0).el, seqRowWidget(2, 8).el, instrumentChips([0, 1])]);
     },
   },
   { // 3 — multipleVoices
     audio: { type: 'group', idx: 0 },
-    onEnter() { sel.inst = 2; },   // start on the snare for the second voice
     build() {
       return olayout(
-        guidePanel('Voices', 'Jolt has many voices', {
-          lead: 'Two voices are playing here, each with its own pattern — that’s how songs get complex.',
-          hints: [
-            ['tap', 'Edit either pattern while it plays'],
-          ],
-        }),
+        textPanel('Jolt has many voices',
+          ['Voices can play many instruments', 'So complex songs are possible']),
         [
           seqRowWidget(3, 0).el, seqRowWidget(3, 8).el,
           h('div', { class: 'vdivider' }),
@@ -3088,7 +2794,6 @@ const SCREENS = [
   },
   { // 4 — multipleVoicesEditable
     audio: { type: 'group', idx: 0 },
-    onEnter() { hatDuration = inst1.morph; audio.sendHatLane(); },
     build() {
       const mkSwatch = i => {
         const sw = h('div', { class: 'iswatch', style: `background:${instColor(i)}` });
@@ -3103,7 +2808,7 @@ const SCREENS = [
       const dial1 = dialWidget({
         caption: 'Decay', defaultValue: 0.3,
         get: () => inst1.morph,
-        set: v => { inst1.morph = v; hatDuration = v; audio.sendHatLane(); },
+        set: v => { inst1.morph = v; audio.pushHatDecayFrom(v); },
       });
       const dial2 = dialWidget({
         caption: 'Decay', defaultValue: 0.4,
@@ -3111,12 +2816,8 @@ const SCREENS = [
         set: v => { inst2.morph = v; audio.pushDialParams(); },
       });
       return olayout(
-        guidePanel('Voices', 'Tweak sounds in real time', {
-          hints: [
-            ['dragv', 'Hold a dial, then drag up + down'],
-            ['dial', 'Every instrument parameter has a dial like these'],
-          ],
-        }),
+        textPanel('Each instrument is tweakable in real-time',
+          ['Dials let you change the sound', 'Hold and drag up + down to adjust']),
         [
           seqRowWidget(3, 0).el, seqRowWidget(3, 8).el,
           h('div', { class: 'vdivider' }),
@@ -3132,44 +2833,53 @@ const SCREENS = [
   },
   { // 5 — automationPresets
     audio: { type: 'group', idx: 1 },
-    onEnter() { sel.inst = 3; showPresetPanel = true; hatDuration = inst3.morph; audio.sendHatLane(); },
+    onEnter() { sel.inst = 3; showPresetPanel = true; },
     build() {
       const container = h('div', { style: 'width:100%;display:flex;flex-direction:column;gap:8px;align-items:center' });
-      // The panel toggle stays visible but locked on — the tour always shows presets
       const wfIcon = h('span'); wfIcon.innerHTML = SVG_WAVEFORM;
-      const toggle = tbtn(wfIcon, { small: true, selected: true });
-      toggle.classList.add('disabled');
+      const toggle = tbtn(wfIcon, {
+        small: true, selected: showPresetPanel,
+        onclick: () => {
+          showPresetPanel = !showPresetPanel;
+          toggle.classList.toggle('selected', showPresetPanel);
+          pp.el.style.display = showPresetPanel ? '' : 'none';
+          if (showPresetPanel) pp.layout();
+        },
+      });
       const ed = autoEditorWidget(5, { drawing: () => false });
-      const pp = presetPanelWidget(() => { applyPresetToLane(); ed.draw(); });
+      const pp = presetPanelWidget(
+        () => { applyPresetToLane(); ed.draw(); },      // stays open (onboarding tweak)
+        () => { showPresetPanel = false; toggle.classList.remove('selected'); pp.el.style.display = 'none'; });
+      pp.el.style.display = showPresetPanel ? '' : 'none';
       container.append(
         h('div', { class: 'toolrow' }, toggle, h('span', { class: 'sp' })),
         ed.el, pp.el);
       return olayout(
-        guidePanel('Automation', 'Changes can be automated', {
-          lead: 'This is the pattern’s automation lane, pre-filled with a ramp.',
-          hints: [
-            ['shape', 'Adjust the preset shape below'],
-            ['apply', 'Tap Apply to fill the lane'],
-          ],
-        }),
+        textPanel('Changes can be automated', [
+          "This is a pattern's automation lane — we've pre-filled a ramp",
+          'Presets fill the lane with a shape',
+          'Adjust the shape, then tap Apply',
+        ]),
         [container]);
     },
   },
   { // 6 — automationDraw
     audio: { type: 'group', idx: 1 },
-    onEnter() { sel.inst = 3; isDrawingAutomation = true; hatDuration = inst3.morph; audio.sendHatLane(); },
+    onEnter() { sel.inst = 3; isDrawingAutomation = true; },
     build() {
-      // Draw stays visible but locked on — the tour always draws freehand
-      const drawBtn = tbtn('Draw', { small: true, caption: true, color: C.orange, selected: true });
-      drawBtn.classList.add('disabled');
-      const ed = autoEditorWidget(5, { drawing: () => true });
+      const drawBtn = tbtn('Draw', {
+        small: true, caption: true, color: C.orange, selected: isDrawingAutomation,
+        onclick: () => {
+          isDrawingAutomation = !isDrawingAutomation;
+          drawBtn.classList.toggle('selected', isDrawingAutomation);
+        },
+      });
+      const ed = autoEditorWidget(5, { drawing: () => isDrawingAutomation });
       return olayout(
-        guidePanel('Automation', 'Draw automation by hand', {
-          hints: [
-            ['draw', 'Drawing is on — drag across the lane'],
-            ['dragv', 'In the full app, Draw off drags single bars instead'],
-          ],
-        }),
+        textPanel('Automations can also be drawn in', [
+          'Drawing mode is on — drag across the lane to shape the automation',
+          'Toggle "Draw" off to drag single bars instead',
+        ]),
         [
           h('div', { class: 'toolrow' }, h('span', { class: 'sp' }), drawBtn),
           ed.el,
@@ -3178,26 +2888,23 @@ const SCREENS = [
   },
   { // 7 — automationBinding
     audio: { type: 'group', idx: 1 },
-    onEnter() { selectedMod = null; hatDuration = inst3.morph; audio.sendHatLane(); },
+    onEnter() { selectedMod = null; },
     build() {
       const ed = autoEditorWidget(5, { interactive: false });
       const dial = dialWidget({
         caption: 'Hi hat duration', defaultValue: 0.5,
         get: () => inst3.morph,
-        set: v => { inst3.morph = v; hatDuration = v; audio.sendHatLane(); },
+        set: v => { inst3.morph = v; },
         modGet: () => inst3.laneOne,
         modSet: v => { inst3.laneOne = v; audio.sendHatLane(); },
         selectedMod: () => selectedMod === 'laneOne',
       });
       const selWrap = modSelectorWidget(dial);
       return olayout(
-        guidePanel('Automation', 'Map automation to a dial', {
-          lead: 'Dials wear a color for each modulation source.',
-          hints: [
-            ['menu', 'Choose “Pattern Lane” from the dropdown'],
-            ['dragv', 'Then drag the dial to set the amount'],
-          ],
-        }),
+        textPanel("Automations are mapped using dials' color modes", [
+          'Try selecting "Pattern Lane" from the dropdown',
+          'Then hold and drag to change the amount of automation applied',
+        ]),
         [ed.el, selWrap.el]);
     },
   },
@@ -3209,14 +2916,11 @@ const SCREENS = [
       const ng = noteGridWidget(8, () => pageSel && pageSel.draw());
       pageSel = pageSelectorWidget(8, page => ng.scrollToPage(page));
       return olayout(
-        guidePanel('Notes', 'Instruments can play notes', {
-          lead: 'This melody came from the Euclidean arp — you’ll find it under “GEN”.',
-          hints: [
-            ['tap', 'Tap the grid to add or remove notes'],
-            ['drag', 'Drag a note to move it'],
-            ['swipe', 'Two pages — swipe across or tap the page buttons'],
-          ],
-        }),
+        textPanel('Instruments can also play notes', [
+          'This synth melody was generated with the Euclidean arp — you\'ll find it under "GEN"',
+          'Tap the grid to add or remove notes, and drag notes to move them',
+          'The pattern is two pages long — tap the page buttons or scroll across to see the second half',
+        ]),
         [pageSel.el, ng.el]);
     },
   },
@@ -3224,13 +2928,11 @@ const SCREENS = [
     audio: { type: 'group', idx: 2 },
     build() {
       return olayout(
-        guidePanel('Pattern grid', 'Patterns live in the grid', {
-          lead: 'Every pattern gets an icon and a color.',
-          hints: [
-            ['tap', 'Tap a pattern to select it'],
-            ['hold', 'Hold, then drag to rearrange'],
-          ],
-        }),
+        textPanel('Patterns live in the pattern grid', [
+          'Each pattern is assigned an icon and a color',
+          'Tap a pattern to select it',
+          'Hold one, then drag, to rearrange the grid',
+        ]),
         [patternGridWidget().el]);
     },
   },
@@ -3245,13 +2947,11 @@ const SCREENS = [
       });
       externalDropTarget = carousel;
       return olayout(
-        guidePanel('Loop groups', 'Build with Loop Groups', {
-          lead: 'Each row is a voice; its columns play in order.',
-          hints: [
-            ['hold', 'Hold a pattern in the grid, drag it onto the group'],
-            ['drag', 'Drag a placed pattern out to remove it'],
-          ],
-        }),
+        textPanel('Patterns combine into "Loop Groups" to build the song', [
+          'Each row of the loop group is a voice — its columns play in order',
+          'Hold a pattern in the grid, then drag it up onto the loop group',
+          'Hold a placed pattern and drag it out again to remove it',
+        ]),
         [carousel.el, patternGridWidget().el]);
     },
   },
@@ -3268,12 +2968,11 @@ const SCREENS = [
         },
       });
       return olayout(
-        guidePanel('Song', 'Groups chain into the song', {
-          lead: 'Each group plays in order — the time underneath shows where it starts. Yours plays last.',
-          hints: [
-            ['swipe', 'Swipe across — the focused group loops'],
-          ],
-        }),
+        textPanel('Loop Groups chain together to form the song', [
+          'In the song, each group plays in order — the time underneath shows where it starts',
+          'Swipe across to see every group — the one you just built plays last',
+          'The selected group loops, so you can hear each part on its own',
+        ]),
         [carousel.el]);
     },
   },
@@ -3326,13 +3025,11 @@ const SCREENS = [
       mountOverview();
 
       return olayout(
-        guidePanel('Song', 'The song view', {
-          hints: [
-            ['tap', 'Tap the focused group to open it — tap outside to come back'],
-            ['hold', 'Hold to duplicate or delete; hold + drag to reorder'],
-            ['play', 'Play starts the song from the focused group'],
-          ],
-        }),
+        textPanel('Loop Groups live in the song view', [
+          'Tap the highlighted group to open it — tap outside the cells to come back',
+          'Hold a group to duplicate or delete it, hold and drag to reorder the song',
+          'The play button starts the song from the highlighted group',
+        ]),
         [holder]);
     },
   },
@@ -3340,14 +3037,12 @@ const SCREENS = [
     audio: { type: 'none' },
     build() {
       return h('div', { class: 'fullpage' },
-        guidePanel('All set', 'That’s the demo', {
-          center: true,
-          lead: 'You’ve seen the basics — the full app goes much deeper, with more voices, effects, automation and song tools.',
-          hints: [
-            ['download', 'Download Jolt and keep these beats going', '/'],
-            ['mail', 'Questions or feedback — hi@joltgroovebox.com', 'mailto:hi@joltgroovebox.com'],
-          ],
-        }));
+        textPanel('Hope you enjoyed the onboarding!', [
+          "There's plenty of other features available",
+          '',
+          'Please experiment, and make some great beats',
+          'You can take this tutorial again from the home screen',
+        ]));
     },
   },
 ];
@@ -3355,156 +3050,6 @@ const SCREENS = [
 /* ═══════════════════════════════════════════════════════════════════════════
    Navigation — bar-quantised transitions (Onboarding.transition(to:))
    ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Sound indicator — reports what the browser lets us know ──────────────────
-   States: off (audio blocked / not started, tap to enable), on (context running,
-   meter shows live engine output), muted (tapped off), fail (engine unavailable).
-   A dancing meter with no audible sound ⇒ the device itself is silenced, which
-   the web cannot detect. */
-
-const SND_SVG = {
-  on:  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/></svg>',
-  off: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>',
-};
-
-const sound = {
-  state: null,
-  muted: false,
-  raf: null,
-
-  setState(s, title) {
-    if (this.state === s) return;
-    this.state = s;
-    const pill = document.getElementById('sound-pill');
-    pill.classList.remove('snd-on', 'snd-off', 'snd-fail');
-    pill.classList.add(s === 'on' ? 'snd-on' : s === 'fail' ? 'snd-fail' : 'snd-off');
-    pill.title = title;
-    document.getElementById('snd-ic').innerHTML = s === 'on' ? SND_SVG.on : SND_SVG.off;
-    if (s === 'on') this.startMeter();
-  },
-
-  update() {
-    if (audio.failed) {
-      this.setState('fail', 'Audio is unavailable in this browser');
-    } else if (!audio.actx || audio.actx.state !== 'running') {
-      this.setState('off', 'Sound is off — tap to enable');
-    } else if (this.muted) {
-      this.setState('muted', 'Muted — tap to unmute');
-    } else {
-      this.setState('on', "Sound is on — if you can't hear it, check your device volume");
-    }
-    soundCheck.refresh();
-  },
-
-  startMeter() {
-    if (this.raf || !audio.analyser) return;
-    const data = new Uint8Array(audio.analyser.fftSize);
-    const SPAN = [8, 12, 6];
-    const tick = () => {
-      if (this.state !== 'on' || !audio.analyser) { this.raf = null; return; }
-      audio.analyser.getByteTimeDomainData(data);
-      let peak = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        const d = Math.abs(data[i] - 128);
-        if (d > peak) peak = d;
-      }
-      const p = Math.min(1, peak / 80);
-      // Re-queried each frame: the welcome screen's sound-check meter comes and
-      // goes with navigation while the nav pill's is permanent
-      document.querySelectorAll('#sound-pill .meter i, #sound-check .meter i')
-        .forEach((bar, i) => { bar.style.height = (3 + p * SPAN[i % 3]) + 'px'; });
-      this.raf = requestAnimationFrame(tick);
-    };
-    this.raf = requestAnimationFrame(tick);
-  },
-};
-
-document.getElementById('sound-pill').addEventListener('click', async () => {
-  if (audio.failed) return;
-  if (!audio.actx || audio.actx.state !== 'running') {
-    // A tap is a user gesture: init and/or resume, then start this screen's audio
-    await audio.init();
-    audio.nudgeResume();
-    const scr = SCREENS[nav.current];
-    if (!audio.playing && scr.audio && scr.audio.type !== 'none') {
-      audio.applyScreenAudio(scr, false);
-    }
-    sound.update();
-    return;
-  }
-  sound.muted = !sound.muted;
-  // Engine-side mute: DecayEnv-shaped fade in the worklet, so no click
-  audio.send({ type: 'set_mute', on: sound.muted });
-  sound.state = null;   // force class refresh
-  sound.update();
-});
-
-/* ── Sound check (welcome screen) — up-front "this demo plays audio" trigger.
-   Tapping it is the user gesture that unlocks audio and previews screen 1's
-   groove, so the visitor can confirm they actually hear something before
-   starting. States: idle (tap to hear), on (beat playing, live meter), fail. */
-const soundCheck = {
-  busy: false,
-
-  stateOf() {
-    if (audio.failed) return 'fail';
-    if (audio.actx && audio.actx.state === 'running' && audio.playing && !sound.muted) return 'on';
-    return 'idle';
-  },
-
-  build() {
-    const btn = h('button', { id: 'sound-check', type: 'button' });
-    btn.addEventListener('click', () => this.tap());
-    this.render(btn);
-    return btn;
-  },
-
-  render(btn) {
-    const s = this.stateOf();
-    if (btn.dataset.sc === s) return;
-    btn.dataset.sc = s;
-    btn.className = 'sc-' + s;
-    const [t, sub] = {
-      idle: ['Sound check — tap to hear the beat', 'This demo plays audio. Make sure your sound is on.'],
-      on:   ['Sound is on', 'Hear the beat? If not, turn up your volume. Tap to pause.'],
-      fail: ['Audio unavailable', 'This browser can’t run the audio engine — the demo will be visual-only.'],
-    }[s];
-    btn.innerHTML =
-      `<span class="sc-in"><span class="sc-ic">${s === 'fail' ? SND_SVG.off : SND_SVG.on}` +
-      `<span class="meter"><i></i><i></i><i></i></span></span>` +
-      `<span class="sc-tx"><span class="sc-t">${t}</span><span class="sc-s">${sub}</span></span></span>`;
-  },
-
-  refresh() {
-    const btn = document.getElementById('sound-check');
-    if (btn) this.render(btn);
-  },
-
-  async tap() {
-    if (audio.failed || this.busy) return;
-    if (this.stateOf() === 'on') {
-      audio.setMode({ type: 'none' });   // pause the preview
-      sound.update();
-      return;
-    }
-    this.busy = true;
-    try {
-      await audio.init();
-    } finally {
-      this.busy = false;
-    }
-    audio.nudgeResume();
-    if (sound.muted) {
-      sound.muted = false;
-      audio.send({ type: 'set_mute', on: false });
-      sound.state = null;
-    }
-    // Preview screen 1's pattern so there is something to hear right away;
-    // navigating on keeps it rolling seamlessly (same pattern, bar-quantised)
-    if (!audio.playing && audio.wNode) audio.applyScreenAudio(SCREENS[1], false);
-    sound.update();
-  },
-};
 
 const nav = {
   current: 0,
@@ -3566,20 +3111,6 @@ const nav = {
     const busy = this.changingTo !== null;
     back.classList.toggle('disabled', busy);
     next.classList.toggle('disabled', busy);
-    next.querySelector('.ti').textContent =
-      this.current === 0 ? 'Start' :
-      this.current === SCREENS.length - 1 ? 'Finish' : 'Next';
-    // progress segments
-    const prog = document.getElementById('progress');
-    if (prog.children.length !== SCREENS.length) {
-      prog.innerHTML = '';
-      for (let i = 0; i < SCREENS.length; i++) prog.append(h('span', { class: 'pseg' }));
-    }
-    [...prog.children].forEach((seg, i) => {
-      seg.classList.toggle('on', i === this.current);
-      seg.classList.toggle('past', i < this.current);
-    });
-    sound.update();
   },
 };
 
